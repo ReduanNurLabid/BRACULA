@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Share - BRACULA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="rideshare-container">
+        <!-- Sidebar Filters -->
+        <div class="sidebar">
+            <h3>Filters</h3>
+            <div class="filter-section">
+                <label>Transport Type</label>
+                <div class="vehicle-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="car">
+                        <i class="fas fa-car"></i> Car
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="bike">
+                        <i class="fas fa-motorcycle"></i> Bike
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="cng">
+                        <i class="fas fa-taxi"></i> CNG
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="rickshaw">
+                        <i class="fas fa-bicycle"></i> Rickshaw
+                    </label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <label for="seats">Minimum Seats</label>
+                <input type="number" id="seats" min="1" max="4" value="1">
+            </div>
+            <div class="filter-section">
+                <label for="max-fare">Maximum Fare (BDT)</label>
+                <input type="number" id="max-fare" min="0" step="10">
+            </div>
+            <button class="apply-filters">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="offer-ride-section">
+                <button class="offer-ride-btn">
+                    <i class="fas fa-plus"></i> Offer a Ride
+                </button>
+            </div>
+
+            <div class="ride-listings">
+                <h2>Available Rides</h2>
+                <div class="rides-grid" id="ridesContainer">
+                    <!-- Rides will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer Ride Modal -->
+    <div id="offerRideModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Offer a Ride</h2>
+            <form id="offerRideForm">
+                <div class="form-group">
+                    <label for="vehicleType">Transport Type</label>
+                    <select id="vehicleType" name="vehicle" required>
+                        <option value="">Select Type</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="cng">CNG</option>
+                        <option value="rickshaw">Rickshaw</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="seats">Available Seats</label>
+                    <input type="number" id="seats" name="seats" min="1" max="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="fare">Fare (BDT)</label>
+                    <input type="number" id="fare" name="fare" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="pickup">Pickup Location</label>
+                    <input type="text" id="pickup" name="pickup" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" name="destination" required>
+                </div>
+                <button type="submit" class="submit-ride-offer">
+                    <i class="fas fa-check"></i> Submit Offer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/rideshare.js"></script>
+</body>
+</html>

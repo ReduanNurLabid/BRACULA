@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - BRACULA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="settings-container">
+        <h1>Settings</h1>
+        <div class="settings-content">
+            <!-- Profile Settings -->
+            <div class="settings-section">
+                <h2>Profile Settings</h2>
+                <form id="profileSettingsForm">
+                    <div class="form-group">
+                        <label for="profilePicture">Profile Picture URL</label>
+                        <div class="profile-picture-preview">
+                            <img src="https://avatar.iran.liara.run/public" alt="Profile Picture" id="profilePicturePreview">
+                            <input type="url" id="profilePictureUrl" class="form-control" placeholder="Enter image URL">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" placeholder="Write something about yourself..." rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="save-button">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="settings-section">
+                <h2>Account Settings</h2>
+                <form id="accountSettingsForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Enter your current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">New Password</label>
+                        <input type="password" id="password" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+                    <button type="submit" class="save-button">Update Account</button>
+                </form>
+            </div>
+
+            <!-- Delete Account Section -->
+            <div class="settings-section">
+                <h2>Delete Account</h2>
+                <div class="danger-zone">
+                    <div class="warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="warning-content">
+                            <h3>Delete Your Account</h3>
+                            <p>Once you delete your account, there is no going back. Please be certain.</p>
+                        </div>
+                    </div>
+                    <form id="deleteAccountForm" onsubmit="deleteAccount(); return false;">
+                        <div class="delete-steps">
+                            <div class="form-group">
+                                <label for="deletePassword">Enter your password to confirm</label>
+                                <input type="password" 
+                                       id="deletePassword" 
+                                       name="deletePassword" 
+                                       placeholder="Enter your password" 
+                                       required>
+                            </div>
+                            <button type="submit" class="delete-button">
+                                <i class="fas fa-trash-alt"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>

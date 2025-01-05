@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - BRACULA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Add Quill.js dependencies -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="feed-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <button class="create-post-btn">
+                <i class="fas fa-plus"></i> Create Post
+            </button>
+            
+            <div class="sidebar-section">
+                <h4>My Communities</h4>
+                <div class="sidebar-item" data-community="general">
+                    <i class="fas fa-globe"></i> General
+                </div>
+                <div class="sidebar-item" data-community="cse">
+                    <i class="fas fa-laptop-code"></i> CSE Community
+                </div>
+                <div class="sidebar-item" data-community="business">
+                    <i class="fas fa-chart-line"></i> Business Club
+                </div>
+                <div class="sidebar-item" data-community="design">
+                    <i class="fas fa-palette"></i> Design Society
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h4>Trending Communities</h4>
+                <div class="trending-communities">
+                    <div class="community-item" data-community="coding">
+                        <img src="https://robohash.org/mail@ashallendesign.co.uk" alt="Community" class="community-avatar">
+                        <div>Coding Enthusiasts</div>
+                    </div>
+                    <div class="community-item" data-community="startup">
+                        <img src="https://robohash.org/mail@ashallendesign.co.uk" alt="Community" class="community-avatar">
+                        <div>Startup Founders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Feed -->
+        <div class="main-feed">
+            <div class="post-filter">
+                <span>Posts</span>
+                <div class="post-filter-buttons">
+                    <button data-sort="latest" class="active">Latest</button>
+                    <button data-sort="popular">Popular</button>
+                    <button data-sort="discussed">Most Discussed</button>
+                </div>
+            </div>
+
+            <!-- Posts Container -->
+            <div class="posts-container">
+                <!-- Post Template for New Posts -->
+                <div class="feed-post">
+                    <div class="vote-section">
+                        <button class="vote-btn upvote" data-vote="up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <span class="vote-count">0</span>
+                        <button class="vote-btn downvote" data-vote="down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-header">
+                            <img src="" alt="User Avatar" class="post-avatar">
+                            <div class="post-meta">
+                                <div class="post-author">
+                                    <strong class="author-name"></strong>
+                                    <span class="post-community"></span>
+                                </div>
+                                <div class="post-time"></div>
+                            </div>
+                            <div class="post-options">
+                                <button class="options-btn">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="options-dropdown">
+                                    <button class="edit-btn">Edit</button>
+                                    <button class="delete-btn">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="post-title"></h3>
+                        <div class="post-text"></div>
+                        <div class="post-image"></div>
+                        <div class="post-actions">
+                            <button class="action-btn comments-btn">
+                                <i class="far fa-comment"></i>
+                                <span class="comments-count">0</span> Comments
+                            </button>
+                            <button class="action-btn save-btn">
+                                <i class="far fa-bookmark"></i>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic posts will be inserted here -->
+            </div>
+
+            <!-- Infinite Scroll Sentinel -->
+            <div class="scroll-sentinel"></div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Create New Post</h2>
+            <form id="create-post-form">
+                <div class="form-group">
+                    <label for="post-caption">Caption (Optional)</label>
+                    <input type="text" id="post-caption" placeholder="Enter a caption">
+                </div>
+                <div class="form-group">
+                    <label for="post-content">Content</label>
+                    <textarea id="post-content" placeholder="What's on your mind?" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="post-community">Community</label>
+                    <select id="post-community" required>
+                        <option value="general">General</option>
+                        <option value="cse">CSE Community</option>
+                        <option value="business">Business Club</option>
+                        <option value="design">Design Society</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-button" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                    Create Post
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Post Detail Modal -->
+    <div id="postDetailModal" class="modal">
+        <div class="modal-content post-detail-modal">
+            <span class="close-modal">&times;</span>
+            <div class="post-detail-container">
+                <!-- Post content will be inserted here -->
+            </div>
+            <div class="comments-section">
+                <h3>Comments</h3>
+                <form class="comment-form">
+                    <div class="form-group">
+                        <textarea placeholder="Write a comment..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-comment">Comment</button>
+                </form>
+                <div class="comments-container">
+                    <!-- Comments will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Template -->
+    <template id="postTemplate">
+        <div class="feed-post">
+            <div class="vote-section">
+                <button class="vote-btn upvote" data-vote="up">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+                <span class="vote-count">0</span>
+                <button class="vote-btn downvote" data-vote="down">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+            </div>
+            <div class="post-content">
+                <div class="post-header">
+                    <img src="" alt="User Avatar" class="post-avatar">
+                    <div class="post-meta">
+                        <strong></strong>
+                        <span class="post-community"></span>
+                        <div class="post-time"></div>
+                    </div>
+                </div>
+                <h3 class="post-caption"></h3>
+                <div class="post-image-container"></div>
+                <div class="post-content-text"></div>
+                <div class="post-actions">
+                    <div class="action-item">
+                        <i class="far fa-comment"></i> 
+                        <span>0</span> Comments
+                    </div>
+                    <div class="action-item">
+                        <i class="far fa-bookmark"></i> Save
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Comment Template -->
+    <template id="commentTemplate">
+        <div class="comment">
+            <div class="comment-header">
+                <img src="" alt="" class="comment-avatar">
+                <div class="comment-meta">
+                    <strong></strong>
+                    <span class="comment-time"></span>
+                </div>
+            </div>
+            <div class="comment-content"></div>
+            <div class="comment-actions">
+                <button class="reply-btn">Reply</button>
+                <button class="like-btn">
+                    <i class="far fa-heart"></i>
+                    <span>0</span>
+                </button>
+            </div>
+            <div class="comment-replies"></div>
+        </div>
+    </template>
+
+    <script src="js/feed.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
