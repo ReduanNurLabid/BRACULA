@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             student_id: document.getElementById('studentID').value,
             email: email,
             password: password.value,
+            department: document.getElementById('department').value,
             avatar_url: 'https://avatar.iran.liara.run/public', // Default avatar
             bio: ''
         };
