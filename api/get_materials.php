@@ -34,15 +34,14 @@ try {
     }
 
     if (!empty($fileType)) {
-    if ($fileType === 'pdf') {
-        $query .= " AND (r.file_type = 'pdf' OR r.file_type = 'notes')";
-        // No need to bind anything here since values are hardcoded
-    } else {
-        $query .= " AND r.file_type = :file_type";
-        $params[':file_type'] = $fileType;
+        if ($fileType === 'pdf') {
+            $query .= " AND (r.file_type = 'pdf' OR r.file_type = 'notes')";
+            // No need to bind anything here since values are hardcoded
+        } else {
+            $query .= " AND r.file_type = :file_type";
+            $params[':file_type'] = $fileType;
+        }
     }
-
-
 
     $query .= " ORDER BY r.created_at DESC";
 

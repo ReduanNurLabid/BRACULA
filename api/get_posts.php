@@ -29,10 +29,18 @@ try {
                 ) - (
                     SELECT COUNT(*) FROM votes v WHERE v.post_id = p.post_id AND v.vote_type = 'down'
                 ), 0) as votes,
-                (SELECT vote_type FROM votes v WHERE v.post_id = p.post_id AND v.user_id = :user_id) as user_vote
+                (SELECT vote_type FROM votes v WHERE v.post_id = p.post_id AND v.user_id = :user_id1) as user_vote,
+                CASE WHEN sp.post_id IS NOT NULL THEN 1 ELSE 0 END as is_saved
             FROM posts p
             JOIN users u ON p.user_id = u.user_id
-            WHERE p.community = :community";
+            LEFT JOIN votes v ON p.post_id = v.post_id AND v.user_id = :user_id2
+            LEFT JOIN saved_posts sp ON p.post_id = sp.post_id AND sp.user_id = :user_id3
+            WHERE 1=1";
+    
+    // Add community filter if not 'all'
+    if ($community !== 'all') {
+        $query .= " AND p.community = :community";
+    }
 
     // Add sorting
     switch($sortBy) {
@@ -49,8 +57,17 @@ try {
     $query .= " LIMIT :limit OFFSET :offset";
 
     $stmt = $db->prepare($query);
-    $stmt->bindParam(':community', $community, PDO::PARAM_STR);
-    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    
+    // Bind user_id three times with different parameter names
+    $stmt->bindParam(':user_id1', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id2', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id3', $user_id, PDO::PARAM_INT);
+    
+    // Add community filter if not 'all'
+    if ($community !== 'all') {
+        $stmt->bindParam(':community', $community, PDO::PARAM_STR);
+    }
+    
     $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
@@ -61,6 +78,7 @@ try {
     $formatted_posts = array_map(function($post) {
         return [
             'id' => $post['post_id'],
+            'user_id' => $post['user_id'], // Add user_id to response
             'author' => $post['author'],
             'avatar_url' => $post['avatar_url'],
             'content' => $post['content'],
@@ -69,7 +87,8 @@ try {
             'timestamp' => $post['created_at'],
             'votes' => (int)$post['votes'],
             'user_vote' => $post['user_vote'],
-            'commentCount' => (int)$post['comment_count']
+            'commentCount' => (int)$post['comment_count'],
+            'is_saved' => (bool)$post['is_saved']
         ];
     }, $posts);
 
@@ -83,7 +102,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Failed to load posts'
+        'message' => 'Failed to load posts: ' . $e->getMessage()
     ]);
 }
 ?> 

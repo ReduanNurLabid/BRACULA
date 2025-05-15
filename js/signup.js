@@ -52,9 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            // Get the base URL dynamically
-            const baseUrl = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-            const response = await fetch(`${baseUrl}/api/register.php`, {
+            // Direct URL to the API endpoint
+            const response = await fetch('api/register.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

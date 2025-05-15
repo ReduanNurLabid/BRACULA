@@ -20,9 +20,32 @@
             <div class="nav-links">
                 <a href="feed.html">Feed</a>
                 <a href="resources.html">Resources</a>
-                <a href="accommodation.html">Accommodation</a>
                 <a href="rideshare.html">Ride Share</a>
                 <a href="events.html">Events</a>
+
+                <!-- Notification Section -->
+                <div class="notification-section">
+                    <div class="notification-icon" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-tabs">
+                                <button class="notification-tab active" data-tab="all">All</button>
+                                <button class="notification-tab" data-tab="unread">Unread</button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <!-- Notifications will be added here dynamically -->
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllReadBtn">Mark all as read</button>
+                            <a href="#" id="viewAllNotificationsBtn">View all</a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Profile Section -->
                 <div class="profile-section">
@@ -30,6 +53,9 @@
                     <div class="profile-dropdown-menu">
                         <div class="dropdown-item" data-action="profile">
                             <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="saved-posts">
+                            <i class="fas fa-bookmark"></i> Saved Posts
                         </div>
                         <div class="dropdown-item" data-action="settings">
                             <i class="fas fa-cog"></i> Settings
@@ -85,6 +111,10 @@
         <div class="main-feed">
             <div class="post-filter">
                 <span>Posts</span>
+                <div class="search-container">
+                    <input type="text" id="post-search" placeholder="Search posts...">
+                    <button id="search-btn"><i class="fas fa-search"></i></button>
+                </div>
                 <div class="post-filter-buttons">
                     <button data-sort="latest" class="active">Latest</button>
                     <button data-sort="popular">Popular</button>
@@ -94,53 +124,6 @@
 
             <!-- Posts Container -->
             <div class="posts-container">
-                <!-- Post Template for New Posts -->
-                <div class="feed-post">
-                    <div class="vote-section">
-                        <button class="vote-btn upvote" data-vote="up">
-                            <i class="fas fa-arrow-up"></i>
-                        </button>
-                        <span class="vote-count">0</span>
-                        <button class="vote-btn downvote" data-vote="down">
-                            <i class="fas fa-arrow-down"></i>
-                        </button>
-                    </div>
-                    <div class="post-content">
-                        <div class="post-header">
-                            <img src="" alt="User Avatar" class="post-avatar">
-                            <div class="post-meta">
-                                <div class="post-author">
-                                    <strong class="author-name"></strong>
-                                    <span class="post-community"></span>
-                                </div>
-                                <div class="post-time"></div>
-                            </div>
-                            <div class="post-options">
-                                <button class="options-btn">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="options-dropdown">
-                                    <button class="edit-btn">Edit</button>
-                                    <button class="delete-btn">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <h3 class="post-title"></h3>
-                        <div class="post-text"></div>
-                        <div class="post-image"></div>
-                        <div class="post-actions">
-                            <button class="action-btn comments-btn">
-                                <i class="far fa-comment"></i>
-                                <span class="comments-count">0</span> Comments
-                            </button>
-                            <button class="action-btn save-btn">
-                                <i class="far fa-bookmark"></i>
-                                Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Dynamic posts will be inserted here -->
             </div>
 
@@ -261,7 +244,24 @@
         </div>
     </template>
 
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>All Notifications</h2>
+            <div class="notification-filters">
+                <button class="notification-filter active" data-filter="all">All</button>
+                <button class="notification-filter" data-filter="unread">Unread</button>
+                <button class="notification-filter" data-filter="read">Read</button>
+            </div>
+            <div class="all-notifications-list" id="allNotificationsList">
+                <!-- All notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script src="js/feed.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>

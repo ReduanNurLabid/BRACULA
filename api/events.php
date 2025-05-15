@@ -15,8 +15,7 @@ try {
         $query = "SELECT e.*, u.full_name as organizer_name, u.avatar_url as organizer_avatar,
                         DATE_FORMAT(e.event_date, '%Y-%m-%d') as formatted_date,
                         (SELECT COUNT(*) FROM event_registrations er 
-                         WHERE er.event_id = e.event_id 
-                         AND er.status = 'registered') as registration_count
+                         WHERE er.event_id = e.event_id) as registration_count
                  FROM events e
                  JOIN users u ON e.user_id = u.user_id
                  WHERE 1=1";

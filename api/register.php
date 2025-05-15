@@ -51,12 +51,31 @@ try {
     require_once __DIR__ . '/../config/database.php';
     require_once __DIR__ . '/../models/User.php';
 
+    // Debug path information
+    error_log("Database config path: " . realpath(__DIR__ . '/../config/database.php'));
+    error_log("User model path: " . realpath(__DIR__ . '/../models/User.php'));
+
     // Get database connection
     $database = new Database();
+    error_log("Using database: " . $database->db_name);
+    
     $db = $database->getConnection();
-
+    
+    // Check for successful connection
     if (!$db) {
         throw new Exception("Database connection failed");
+    }
+    
+    // Verify users table exists
+    try {
+        $tableCheck = $db->query("SHOW TABLES LIKE 'users'");
+        if ($tableCheck->rowCount() == 0) {
+            throw new Exception("Table 'users' does not exist. Please initialize the database first at http://localhost:8081/BRACULA/check_db.php");
+        }
+        error_log("Table 'users' exists in database");
+    } catch (PDOException $ex) {
+        error_log("Error checking for users table: " . $ex->getMessage());
+        throw $ex;
     }
 
     // Create user object

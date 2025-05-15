@@ -14,9 +14,32 @@
             <div class="nav-links">
                 <a href="feed.html">Feed</a>
                 <a href="resources.html">Resources</a>
-                <a href="accommodation.html">Accommodation</a>
                 <a href="rideshare.html">Ride Share</a>
                 <a href="events.html">Events</a>
+
+                <!-- Notification Section -->
+                <div class="notification-section">
+                    <div class="notification-icon" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-tabs">
+                                <button class="notification-tab active" data-tab="all">All</button>
+                                <button class="notification-tab" data-tab="unread">Unread</button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <!-- Notifications will be added here dynamically -->
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllReadBtn">Mark all as read</button>
+                            <a href="#" id="viewAllNotificationsBtn">View all</a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Profile Section -->
                 <div class="profile-section">
@@ -24,6 +47,9 @@
                     <div class="profile-dropdown-menu">
                         <div class="dropdown-item" data-action="profile">
                             <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="saved-posts">
+                            <i class="fas fa-bookmark"></i> Saved Posts
                         </div>
                         <div class="dropdown-item" data-action="settings">
                             <i class="fas fa-cog"></i> Settings
@@ -132,8 +158,24 @@
         </div>
     </div>
 
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>All Notifications</h2>
+            <div class="notification-filters">
+                <button class="notification-filter active" data-filter="all">All</button>
+                <button class="notification-filter" data-filter="unread">Unread</button>
+                <button class="notification-filter" data-filter="read">Read</button>
+            </div>
+            <div class="all-notifications-list" id="allNotificationsList">
+                <!-- All notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
 
     <script src="js/events.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>

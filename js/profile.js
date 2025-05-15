@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadUserProfileById(userId) {
     try {
+        // Check if userId is valid
+        if (!userId || userId === 'undefined') {
+            throw new Error('Invalid user ID');
+        }
+        
         const response = await fetch(`${BASE_URL}/BRACULA/api/get_user_profile.php?user_id=${userId}`);
         const data = await response.json();
         
@@ -48,7 +53,12 @@ async function loadUserProfileById(userId) {
         }
     } catch (error) {
         console.error('Error loading profile:', error);
-        showNotification('Failed to load profile', 'error');
+        showNotification('Failed to load profile: ' + error.message, 'error');
+        
+        // Redirect to own profile if there's an error
+        setTimeout(() => {
+            window.location.href = 'profile.html';
+        }, 2000);
     }
 }
 
@@ -276,31 +286,52 @@ function displayUserActivities(activities) {
         const activityTime = formatTimestamp(activity.created_at);
         let activityDescription = '';
         let icon = '';
+        let url = '';
+        let clickable = false;
 
         switch (activity.activity_type) {
             case 'post':
                 icon = '<i class="fas fa-pen"></i>';
                 activityDescription = `Created a new post${activity.post_caption ? `: "${activity.post_caption}"` : ''}`;
+                if (activity.post_id) {
+                    url = `feed.html?post_id=${activity.post_id}`;
+                    clickable = true;
+                }
                 break;
             case 'comment':
                 icon = '<i class="fas fa-comment"></i>';
                 activityDescription = 'Commented on a post';
+                if (activity.post_id) {
+                    url = `feed.html?post_id=${activity.post_id}&comment_id=${activity.content_id}`;
+                    clickable = true;
+                }
                 break;
             case 'like':
                 icon = '<i class="fas fa-heart"></i>';
                 activityDescription = 'Liked a post';
+                if (activity.post_id) {
+                    url = `feed.html?post_id=${activity.post_id}`;
+                    clickable = true;
+                }
                 break;
             case 'share':
                 icon = '<i class="fas fa-share"></i>';
                 activityDescription = 'Shared a post';
+                if (activity.post_id) {
+                    url = `feed.html?post_id=${activity.post_id}`;
+                    clickable = true;
+                }
                 break;
             default:
                 icon = '<i class="fas fa-circle"></i>';
                 activityDescription = 'Unknown activity';
         }
 
+        const cursorClass = clickable ? 'cursor-pointer' : '';
+        const onClickAttr = clickable ? `onclick="window.location.href='${url}'"` : '';
+
         return `
-            <div class="activity-item">
+            <div class="activity-item ${cursorClass}" ${onClickAttr}>
                 <div class="activity-icon">${icon}</div>
                 <div class="activity-content">
                     <div class="activity-description">${activityDescription}</div>

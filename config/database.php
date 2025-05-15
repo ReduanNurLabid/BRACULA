@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "bracula_db";
+    public $db_name = "bracula_db";
     private $username = "root";
     private $password = "";
     private $conn;

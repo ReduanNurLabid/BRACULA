@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRACULA - Comment System Test</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="test_comments.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Comment System Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Post</h2>
+            <div class="feed-post" data-post-id="1">
+                <div class="post-content">
+                    <div class="post-header">
+                        <img src="../assets/images/default-avatar.png" alt="Test User" class="post-avatar">
+                        <div class="post-meta">
+                            <div class="author-info">
+                                <strong class="author-name">Test User</strong>
+                                <span class="post-community">general</span>
+                            </div>
+                            <div class="post-time">Just now</div>
+                        </div>
+                        <div class="post-actions-dropdown">
+                            <button class="dropdown-toggle"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="edit-post-btn" data-post-id="1"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="delete-post-btn" data-post-id="1"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="post-title">Test Post Title</h3>
+                    <div class="post-text">This is a test post to verify comment functionality.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Comments</h2>
+            <div class="comments-container">
+                <!-- Comment 1 -->
+                <div class="comment" data-comment-id="1">
+                    <div class="comment-header">
+                        <img src="../assets/images/default-avatar.png" alt="Comment User" class="comment-avatar">
+                        <div class="comment-meta">
+                            <strong class="comment-author">Comment User</strong>
+                            <span class="comment-time">Just now</span>
+                        </div>
+                        <div class="comment-actions-dropdown">
+                            <button class="dropdown-toggle"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="edit-comment-btn" data-comment-id="1"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="delete-comment-btn" data-comment-id="1"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-content">This is a test comment.</div>
+                    <div class="comment-actions">
+                        <button class="reply-comment-btn" data-comment-id="1" data-post-id="1">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </div>
+                    <div class="reply-form-container" id="reply-form-1" style="display: none;">
+                        <form class="reply-form">
+                            <textarea placeholder="Write your reply..." required></textarea>
+                            <div class="form-actions">
+                                <button type="button" class="cancel-reply-btn">Cancel</button>
+                                <button type="submit" class="submit-reply-btn">Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Reply to Comment 1 -->
+                <div class="comment comment-reply" data-comment-id="2" data-parent-id="1">
+                    <div class="comment-header">
+                        <img src="../assets/images/default-avatar.png" alt="Reply User" class="comment-avatar">
+                        <div class="comment-meta">
+                            <strong class="comment-author">Reply User</strong>
+                            <span class="comment-time">Just now</span>
+                        </div>
+                        <div class="comment-actions-dropdown">
+                            <button class="dropdown-toggle"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="edit-comment-btn" data-comment-id="2"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="delete-comment-btn" data-comment-id="2"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-content">This is a reply to the test comment.</div>
+                    <div class="comment-actions">
+                        <button class="reply-comment-btn" data-comment-id="2" data-post-id="1">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </div>
+                    <div class="reply-form-container" id="reply-form-2" style="display: none;">
+                        <form class="reply-form">
+                            <textarea placeholder="Write your reply..." required></textarea>
+                            <div class="form-actions">
+                                <button type="button" class="cancel-reply-btn">Cancel</button>
+                                <button type="submit" class="submit-reply-btn">Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Comment Form -->
+            <div class="add-comment-section">
+                <h3>Add a Comment</h3>
+                <form class="comment-form">
+                    <textarea placeholder="Write your comment..." required></textarea>
+                    <button type="submit" class="submit-button">Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide reply form
+        document.querySelectorAll('.reply-comment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const commentId = btn.dataset.commentId;
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+                
+                // Hide all other reply forms
+                document.querySelectorAll('.reply-form-container').forEach(form => {
+                    if (form.id !== `reply-form-${commentId}`) {
+                        form.style.display = 'none';
+                    }
+                });
+                
+                // Toggle this reply form
+                replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+                
+                // Focus on textarea if showing
+                if (replyForm.style.display === 'block') {
+                    replyForm.querySelector('textarea').focus();
+                }
+            });
+        });
+        
+        // Cancel reply
+        document.querySelectorAll('.cancel-reply-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const form = btn.closest('.reply-form-container');
+                form.style.display = 'none';
+            });
+        });
+        
+        // Toggle dropdown menus
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const menu = toggle.nextElementSibling;
+                
+                // Close all other menus
+                document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+                    if (m !== menu) m.classList.remove('show');
+                });
+                
+                // Toggle this menu
+                menu.classList.toggle('show');
+            });
+        });
+        
+        // Close dropdowns when clicking elsewhere
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
+        
+        // Edit comment demonstration
+        document.querySelectorAll('.edit-comment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const commentId = btn.dataset.commentId;
+                const comment = document.querySelector(`.comment[data-comment-id="${commentId}"]`);
+                const contentElement = comment.querySelector('.comment-content');
+                const currentContent = contentElement.textContent;
+                
+                // Replace with editable form
+                contentElement.innerHTML = `
+                    <form class="edit-comment-form">
+                        <textarea class="edit-comment-textarea" required>${currentContent}</textarea>
+                        <div class="form-actions">
+                            <button type="button" class="cancel-edit-btn">Cancel</button>
+                            <button type="submit" class="save-edit-btn">Save</button>
+                        </div>
+                    </form>
+                `;
+                
+                // Focus on textarea
+                contentElement.querySelector('textarea').focus();
+                
+                // Handle cancel
+                contentElement.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+                    contentElement.textContent = currentContent;
+                });
+                
+                // Handle save (demo only)
+                contentElement.querySelector('form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newContent = contentElement.querySelector('textarea').value.trim();
+                    if (newContent) {
+                        contentElement.textContent = newContent;
+                        alert('Comment updated! (Demo only - no actual API call)');
+                    }
+                });
+            });
+        });
+        
+        // Delete comment demonstration
+        document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete this comment? (Demo only)')) {
+                    const commentId = btn.dataset.commentId;
+                    const comment = document.querySelector(`.comment[data-comment-id="${commentId}"]`);
+                    comment.style.opacity = '0.5';
+                    comment.style.pointerEvents = 'none';
+                    alert('Comment deleted! (Demo only - no actual API call)');
+                }
+            });
+        });
+        
+        // Edit post demonstration
+        document.querySelector('.edit-post-btn').addEventListener('click', () => {
+            alert('Edit post clicked! This would open an edit modal in the real implementation.');
+        });
+        
+        // Delete post demonstration
+        document.querySelector('.delete-post-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete this post? (Demo only)')) {
+                const post = document.querySelector('.feed-post');
+                post.style.opacity = '0.5';
+                post.style.pointerEvents = 'none';
+                alert('Post deleted! (Demo only - no actual API call)');
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -14,7 +14,7 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    $query = "SELECT ua.*, 
+    $query = "SELECT ua.*,
               CASE 
                 WHEN ua.activity_type = 'post' THEN p.content
                 WHEN ua.activity_type = 'comment' THEN c.content
@@ -22,7 +22,12 @@ try {
               CASE 
                 WHEN ua.activity_type = 'post' THEN p.caption
                 ELSE NULL
-              END as post_caption
+              END as post_caption,
+              CASE
+                WHEN ua.activity_type = 'post' THEN ua.content_id
+                WHEN ua.activity_type = 'comment' THEN c.post_id
+                ELSE NULL
+              END as post_id
               FROM user_activities ua
               LEFT JOIN posts p ON ua.content_id = p.post_id AND ua.activity_type = 'post'
               LEFT JOIN comments c ON ua.content_id = c.comment_id AND ua.activity_type = 'comment'
