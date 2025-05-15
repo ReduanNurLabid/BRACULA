@@ -1,0 +1,13 @@
+[15-May-2025 20:15:34 Europe/Berlin] Register API Debug Info: Array
+(
+    [request_method] => POST
+    [content_type] => application/json
+    [raw_input] => {"full_name":"kabir","student_id":"22101732","email":"kabir@g.bracu.ac.bd","password":"Fardin16@","department":"CSE","avatar_url":"https://avatar.iran.liara.run/public","bio":""}
+    [request_time] => 2025-05-15 20:15:34
+)
+
+[15-May-2025 20:15:34 Europe/Berlin] Raw POST data: {"full_name":"kabir","student_id":"22101732","email":"kabir@g.bracu.ac.bd","password":"Fardin16@","department":"CSE","avatar_url":"https://avatar.iran.liara.run/public","bio":""}
+[15-May-2025 20:15:34 Europe/Berlin] PHP Deprecated:  strip_tags(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\BRACULA\models\User.php on line 36
+[15-May-2025 20:15:34 Europe/Berlin] PHP Deprecated:  strip_tags(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\BRACULA\models\User.php on line 38
+[15-May-2025 20:15:35 Europe/Berlin] Error creating user: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'interests' in 'field list'
+[15-May-2025 20:15:35 Europe/Berlin] Buffered output:   {"status":"error","message":"Failed to create user","debug_info":{"request_method":"POST","content_type":"application\/json","raw_input":"{\"full_name\":\"kabir\",\"student_id\":\"22101732\",\"email\":\"kabir@g.bracu.ac.bd\",\"password\":\"Fardin16@\",\"department\":\"CSE\",\"avatar_url\":\"https:\/\/avatar.iran.liara.run\/public\",\"bio\":\"\"}","request_time":"2025-05-15 20:15:34"}}
