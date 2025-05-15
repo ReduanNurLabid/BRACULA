@@ -64,10 +64,25 @@ echo Fixing ride_requests table...
 "%PHP_PATH%" "%PROJECT_PATH%\database\fix_ride_requests_table.php" > "%PROJECT_PATH%\logs\fix_ride_requests.log"
 echo Ride_requests table check completed. See logs/fix_ride_requests.log for details.
 
+REM Fix missing pickup column in ride_requests table
+echo Fixing pickup column in ride_requests table...
+"%PHP_PATH%" "%PROJECT_PATH%\database\fix_pickup_column.php" > "%PROJECT_PATH%\logs\fix_pickup_column.log"
+echo Pickup column check completed. See logs/fix_pickup_column.log for details.
+
+REM Fix missing notes column in ride_requests table
+echo Fixing notes column in ride_requests table...
+"%PHP_PATH%" "%PROJECT_PATH%\database\fix_notes_column.php" > "%PROJECT_PATH%\logs\fix_notes_column.log"
+echo Notes column check completed. See logs/fix_notes_column.log for details.
+
 REM Fix missing driver_reviews table
 echo Creating driver_reviews table if not exists...
 "%PHP_PATH%" "%PROJECT_PATH%\database\create_driver_reviews_table.php" > "%PROJECT_PATH%\logs\create_driver_reviews.log"
 echo Driver_reviews table check completed. See logs/create_driver_reviews.log for details.
+
+REM Create accommodation tables if they don't exist
+echo Setting up accommodation tables...
+"%PHP_PATH%" "%PROJECT_PATH%\database\create_accommodation_tables.php" > "%PROJECT_PATH%\logs\create_accommodation_tables.log"
+echo Accommodation tables check completed. See logs/create_accommodation_tables.log for details.
 
 REM Call update_database.php to create saved_posts table
 echo Creating saved_posts table...

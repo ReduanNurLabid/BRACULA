@@ -12,9 +12,9 @@ $database = new Database();
 $conn = $database->getConnection();
 
 // Enable CORS for development
-header('Access-Control-Allow-Origin: http://localhost');
+header('Access-Control-Allow-Origin: http://localhost:8081');
 header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Accept');
 
 // Handle preflight requests
@@ -36,7 +36,33 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     switch($method) {
         case 'GET':
-            if (isset($_GET['id'])) {
+            if (isset($_GET['owner']) && $_GET['owner'] === 'me') {
+                // Get accommodations owned by the current user
+                $query = "SELECT a.*, u.full_name, 
+                    (SELECT COUNT(*) FROM accommodation_favorites WHERE accommodation_id = a.accommodation_id AND user_id = :user_id) as isFavorite
+                    FROM accommodations a 
+                    JOIN users u ON a.owner_id = u.user_id 
+                    WHERE a.owner_id = :owner_id
+                    ORDER BY a.created_at DESC";
+                
+                $stmt = $conn->prepare($query);
+                $stmt->execute([
+                    ':user_id' => $user_id,
+                    ':owner_id' => $user_id
+                ]);
+                
+                $accommodations = $stmt->fetchAll();
+                
+                // Get images for each accommodation
+                foreach ($accommodations as &$acc) {
+                    $stmt = $conn->prepare("SELECT image_url FROM accommodation_images WHERE accommodation_id = :id");
+                    $stmt->execute([':id' => $acc['accommodation_id']]);
+                    $acc['images'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                }
+                
+                echo json_encode(['status' => 'success', 'data' => $accommodations]);
+            }
+            else if (isset($_GET['id'])) {
                 // Get specific accommodation
                 $query = "SELECT a.*, u.full_name, u.email, 
                     (SELECT COUNT(*) FROM accommodation_favorites WHERE accommodation_id = a.accommodation_id AND user_id = :user_id) as isFavorite
@@ -66,6 +92,7 @@ try {
                     (SELECT COUNT(*) FROM accommodation_favorites WHERE accommodation_id = a.accommodation_id AND user_id = :user_id) as isFavorite
                     FROM accommodations a 
                     JOIN users u ON a.owner_id = u.user_id 
+                    WHERE a.status = 'active'
                     ORDER BY a.created_at DESC";
                 
                 $stmt = $conn->prepare($query);
@@ -144,15 +171,27 @@ try {
                     // Handle image uploads
                     if (isset($_FILES['images'])) {
                         $uploadDir = '../uploads/accommodations/';
+                        
+                        // Ensure upload directory exists
                         if (!file_exists($uploadDir)) {
-                            mkdir($uploadDir, 0777, true);
+                            if (!mkdir($uploadDir, 0777, true)) {
+                                throw new Exception("Failed to create uploads directory. Please check permissions.");
+                            }
+                            chmod($uploadDir, 0777); // Ensure directory is writable
                         }
+                        
+                        // Debug upload directory
+                        error_log("Upload directory: " . realpath($uploadDir));
+                        error_log("Upload directory writable: " . (is_writable($uploadDir) ? 'Yes' : 'No'));
 
                         $uploaded_images = [];
                         foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
                             if (!empty($tmp_name)) {
                                 $file_name = $_FILES['images']['name'][$key];
                                 $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                                
+                                // Debug file info
+                                error_log("Processing file: $file_name, tmp: $tmp_name, exists: " . (file_exists($tmp_name) ? 'Yes' : 'No'));
                                 
                                 // Validate file type
                                 $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
@@ -167,14 +206,19 @@ try {
 
                                 $new_name = uniqid() . '.' . $file_ext;
                                 $destination = $uploadDir . $new_name;
+                                
+                                error_log("Destination path: $destination");
 
                                 if (move_uploaded_file($tmp_name, $destination)) {
                                     $image_url = 'uploads/accommodations/' . $new_name;
+                                    error_log("File uploaded successfully to: $image_url");
+                                    
                                     $stmt = $conn->prepare("INSERT INTO accommodation_images (accommodation_id, image_url) VALUES (:acc_id, :url)");
                                     $stmt->execute([':acc_id' => $accommodation_id, ':url' => $image_url]);
                                     $uploaded_images[] = $image_url;
                                 } else {
-                                    throw new Exception("Failed to upload image: $file_name");
+                                    error_log("Failed to move uploaded file. PHP Error: " . error_get_last()['message']);
+                                    throw new Exception("Failed to upload image: $file_name. Check server logs for details.");
                                 }
                             }
                         }
@@ -197,6 +241,109 @@ try {
                     $conn->rollBack();
                     throw $e;
                 }
+            }
+            break;
+            
+        case 'PUT':
+            // Update accommodation
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!isset($data['accommodation_id'])) {
+                throw new Exception("Missing accommodation ID");
+            }
+            
+            // Check ownership
+            $stmt = $conn->prepare("SELECT owner_id FROM accommodations WHERE accommodation_id = :id");
+            $stmt->execute([':id' => $data['accommodation_id']]);
+            $accommodation = $stmt->fetch();
+            
+            if (!$accommodation) {
+                throw new Exception("Accommodation not found");
+            }
+            
+            if ($accommodation['owner_id'] != $user_id) {
+                throw new Exception("You don't have permission to update this accommodation");
+            }
+            
+            // Update fields
+            $fieldUpdates = [];
+            $params = [':id' => $data['accommodation_id']];
+            
+            $allowedFields = [
+                'title' => 'title',
+                'roomType' => 'room_type',
+                'price' => 'price',
+                'location' => 'location',
+                'description' => 'description',
+                'contactInfo' => 'contact_info',
+                'status' => 'status'
+            ];
+            
+            foreach ($allowedFields as $clientField => $dbField) {
+                if (isset($data[$clientField])) {
+                    $fieldUpdates[] = "$dbField = :$dbField";
+                    $params[":$dbField"] = $data[$clientField];
+                }
+            }
+            
+            if (empty($fieldUpdates)) {
+                throw new Exception("No fields to update");
+            }
+            
+            $query = "UPDATE accommodations SET " . implode(', ', $fieldUpdates) . " WHERE accommodation_id = :id";
+            $stmt = $conn->prepare($query);
+            $stmt->execute($params);
+            
+            echo json_encode(['status' => 'success', 'message' => 'Accommodation updated successfully']);
+            break;
+            
+        case 'DELETE':
+            // Delete accommodation
+            if (!isset($_GET['id'])) {
+                throw new Exception("Missing accommodation ID");
+            }
+            
+            $accommodation_id = $_GET['id'];
+            
+            // Check ownership
+            $stmt = $conn->prepare("SELECT owner_id FROM accommodations WHERE accommodation_id = :id");
+            $stmt->execute([':id' => $accommodation_id]);
+            $accommodation = $stmt->fetch();
+            
+            if (!$accommodation) {
+                throw new Exception("Accommodation not found");
+            }
+            
+            if ($accommodation['owner_id'] != $user_id) {
+                throw new Exception("You don't have permission to delete this accommodation");
+            }
+            
+            // Start transaction
+            $conn->beginTransaction();
+            
+            try {
+                // Delete images
+                $stmt = $conn->prepare("SELECT image_url FROM accommodation_images WHERE accommodation_id = :id");
+                $stmt->execute([':id' => $accommodation_id]);
+                $images = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                
+                // Delete image files
+                foreach ($images as $imageUrl) {
+                    $imagePath = realpath('../' . $imageUrl);
+                    if ($imagePath && file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                }
+                
+                // Delete from database - cascading will handle related tables
+                $stmt = $conn->prepare("DELETE FROM accommodations WHERE accommodation_id = :id");
+                $stmt->execute([':id' => $accommodation_id]);
+                
+                $conn->commit();
+                echo json_encode(['status' => 'success', 'message' => 'Accommodation deleted successfully']);
+            } catch (Exception $e) {
+                $conn->rollBack();
+                throw $e;
             }
             break;
 

@@ -81,6 +81,10 @@ function handleProfileAction(action) {
             // Redirect to login page
             window.location.href = 'login.html';
             break;
+        case 'my-accommodations':
+            console.log('Navigating to my-accommodations page');
+            window.location.href = 'my_accommodations.html';
+            break;
         default:
             console.log('Unknown action:', action);
     }
@@ -132,3 +136,135 @@ function formatTimestamp(timestamp) {
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
 }
+
+// Common UI functionality for BRACULA
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle profile dropdown toggle
+    const profileToggle = document.querySelector('.profile-dropdown-toggle');
+    const profileMenu = document.querySelector('.profile-dropdown-menu');
+    
+    if (profileToggle && profileMenu) {
+        profileToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            profileMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            profileMenu.classList.remove('show');
+        });
+        
+        // Prevent clicks within dropdown from closing it
+        profileMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Handle dropdown actions
+        const dropdownItems = profileMenu.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                
+                switch(action) {
+                    case 'profile':
+                        window.location.href = 'profile.html';
+                        break;
+                    case 'settings':
+                        window.location.href = 'settings.html';
+                        break;
+                    case 'logout':
+                        // You might want to call a logout API here
+                        window.location.href = 'login.html';
+                        break;
+                    case 'my-accommodations':
+                        window.location.href = 'my_accommodations.html';
+                        break;
+                }
+                
+                profileMenu.classList.remove('show');
+            });
+        });
+    }
+    
+    // Add 'show' class to profile dropdown menu for proper styling
+    const style = document.createElement('style');
+    style.textContent = `
+        .profile-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            min-width: 180px;
+            z-index: 1000;
+        }
+        
+        .profile-dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .profile-dropdown-toggle {
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            min-width: 300px;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .navbar {
+            z-index: 900;
+            position: sticky;
+            top: 0;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Handle mobile navigation toggle if it exists
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (mobileMenuToggle && navLinks) {
+        mobileMenuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('show-mobile');
+        });
+    }
+});

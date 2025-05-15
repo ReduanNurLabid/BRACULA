@@ -1,6 +1,6 @@
 // Global variables
 let accommodations = [];
-let API_BASE_URL = 'http://localhost/BRACULA/api';
+let API_BASE_URL = 'http://localhost:8081/BRACULA/api';
 
 // Utility Functions
 function showNotification(title, message, type) {
@@ -120,31 +120,50 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show loading state
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
             
-            // Send data to server
-            const response = await fetch(`${API_BASE_URL}/accommodations.php`, {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log('Server response:', result);
-
-            if (result.status === 'success' && result.data) {
-                // Add new accommodation to the list
-                addAccommodationToList(result.data);
+            // Send data to server with better error handling
+            try {
+                // Log the full URL for debugging
+                console.log('Sending request to:', `${API_BASE_URL}/accommodations.php`);
                 
-                // Close modal and reset form
-                modal.style.display = 'none';
-                accommodationForm.reset();
+                const response = await fetch(`${API_BASE_URL}/accommodations.php`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server returned error:', response.status, errorText);
+                    throw new Error(`Server error: ${response.status} ${response.statusText}. Details: ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Server response:', result);
+
+                if (result.status === 'success' && result.data) {
+                    // Add new accommodation to the list
+                    addAccommodationToList(result.data);
+                    
+                    // Close modal and reset form
+                    modal.style.display = 'none';
+                    accommodationForm.reset();
+                    if (imagePreview) {
+                        imagePreview.innerHTML = '';
+                    }
+                    
+                    showNotification('Success', 'Accommodation posted successfully!', 'success');
+                } else {
+                    throw new Error(result.message || 'Failed to post accommodation');
+                }
+            } catch (fetchError) {
+                console.error('Network or parsing error:', fetchError);
                 
-                showNotification('Success', 'Accommodation posted successfully!', 'success');
-            } else {
-                throw new Error(result.message || 'Failed to post accommodation');
+                // More detailed error message based on the type of error
+                if (fetchError.message.includes('Failed to fetch')) {
+                    throw new Error('Connection error: Could not connect to the server. Please check if XAMPP is running and Apache is started.');
+                } else {
+                    throw fetchError;
+                }
             }
         } catch (error) {
             console.error('Error during form submission:', error);
