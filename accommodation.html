@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accommodation Listings - BRACULA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="accommodation.html">Accommodation</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="accommodation-container">
+        <!-- Sidebar Filters -->
+        <div class="sidebar">
+            <h3>Filters</h3>
+            <div class="filter-section">
+                <label>Room Type</label>
+                <div class="room-type-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="roomType" value="single">
+                        <i class="fas fa-bed"></i> Single Room
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="roomType" value="shared">
+                        <i class="fas fa-users"></i> Shared Room
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="roomType" value="apartment">
+                        <i class="fas fa-home"></i> Apartment
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="roomType" value="studio">
+                        <i class="fas fa-building"></i> Studio
+                    </label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="Search by location...">
+            </div>
+            <div class="filter-section">
+                <label for="price-range">Price Range (BDT)</label>
+                <div class="price-inputs">
+                    <input type="number" id="min-price" placeholder="Min" min="0">
+                    <input type="number" id="max-price" placeholder="Max" min="0">
+                </div>
+            </div>
+            <button class="apply-filters">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="post-accommodation-section">
+                <button class="post-accommodation-btn">
+                    <i class="fas fa-plus"></i> Post Accommodation
+                </button>
+            </div>
+
+            <div class="accommodation-listings">
+                <h2>Available Accommodations</h2>
+                <div class="accommodations-grid" id="accommodationsContainer">
+                    <!-- Accommodations will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Accommodation Modal -->
+    <div id="postAccommodationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Post Accommodation</h2>
+            <form id="postAccommodationForm">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" name="roomType" required>
+                        <option value="">Select Type</option>
+                        <option value="single">Single Room</option>
+                        <option value="shared">Shared Room</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price (BDT/month)</label>
+                    <input type="number" id="price" name="price" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="form-location">Location</label>
+                    <input type="text" id="form-location" name="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="images">Images (Max 5 images)</label>
+                    <input type="file" id="images" name="images[]" multiple accept="image/*" required>
+                    <small>Supported formats: JPG, PNG, GIF. Max size: 5MB per image</small>
+                </div>
+                <div class="form-group">
+                    <label for="contactInfo">Contact Information</label>
+                    <input type="text" id="contactInfo" name="contactInfo" required>
+                </div>
+                <button type="submit" class="submit-accommodation">
+                    <i class="fas fa-check"></i> Post Accommodation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/accommodation.js"></script>
+</body>
+</html> 
