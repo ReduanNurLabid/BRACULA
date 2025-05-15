@@ -47,12 +47,14 @@ try {
     $user->full_name = $data['full_name'] ?? '';
     $user->bio = $data['bio'] ?? '';
     $user->avatar_url = $data['avatar_url'] ?? '';
+    $user->interests = $data['interests'] ?? '';
 
     error_log("Attempting to update profile for user: " . $user->user_id);
     error_log("Profile data: " . print_r([
         'full_name' => $user->full_name,
         'bio' => $user->bio,
-        'avatar_url' => $user->avatar_url
+        'avatar_url' => $user->avatar_url,
+        'interests' => $user->interests
     ], true));
 
     if ($user->update()) {
@@ -63,7 +65,8 @@ try {
                 'user_id' => $user->user_id,
                 'full_name' => $user->full_name,
                 'bio' => $user->bio,
-                'avatar_url' => $user->avatar_url
+                'avatar_url' => $user->avatar_url,
+                'interests' => $user->interests
             ]
         ];
         error_log("Profile updated successfully");

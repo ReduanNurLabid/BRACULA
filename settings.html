@@ -44,7 +44,7 @@
                 <h2>Profile Settings</h2>
                 <form id="profileSettingsForm">
                     <div class="form-group">
-                        <label for="profilePicture">Profile Picture URL</label>
+                        <label for="profilePicture">Profile Picture</label>
                         <div class="profile-picture-preview">
                             <img src="https://avatar.iran.liara.run/public" alt="Profile Picture" id="profilePicturePreview">
                             <input type="url" id="profilePictureUrl" class="form-control" placeholder="Enter image URL">
@@ -57,6 +57,11 @@
                     <div class="form-group">
                         <label for="bio">Bio</label>
                         <textarea id="bio" placeholder="Write something about yourself..." rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="interests">Interests</label>
+                        <input type="text" id="interests" placeholder="Enter your interests separated by commas (e.g., Coding, Music, Sports)">
+                        <small class="form-help">Separate multiple interests with commas</small>
                     </div>
                     <button type="submit" class="save-button">Save Changes</button>
                 </form>

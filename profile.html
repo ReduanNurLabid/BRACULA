@@ -41,11 +41,26 @@
         <div class="profile-header">
             <div class="profile-picture">
                 <img src="https://avatar.iran.liara.run/public" alt="Profile Picture">
+                <div class="edit-profile-picture">
+                    <i class="fas fa-camera"></i>
+                </div>
             </div>
             <div class="profile-info">
                 <h1>Loading...</h1>
                 <p class="department">Department of Computer Science and Engineering</p>
                 <p class="bio">Loading...</p>
+                <div class="status-indicator">
+                    <span class="status-dot online"></span> <!-- online, away, offline classes -->
+                    <span class="status-text">Online</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interests Section -->
+        <div class="interests-section">
+            <h2>Interests</h2>
+            <div class="interests-tags">
+                <p>Loading interests...</p>
             </div>
         </div>
 
@@ -57,6 +72,22 @@
             </div>
         </div>
     </div>
+    
+    <!-- Profile Picture Update Modal -->
+    <div id="profile-picture-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Update Profile Picture</h2>
+            <form id="profile-picture-form">
+                <div class="form-group">
+                    <label for="avatar-url">Image URL</label>
+                    <input type="text" id="avatar-url" name="avatar-url" placeholder="Enter image URL">
+                </div>
+                <button type="submit" class="btn-primary">Update Picture</button>
+            </form>
+        </div>
+    </div>
+    
     <script src="js/script.js"></script>
     <script src="js/profile.js"></script>
 </body>

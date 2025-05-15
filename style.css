@@ -2631,3 +2631,455 @@ body {
 .submit-button i {
     font-size: 1.1rem;
 }
+
+/* Profile Picture Styles */
+.profile-picture {
+    position: relative;
+}
+
+.edit-profile-picture {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #5e72e4;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-picture:hover {
+    background-color: #324cdd;
+}
+
+/* Status Indicator Styles */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-dot.online {
+    background-color: #2ecc71;
+}
+
+.status-dot.away {
+    background-color: #f39c12;
+}
+
+.status-dot.offline {
+    background-color: #e74c3c;
+}
+
+.status-text {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Interests Section Styles */
+.interests-section {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.interests-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.interests-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.interest-tag {
+    background-color: #e1e8ff;
+    color: #5e72e4;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* Profile Picture Modal Styles */
+#profile-picture-modal .modal-content {
+    max-width: 400px;
+}
+
+#profile-picture-modal form {
+    margin-top: 20px;
+}
+
+#profile-picture-form .form-group {
+    margin-bottom: 20px;
+}
+
+#profile-picture-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+#profile-picture-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#profile-picture-form button {
+    background-color: #5e72e4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#profile-picture-form button:hover {
+    background-color: #324cdd;
+}
+
+/* Form help text */
+.form-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Clickable usernames */
+.author-name, .post-avatar, .comment-author, .comment-avatar {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.author-name:hover, .comment-author:hover {
+    color: #5e72e4;
+    text-decoration: underline;
+}
+
+.post-avatar:hover, .comment-avatar:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+/* Accommodation Container Layout - matching rideshare container style */
+.accommodation-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 60px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 100px auto 20px;
+}
+
+.accommodation-container .sidebar {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+    align-self: start;
+}
+
+.accommodation-listings h2 {
+    margin-bottom: 20px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+}
+
+.accommodations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.accommodation-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.accommodation-card:hover {
+    transform: translateY(-5px);
+}
+
+.post-accommodation-section {
+    margin-bottom: 20px;
+}
+
+.post-accommodation-btn {
+    padding: 12px 24px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.post-accommodation-btn:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* Accommodation Responsive Design */
+@media (max-width: 1024px) {
+    .accommodations-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .accommodation-container {
+        grid-template-columns: 1fr;
+        margin-top: 80px;
+        gap: 20px;
+    }
+
+    .accommodation-container .sidebar {
+        position: relative;
+        top: 0;
+    }
+
+    .accommodations-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Additional Accommodation Styles matching Rideshare */
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--secondary);
+    font-weight: 500;
+}
+
+.filter-section input[type="text"],
+.filter-section input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+}
+
+.filter-section input[type="text"]:focus,
+.filter-section input[type="number"]:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.room-type-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.apply-filters {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-filters:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.accommodation-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.accommodation-card-header i {
+    font-size: 24px;
+    color: var(--secondary);
+}
+
+.accommodation-card-details {
+    display: grid;
+    gap: 10px;
+}
+
+.accommodation-card-details p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+}
+
+.accommodation-card-details i {
+    color: var(--secondary);
+}
+
+.view-accommodation-btn,
+.contact-owner-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.view-accommodation-btn:hover,
+.contact-owner-btn:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.contact-owner-btn {
+    margin-top: 8px;
+}
+
+/* Modal styles matching rideshare */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 5% auto;
+    padding: 25px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: var(--secondary);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--secondary);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(73, 109, 53, 0.1);
+}
+
+.submit-accommodation {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 20px auto 0;
+    padding: 12px 24px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.submit-accommodation:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+}
