@@ -15,9 +15,78 @@ function showNotification(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadUserProfile();
-    loadUserActivities();
+    // Check if viewing own profile or another user's profile
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('user_id');
+    
+    if (userId) {
+        // Viewing another user's profile
+        loadUserProfileById(userId);
+        loadUserActivitiesById(userId);
+        // Hide edit profile picture button for other users
+        const editButton = document.querySelector('.edit-profile-picture');
+        if (editButton) {
+            editButton.style.display = 'none';
+        }
+    } else {
+        // Viewing own profile
+        loadUserProfile();
+        loadUserActivities();
+        initializeProfilePictureUpdate();
+    }
 });
+
+async function loadUserProfileById(userId) {
+    try {
+        const response = await fetch(`${BASE_URL}/BRACULA/api/get_user_profile.php?user_id=${userId}`);
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            displayUserProfile(data.user);
+        } else {
+            throw new Error(data.message || 'Failed to load user profile');
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        showNotification('Failed to load profile', 'error');
+    }
+}
+
+async function loadUserActivitiesById(userId) {
+    try {
+        const response = await fetch(`${BASE_URL}/BRACULA/api/get_user_activities.php?user_id=${userId}`);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            displayUserActivities(data.data);
+        } else {
+            throw new Error(data.message || 'Failed to load activities');
+        }
+    } catch (error) {
+        console.error('Error loading activities:', error);
+        document.querySelector('.activity-list').innerHTML = 
+            '<p class="error-message">Failed to load activities</p>';
+    }
+}
+
+function displayUserProfile(userData) {
+    // Update profile information
+    document.querySelector('.profile-info h1').textContent = userData.full_name;
+    document.querySelector('.profile-info .bio').textContent = userData.bio || 'No bio added yet';
+    document.querySelector('.profile-info .department').textContent = userData.department;
+    
+    // Update profile pictures
+    const profilePics = document.querySelectorAll('.profile-picture img');
+    profilePics.forEach(img => {
+        img.src = userData.avatar_url || 'https://avatar.iran.liara.run/public';
+    });
+
+    // Display interests
+    displayInterests(userData.interests);
+    
+    // For demo purposes, we'll set a random status
+    setRandomStatus();
+}
 
 async function loadUserProfile() {
     try {
@@ -34,11 +103,142 @@ async function loadUserProfile() {
         // Update profile pictures (both in header and nav)
         const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
         profilePics.forEach(img => {
+            // Use the stored avatar_url if available, otherwise use default
             img.src = userData.avatar_url || 'https://avatar.iran.liara.run/public';
         });
+
+        // Display interests
+        displayInterests(userData.interests);
+        
+        // For demo purposes, we'll set a random status
+        setRandomStatus();
     } catch (error) {
         console.error('Error loading profile:', error);
         showNotification('Failed to load profile', 'error');
+    }
+}
+
+function displayInterests(interests) {
+    const interestsContainer = document.querySelector('.interests-tags');
+    
+    if (!interests) {
+        interestsContainer.innerHTML = '<p>No interests added yet</p>';
+        return;
+    }
+    
+    // Split interests by commas and generate tags
+    const interestsList = interests.split(',').map(interest => interest.trim());
+    if (interestsList.length === 0 || (interestsList.length === 1 && interestsList[0] === '')) {
+        interestsContainer.innerHTML = '<p>No interests added yet</p>';
+        return;
+    }
+    
+    const tagsHTML = interestsList.map(interest => 
+        `<span class="interest-tag">${interest}</span>`
+    ).join('');
+    
+    interestsContainer.innerHTML = tagsHTML;
+}
+
+function setRandomStatus() {
+    // This would be replaced with actual user status in a real app
+    const statuses = ['online', 'away', 'offline'];
+    const statusTexts = ['Online', 'Away', 'Offline'];
+    
+    const randomIndex = Math.floor(Math.random() * statuses.length);
+    const status = statuses[randomIndex];
+    const statusText = statusTexts[randomIndex];
+    
+    const statusDot = document.querySelector('.status-dot');
+    const statusTextElement = document.querySelector('.status-text');
+    
+    // Remove all status classes
+    statusDot.classList.remove('online', 'away', 'offline');
+    // Add the selected status class
+    statusDot.classList.add(status);
+    // Update the status text
+    statusTextElement.textContent = statusText;
+}
+
+function initializeProfilePictureUpdate() {
+    const editButton = document.querySelector('.edit-profile-picture');
+    const modal = document.getElementById('profile-picture-modal');
+    const closeBtn = modal.querySelector('.close');
+    const form = document.getElementById('profile-picture-form');
+    
+    // Open modal when clicking the edit button
+    editButton.addEventListener('click', () => {
+        openModal(modal);
+    });
+    
+    // Close modal when clicking the X
+    closeBtn.addEventListener('click', () => {
+        closeModal(modal);
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal(modal);
+        }
+    });
+    
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const avatarUrl = document.getElementById('avatar-url').value.trim();
+        if (!avatarUrl) {
+            showNotification('Please enter a valid image URL', 'error');
+            return;
+        }
+        
+        await updateProfilePicture(avatarUrl);
+        closeModal(modal);
+    });
+}
+
+async function updateProfilePicture(avatarUrl) {
+    try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (!userData || !userData.user_id) {
+            throw new Error('User not logged in');
+        }
+        
+        const response = await fetch(`${BASE_URL}/BRACULA/api/update_profile.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: userData.user_id,
+                full_name: userData.full_name,
+                bio: userData.bio,
+                avatar_url: avatarUrl,
+                interests: userData.interests
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local storage with new avatar URL
+            userData.avatar_url = avatarUrl;
+            localStorage.setItem('user', JSON.stringify(userData));
+            
+            // Update profile pictures on page
+            const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
+            profilePics.forEach(img => {
+                img.src = avatarUrl;
+            });
+            
+            showNotification('Profile picture updated successfully', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to update profile picture');
+        }
+    } catch (error) {
+        console.error('Error updating profile picture:', error);
+        showNotification('Failed to update profile picture', 'error');
     }
 }
 

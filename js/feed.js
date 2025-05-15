@@ -125,10 +125,10 @@ function createPostElement(post) {
         <div class="post-content">
             <div class="post-header">
                 <img src="${post.avatar_url || 'assets/images/default-avatar.png'}" 
-                     alt="${post.author}" class="post-avatar">
+                     alt="${post.author}" class="post-avatar" data-user-id="${post.user_id}">
                 <div class="post-meta">
                     <div class="author-info">
-                        <strong>${post.author}</strong>
+                        <strong class="author-name" data-user-id="${post.user_id}">${post.author}</strong>
                         <span class="post-community">${post.community}</span>
                     </div>
                     <div class="post-time">${formatTimestamp(post.timestamp)}</div>
@@ -438,15 +438,41 @@ function refreshFeed() {
 // Attach Post Event Listeners
 function attachPostEventListeners() {
     document.querySelectorAll('.feed-post').forEach(post => {
-        // Vote buttons
+        // Vote button event listeners
         post.querySelectorAll('.vote-btn').forEach(btn => {
             btn.addEventListener('click', handleVote);
         });
-
-        // Comment button
-        post.querySelector('.comments-btn').addEventListener('click', () => {
-            openCommentModal(post.dataset.postId);
-        });
+        
+        // Comment button event listener
+        const commentBtn = post.querySelector('.comments-btn');
+        if (commentBtn) {
+            commentBtn.addEventListener('click', () => {
+                const postId = post.dataset.postId;
+                openCommentModal(postId);
+            });
+        }
+        
+        // Author name and avatar click event listeners for profile view
+        const authorName = post.querySelector('.author-name');
+        const authorAvatar = post.querySelector('.post-avatar');
+        
+        if (authorName) {
+            authorName.addEventListener('click', (e) => {
+                const userId = e.target.dataset.userId;
+                if (userId) {
+                    viewUserProfile(userId);
+                }
+            });
+        }
+        
+        if (authorAvatar) {
+            authorAvatar.addEventListener('click', (e) => {
+                const userId = e.target.dataset.userId;
+                if (userId) {
+                    viewUserProfile(userId);
+                }
+            });
+        }
     });
 }
 
@@ -599,23 +625,42 @@ async function openCommentModal(postId) {
 }
 
 function createCommentElement(comment) {
-    const commentDiv = document.createElement('div');
-    commentDiv.className = 'comment';
-    commentDiv.dataset.commentId = comment.comment_id;
-
-    commentDiv.innerHTML = `
+    const commentElement = document.createElement('div');
+    commentElement.className = 'comment';
+    commentElement.innerHTML = `
         <div class="comment-header">
-            <img src="${comment.avatar_url || 'assets/images/default-avatar.png'}" 
-                 alt="${comment.full_name}" class="comment-avatar">
+            <img src="${comment.avatar_url || 'assets/images/default-avatar.png'}" alt="${comment.author}" class="comment-avatar" data-user-id="${comment.user_id}">
             <div class="comment-meta">
-                <strong>${comment.full_name}</strong>
-                <span class="comment-time">${formatTimestamp(comment.created_at)}</span>
+                <strong class="comment-author" data-user-id="${comment.user_id}">${comment.author}</strong>
+                <span class="comment-time">${formatTimestamp(comment.timestamp)}</span>
             </div>
         </div>
         <div class="comment-content">${comment.content}</div>
     `;
-
-    return commentDiv;
+    
+    // Add click event listener to the author name and avatar
+    const authorName = commentElement.querySelector('.comment-author');
+    const authorAvatar = commentElement.querySelector('.comment-avatar');
+    
+    if (authorName) {
+        authorName.addEventListener('click', (e) => {
+            const userId = e.target.dataset.userId;
+            if (userId) {
+                viewUserProfile(userId);
+            }
+        });
+    }
+    
+    if (authorAvatar) {
+        authorAvatar.addEventListener('click', (e) => {
+            const userId = e.target.dataset.userId;
+            if (userId) {
+                viewUserProfile(userId);
+            }
+        });
+    }
+    
+    return commentElement;
 }
 
 async function submitComment(postId, form) {
@@ -676,6 +721,11 @@ async function submitComment(postId, form) {
         console.error('Error submitting comment:', error);
         showNotification(error.message, 'error');
     }
+}
+
+// Function to view user profile
+function viewUserProfile(userId) {
+    window.location.href = `profile.html?user_id=${userId}`;
 }
 
 // ... rest of the existing code ...

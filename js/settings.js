@@ -51,6 +51,7 @@ function loadUserData() {
         document.getElementById('fullName').value = userData.full_name || '';
         document.getElementById('bio').value = userData.bio || '';
         document.getElementById('email').value = userData.email || '';
+        document.getElementById('interests').value = userData.interests || '';
         if (userData.avatar_url) {
             document.getElementById('profilePicturePreview').src = userData.avatar_url;
             document.getElementById('profilePictureUrl').value = userData.avatar_url;
@@ -77,6 +78,7 @@ async function updateProfile() {
             user_id: userData.user_id,
             full_name: document.getElementById('fullName').value,
             bio: document.getElementById('bio').value,
+            interests: document.getElementById('interests').value.trim(),
             avatar_url: document.getElementById('profilePictureUrl').value.trim() || 'https://avatar.iran.liara.run/public'
         };
 

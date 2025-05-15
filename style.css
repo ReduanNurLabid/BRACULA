@@ -2631,3 +2631,153 @@ body {
 .submit-button i {
     font-size: 1.1rem;
 }
+
+/* Profile Picture Styles */
+.profile-picture {
+    position: relative;
+}
+
+.edit-profile-picture {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #5e72e4;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-picture:hover {
+    background-color: #324cdd;
+}
+
+/* Status Indicator Styles */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-dot.online {
+    background-color: #2ecc71;
+}
+
+.status-dot.away {
+    background-color: #f39c12;
+}
+
+.status-dot.offline {
+    background-color: #e74c3c;
+}
+
+.status-text {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* Interests Section Styles */
+.interests-section {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.interests-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.interests-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.interest-tag {
+    background-color: #e1e8ff;
+    color: #5e72e4;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* Profile Picture Modal Styles */
+#profile-picture-modal .modal-content {
+    max-width: 400px;
+}
+
+#profile-picture-modal form {
+    margin-top: 20px;
+}
+
+#profile-picture-form .form-group {
+    margin-bottom: 20px;
+}
+
+#profile-picture-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+#profile-picture-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#profile-picture-form button {
+    background-color: #5e72e4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#profile-picture-form button:hover {
+    background-color: #324cdd;
+}
+
+/* Form help text */
+.form-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Clickable usernames */
+.author-name, .post-avatar, .comment-author, .comment-avatar {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.author-name:hover, .comment-author:hover {
+    color: #5e72e4;
+    text-decoration: underline;
+}
+
+.post-avatar:hover, .comment-avatar:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}

@@ -61,6 +61,7 @@ function updateNavigation() {
         if (profileSection) {
             const profileImage = profileSection.querySelector('.profile-dropdown-toggle');
             if (profileImage) {
+                // Use the stored avatar_url if available, otherwise use default
                 profileImage.src = user.avatar_url || 'https://avatar.iran.liara.run/public';
             }
         }

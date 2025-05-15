@@ -12,6 +12,7 @@ class User {
     public $avatar_url;
     public $bio;
     public $department;
+    public $interests;
 
     // Constructor with DB
     public function __construct($db) {
@@ -21,9 +22,9 @@ class User {
     // Create new user
     public function create() {
         $query = "INSERT INTO " . $this->table_name . "
-                (full_name, student_id, email, password_hash, avatar_url, bio, department)
+                (full_name, student_id, email, password_hash, avatar_url, bio, department, interests)
                 VALUES
-                (:full_name, :student_id, :email, :password_hash, :avatar_url, :bio, :department)";
+                (:full_name, :student_id, :email, :password_hash, :avatar_url, :bio, :department, :interests)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -34,6 +35,7 @@ class User {
         $this->avatar_url = htmlspecialchars(strip_tags($this->avatar_url));
         $this->bio = htmlspecialchars(strip_tags($this->bio));
         $this->department = htmlspecialchars(strip_tags($this->department));
+        $this->interests = htmlspecialchars(strip_tags($this->interests));
 
         // Hash password
         $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
@@ -46,6 +48,7 @@ class User {
         $stmt->bindParam(":avatar_url", $this->avatar_url);
         $stmt->bindParam(":bio", $this->bio);
         $stmt->bindParam(":department", $this->department);
+        $stmt->bindParam(":interests", $this->interests);
 
         try {
             if($stmt->execute()) {
@@ -60,7 +63,7 @@ class User {
 
     // Login user
     public function login($email, $password) {
-        $query = "SELECT user_id, full_name, email, password_hash 
+        $query = "SELECT user_id, full_name, email, password_hash, avatar_url, bio, department, interests 
                 FROM " . $this->table_name . "
                 WHERE email = :email";
 
@@ -73,6 +76,10 @@ class User {
                 $this->user_id = $row['user_id'];
                 $this->full_name = $row['full_name'];
                 $this->email = $row['email'];
+                $this->avatar_url = $row['avatar_url'];
+                $this->bio = $row['bio'];
+                $this->department = $row['department'];
+                $this->interests = $row['interests'];
                 return true;
             }
         }
@@ -105,7 +112,8 @@ class User {
         $query = "UPDATE " . $this->table_name . "
                 SET full_name = :full_name,
                     avatar_url = :avatar_url,
-                    bio = :bio
+                    bio = :bio,
+                    interests = :interests
                 WHERE user_id = :user_id";
 
         $stmt = $this->conn->prepare($query);
@@ -114,12 +122,14 @@ class User {
         $this->full_name = htmlspecialchars(strip_tags($this->full_name));
         $this->avatar_url = htmlspecialchars(strip_tags($this->avatar_url));
         $this->bio = htmlspecialchars(strip_tags($this->bio));
+        $this->interests = htmlspecialchars(strip_tags($this->interests));
         $this->user_id = htmlspecialchars(strip_tags($this->user_id));
 
         // Bind data
         $stmt->bindParam(":full_name", $this->full_name);
         $stmt->bindParam(":avatar_url", $this->avatar_url);
         $stmt->bindParam(":bio", $this->bio);
+        $stmt->bindParam(":interests", $this->interests);
         $stmt->bindParam(":user_id", $this->user_id);
 
         try {
@@ -135,7 +145,7 @@ class User {
 
     // Get user by ID
     public function getById($id) {
-        $query = "SELECT user_id, full_name, email, avatar_url, bio, created_at 
+        $query = "SELECT user_id, full_name, email, avatar_url, bio, department, interests, created_at 
                 FROM " . $this->table_name . "
                 WHERE user_id = :user_id";
 
