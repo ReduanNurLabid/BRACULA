@@ -446,3 +446,17 @@
 [15-May-2025 03:54:35 Europe/Berlin] Using database: bracula_db
 [15-May-2025 03:54:35 Europe/Berlin] Table 'users' exists in database
 [15-May-2025 03:54:35 Europe/Berlin] Buffered output:   {"status":"success","message":"User was created successfully"}
+[15-May-2025 21:45:18 Europe/Berlin] Register API Debug Info: Array
+(
+    [request_method] => POST
+    [content_type] => application/json
+    [raw_input] => {"full_name":"Reduan","student_id":"22101803","email":"reduan@g.bracu.ac.bd","password":"Reduan@123","department":"CSE","avatar_url":"https://avatar.iran.liara.run/public","bio":""}
+    [request_time] => 2025-05-15 21:45:18
+)
+
+[15-May-2025 21:45:18 Europe/Berlin] Raw POST data: {"full_name":"Reduan","student_id":"22101803","email":"reduan@g.bracu.ac.bd","password":"Reduan@123","department":"CSE","avatar_url":"https://avatar.iran.liara.run/public","bio":""}
+[15-May-2025 21:45:18 Europe/Berlin] Database config path: C:\xampp\htdocs\BRACULA\config\database.php
+[15-May-2025 21:45:18 Europe/Berlin] User model path: C:\xampp\htdocs\BRACULA\models\User.php
+[15-May-2025 21:45:18 Europe/Berlin] Using database: bracula_db
+[15-May-2025 21:45:18 Europe/Berlin] Table 'users' exists in database
+[15-May-2025 21:45:18 Europe/Berlin] Buffered output:   {"status":"success","message":"User was created successfully"}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRACULA - Setup Driver Reviews Table</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Setup Driver Reviews Table</h1>
+        <p>This tool will create the missing <code>driver_reviews</code> table in your database.</p>
+        <p>The table is required for displaying driver ratings in the rideshare feature.</p>
+        
+        <button id="setupBtn" class="btn">Create Driver Reviews Table</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('setupBtn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Processing...';
+            
+            fetch('database/create_driver_reviews_table.php')
+                .then(response => response.text())
+                .then(data => {
+                    resultDiv.innerHTML = data;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = 'Error: ' + error;
+                });
+        });
+    </script>
+</body>
+</html> 

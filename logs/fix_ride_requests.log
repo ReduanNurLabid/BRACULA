@@ -1,0 +1,7 @@
+
+Warning: require_once(../config/database.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\BRACULA\database\fix_ride_requests_table.php on line 3
+
+Fatal error: Uncaught Error: Failed opening required '../config/database.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\BRACULA\database\fix_ride_requests_table.php:3
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\BRACULA\database\fix_ride_requests_table.php on line 3

@@ -59,25 +59,19 @@ echo Creating events table...
 echo Setting up rideshare tables...
 "%PHP_PATH%" "%PROJECT_PATH%\database\setup_rideshare_tables.php"
 
-REM Create saved_posts table if it doesn't exist
-echo Creating saved_posts table if not exists...
-echo ^<?php > "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo require_once __DIR__ . '/../config/database.php'; >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo $database = new Database(); >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo $conn = $database->getConnection(); >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo $sql = "CREATE TABLE IF NOT EXISTS saved_posts ( >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     id INT AUTO_INCREMENT PRIMARY KEY, >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     user_id INT NOT NULL, >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     post_id INT NOT NULL, >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     UNIQUE KEY unique_save (user_id, post_id), >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo )"; >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo $conn-^>exec($sql); >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo echo "Saved posts table created or verified.\n"; >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-echo ?^> >> "%PROJECT_PATH%\database\create_saved_posts_table.php"
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_saved_posts_table.php"
+REM Fix missing columns in ride_requests table
+echo Fixing ride_requests table...
+"%PHP_PATH%" "%PROJECT_PATH%\database\fix_ride_requests_table.php" > "%PROJECT_PATH%\logs\fix_ride_requests.log"
+echo Ride_requests table check completed. See logs/fix_ride_requests.log for details.
+
+REM Fix missing driver_reviews table
+echo Creating driver_reviews table if not exists...
+"%PHP_PATH%" "%PROJECT_PATH%\database\create_driver_reviews_table.php" > "%PROJECT_PATH%\logs\create_driver_reviews.log"
+echo Driver_reviews table check completed. See logs/create_driver_reviews.log for details.
+
+REM Call update_database.php to create saved_posts table
+echo Creating saved_posts table...
+"%PHP_PATH%" "%PROJECT_PATH%\api\update_database.php"
 
 REM Create notifications table if it doesn't exist
 echo Creating notifications table if not exists...
@@ -140,6 +134,12 @@ echo Checking resources table...
 
 echo Checking comments table...
 "%PHP_PATH%" "%PROJECT_PATH%\database\check_comments_table.php"
+
+REM Create logs directory if it doesn't exist
+if not exist "%PROJECT_PATH%\logs" (
+    mkdir "%PROJECT_PATH%\logs"
+    echo Created logs directory.
+)
 
 echo.
 echo ========================================

@@ -43,8 +43,8 @@ function getRides($conn) {
     try {
         $query = "SELECT r.*, u.full_name, u.avatar_url, 
                  (SELECT COUNT(*) FROM ride_requests WHERE ride_id = r.ride_id AND status = 'pending') as request_count,
-                 (SELECT AVG(rating) FROM driver_reviews WHERE driver_id = r.user_id) as average_rating,
-                 (SELECT COUNT(*) FROM driver_reviews WHERE driver_id = r.user_id) as rating_count
+                 IFNULL((SELECT AVG(rating) FROM driver_reviews WHERE driver_id = r.user_id), 0) as average_rating,
+                 IFNULL((SELECT COUNT(*) FROM driver_reviews WHERE driver_id = r.user_id), 0) as rating_count
                  FROM rides r
                  LEFT JOIN users u ON r.user_id = u.user_id";
         
@@ -78,8 +78,54 @@ function getRides($conn) {
         
         echo json_encode(['status' => 'success', 'data' => $rides]);
     } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+        // Check if the error is related to driver_reviews table
+        if (strpos($e->getMessage(), "driver_reviews' doesn't exist") !== false) {
+            // Run the query without the driver reviews part as a fallback
+            try {
+                $query = "SELECT r.*, u.full_name, u.avatar_url, 
+                         (SELECT COUNT(*) FROM ride_requests WHERE ride_id = r.ride_id AND status = 'pending') as request_count,
+                         0 as average_rating,
+                         0 as rating_count
+                         FROM rides r
+                         LEFT JOIN users u ON r.user_id = u.user_id";
+                
+                $params = [];
+                
+                // Filter by user_id if provided
+                if (isset($_GET['user_id'])) {
+                    $query .= " WHERE r.user_id = ?";
+                    $params[] = $_GET['user_id'];
+                }
+                
+                // Filter by status if provided
+                if (isset($_GET['status'])) {
+                    $query .= isset($_GET['user_id']) ? " AND r.status = ?" : " WHERE r.status = ?";
+                    $params[] = $_GET['status'];
+                }
+                
+                // Order by creation date, newest first
+                $query .= " ORDER BY r.created_at DESC";
+                
+                $stmt = $conn->prepare($query);
+                
+                // Bind parameters if any
+                for ($i = 0; $i < count($params); $i++) {
+                    $stmt->bindParam($i + 1, $params[$i]);
+                }
+                
+                $stmt->execute();
+                
+                $rides = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                echo json_encode(['status' => 'success', 'data' => $rides]);
+            } catch (Exception $e2) {
+                http_response_code(500);
+                echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e2->getMessage()]);
+            }
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+        }
     }
 }
 
