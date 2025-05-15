@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
+                credentials: 'include' // Include cookies for session handling
             });
 
             const data = await response.json();
@@ -24,8 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 // Store user data in localStorage
                 localStorage.setItem('user', JSON.stringify(data.user));
-                // localStorage.setItem('token', data.token); // If using JWT
-
+                
+                console.log('Login successful, session established');
+                
                 // Redirect to feed page
                 window.location.href = 'feed.html';
             } else {

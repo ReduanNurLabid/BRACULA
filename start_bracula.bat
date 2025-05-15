@@ -39,75 +39,96 @@ echo.
 echo ========================================
 echo Initializing core database and tables...
 echo ========================================
-"%PHP_PATH%" "%PROJECT_PATH%\database\init_db.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\init_db.php"
 
 echo.
 echo ========================================
 echo Creating or updating additional tables...
 echo ========================================
 
+REM Create logs directory if it doesn't exist
+if not exist "%PROJECT_PATH%\logs" (
+    mkdir "%PROJECT_PATH%\logs"
+    echo Created logs directory.
+)
+
 REM Create or update core tables
 echo Creating activities table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_activities_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\create_activities_table.php"
 
 echo Creating event registrations table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_event_registrations_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\create_event_registrations_table.php"
 
 echo Creating events table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_events_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\create_events_table.php"
 
 echo Setting up rideshare tables...
-"%PHP_PATH%" "%PROJECT_PATH%\database\setup_rideshare_tables.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\setup_rideshare_tables.php"
 
 REM Fix missing columns in ride_requests table
 echo Fixing ride_requests table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\fix_ride_requests_table.php" > "%PROJECT_PATH%\logs\fix_ride_requests.log"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\fix_ride_requests_table.php" > "logs\fix_ride_requests.log"
 echo Ride_requests table check completed. See logs/fix_ride_requests.log for details.
 
 REM Fix missing pickup column in ride_requests table
 echo Fixing pickup column in ride_requests table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\fix_pickup_column.php" > "%PROJECT_PATH%\logs\fix_pickup_column.log"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\fix_pickup_column.php" > "logs\fix_pickup_column.log"
 echo Pickup column check completed. See logs/fix_pickup_column.log for details.
 
 REM Fix missing notes column in ride_requests table
 echo Fixing notes column in ride_requests table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\fix_notes_column.php" > "%PROJECT_PATH%\logs\fix_notes_column.log"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\fix_notes_column.php" > "logs\fix_notes_column.log"
 echo Notes column check completed. See logs/fix_notes_column.log for details.
 
 REM Fix missing driver_reviews table
 echo Creating driver_reviews table if not exists...
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_driver_reviews_table.php" > "%PROJECT_PATH%\logs\create_driver_reviews.log"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\create_driver_reviews_table.php" > "logs\create_driver_reviews.log"
 echo Driver_reviews table check completed. See logs/create_driver_reviews.log for details.
 
 REM Create accommodation tables if they don't exist
 echo Setting up accommodation tables...
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_accommodation_tables.php" > "%PROJECT_PATH%\logs\create_accommodation_tables.log"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\create_accommodation_tables.php" > "logs\create_accommodation_tables.log"
 echo Accommodation tables check completed. See logs/create_accommodation_tables.log for details.
 
 REM Call update_database.php to create saved_posts table
 echo Creating saved_posts table...
-"%PHP_PATH%" "%PROJECT_PATH%\api\update_database.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "api\update_database.php"
 
 REM Create notifications table if it doesn't exist
 echo Creating notifications table if not exists...
-echo ^<?php > "%PROJECT_PATH%\database\create_notifications_table.php"
-echo require_once __DIR__ . '/../config/database.php'; >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo $database = new Database(); >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo $conn = $database->getConnection(); >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo $sql = "CREATE TABLE IF NOT EXISTS notifications ( >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     notification_id INT AUTO_INCREMENT PRIMARY KEY, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     user_id INT NOT NULL, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     type VARCHAR(50) NOT NULL, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     content TEXT NOT NULL, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     related_id INT, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     is_read BOOLEAN DEFAULT FALSE, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo )"; >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo $conn-^>exec($sql); >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo echo "Notifications table created or verified.\n"; >> "%PROJECT_PATH%\database\create_notifications_table.php"
-echo ?^> >> "%PROJECT_PATH%\database\create_notifications_table.php"
-"%PHP_PATH%" "%PROJECT_PATH%\database\create_notifications_table.php"
+cd "%PROJECT_PATH%"
+(
+echo ^<?php
+echo // Create notifications table
+echo require_once __DIR__ . '/../config/database.php';
+echo $database = new Database();
+echo $conn = $database->getConnection();
+echo $sql = "CREATE TABLE IF NOT EXISTS notifications (";
+echo     "notification_id INT AUTO_INCREMENT PRIMARY KEY,";
+echo     "user_id INT NOT NULL,";
+echo     "type VARCHAR(50) NOT NULL,";
+echo     "content TEXT NOT NULL,";
+echo     "related_id INT,";
+echo     "is_read BOOLEAN DEFAULT FALSE,";
+echo     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,";
+echo     "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE";
+echo ")";
+echo $conn-^>exec($sql);
+echo echo "Notifications table created or verified.\n";
+echo ?^>
+) > "database\create_notifications_table.php"
+"%PHP_PATH%" "database\create_notifications_table.php"
 
 echo.
 echo ========================================
@@ -116,25 +137,30 @@ echo ========================================
 
 REM Update tables with required fields
 echo Updating comments table structure...
-"%PHP_PATH%" "%PROJECT_PATH%\database\update_comments_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\update_comments_table.php"
 
 echo Updating posts table structure...
-"%PHP_PATH%" "%PROJECT_PATH%\database\update_posts_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\update_posts_table.php"
 
 echo.
 echo ========================================
 echo Populating initial data...
 echo ========================================
 echo Populating users...
-"%PHP_PATH%" "%PROJECT_PATH%\database\populate_users.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\populate_users.php"
 
 echo Populating resources...
-"%PHP_PATH%" "%PROJECT_PATH%\database\populate_resources.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\populate_resources.php"
 
 REM Optional: Add test user if the script exists
-if exist "%PROJECT_PATH%\database\add_test_user.php" (
+if exist "database\add_test_user.php" (
     echo Adding test user...
-    "%PHP_PATH%" "%PROJECT_PATH%\database\add_test_user.php"
+    cd "%PROJECT_PATH%"
+    "%PHP_PATH%" "database\add_test_user.php"
 )
 
 echo.
@@ -142,19 +168,35 @@ echo ========================================
 echo Verifying database setup...
 echo ========================================
 echo Checking users table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\check_users.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\check_users.php"
 
 echo Checking resources table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\check_resources.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\check_resources.php"
 
 echo Checking comments table...
-"%PHP_PATH%" "%PROJECT_PATH%\database\check_comments_table.php"
+cd "%PROJECT_PATH%"
+"%PHP_PATH%" "database\check_comments_table.php"
 
-REM Create logs directory if it doesn't exist
-if not exist "%PROJECT_PATH%\logs" (
-    mkdir "%PROJECT_PATH%\logs"
-    echo Created logs directory.
+echo.
+echo ========================================
+echo Creating required directories...
+echo ========================================
+if not exist "%PROJECT_PATH%\uploads" (
+    mkdir "%PROJECT_PATH%\uploads"
+    echo Created uploads directory.
 )
+
+if not exist "%PROJECT_PATH%\uploads\accommodations" (
+    mkdir "%PROJECT_PATH%\uploads\accommodations"
+    echo Created uploads/accommodations directory.
+)
+
+REM Set permissions for uploads directories
+echo Setting permissions for uploads directories...
+icacls "%PROJECT_PATH%\uploads" /grant Everyone:F
+icacls "%PROJECT_PATH%\uploads\accommodations" /grant Everyone:F
 
 echo.
 echo ========================================

@@ -103,8 +103,10 @@ try {
     echo "<h3>All accommodation tables have been successfully created!</h3>";
     
 } catch (PDOException $e) {
-    // Rollback transaction on error
-    $conn->rollBack();
+    // Check if a transaction is active before rolling back
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+    }
     echo "Error creating tables: " . $e->getMessage();
 }
 ?> 

@@ -178,15 +178,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to fetch accommodations from server
     async function fetchAccommodations() {
         try {
+            console.log('Fetching accommodations from:', `${API_BASE_URL}/accommodations.php`);
+            
             const response = await fetch(`${API_BASE_URL}/accommodations.php`, {
                 credentials: 'include'
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Try to get the error details from the response
+                try {
+                    const errorText = await response.text();
+                    console.error('Server error response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
+                } catch (parseError) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
             }
 
             const result = await response.json();
+            console.log('Accommodations data received:', result);
 
             if (result.status === 'success') {
                 accommodations = result.data || [];
@@ -226,12 +236,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="price"><i class="fas fa-tag"></i> BDT ${formatPrice(accommodation.price)}/month</p>
                 <p class="owner"><i class="fas fa-user"></i> Posted by: ${escapeHtml(accommodation.full_name || 'Anonymous')}</p>
                 <p class="time"><i class="fas fa-clock"></i> Posted: ${formatTimestamp(accommodation.created_at)}</p>
-                <button class="view-details-btn" onclick="viewDetails(${accommodation.accommodation_id})">
-                    <i class="fas fa-info-circle"></i> View Details
-                </button>
-                <button class="contact-owner-btn" onclick="contactOwner(${accommodation.accommodation_id})">
-                    <i class="fas fa-envelope"></i> Contact Owner
-                </button>
+                <div class="card-buttons">
+                    <button class="view-details-btn" onclick="viewDetails(${parseInt(accommodation.accommodation_id, 10)})">
+                        <i class="fas fa-info-circle"></i> View Details
+                    </button>
+                    <button class="contact-owner-btn" onclick="contactOwner(${parseInt(accommodation.accommodation_id, 10)})">
+                        <i class="fas fa-envelope"></i> Contact Owner
+                    </button>
+                </div>
             </div>
         `;
 
@@ -277,21 +289,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Global functions
 window.viewDetails = function(accommodationId) {
-    const accommodation = accommodations.find(acc => acc.accommodation_id === accommodationId);
-    if (!accommodation) return;
+    console.log('View details clicked for accommodation ID:', accommodationId);
+    console.log('Available accommodations:', accommodations);
+    
+    // Convert the ID to the same type to ensure accurate comparison
+    accommodationId = parseInt(accommodationId, 10);
+    
+    // Find the accommodation with matching ID
+    const accommodation = accommodations.find(acc => parseInt(acc.accommodation_id, 10) === accommodationId);
+    
+    if (!accommodation) {
+        console.error('Accommodation not found with ID:', accommodationId);
+        showNotification('Error', 'Could not find accommodation details', 'error');
+        return;
+    }
+    
+    console.log('Found accommodation:', accommodation);
 
+    // Create and display the modal
     const detailsModal = document.createElement('div');
     detailsModal.className = 'modal';
+    detailsModal.style.display = 'block';
+    
+    // Check if there are images to display
+    let imagesHtml = '';
+    if (accommodation.images && accommodation.images.length > 0) {
+        imagesHtml = `
+            <div class="details-images">
+                ${accommodation.images.map(img => 
+                    `<img src="${img}" alt="${escapeHtml(accommodation.title)}" onerror="this.src='images/placeholder.jpg'">`
+                ).join('')}
+            </div>
+        `;
+    }
+    
     detailsModal.innerHTML = `
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2>${escapeHtml(accommodation.title)}</h2>
+            ${imagesHtml}
             <div class="details-content">
                 <p><strong>Location:</strong> ${escapeHtml(accommodation.location)}</p>
                 <p><strong>Room Type:</strong> ${escapeHtml(accommodation.room_type)}</p>
                 <p><strong>Price:</strong> BDT ${formatPrice(accommodation.price)}/month</p>
                 <p><strong>Description:</strong> ${escapeHtml(accommodation.description)}</p>
                 <p><strong>Contact:</strong> ${escapeHtml(accommodation.contact_info)}</p>
+                <p><strong>Posted By:</strong> ${escapeHtml(accommodation.full_name || 'Anonymous')}</p>
+                <p><strong>Posted On:</strong> ${formatTimestamp(accommodation.created_at)}</p>
+            </div>
+            <div class="details-actions">
+                <button class="contact-owner-btn" onclick="contactOwner(${accommodation.accommodation_id})">
+                    <i class="fas fa-envelope"></i> Contact Owner
+                </button>
             </div>
         </div>
     `;
@@ -308,8 +357,19 @@ window.viewDetails = function(accommodationId) {
 };
 
 window.contactOwner = function(accommodationId) {
-    const accommodation = accommodations.find(acc => acc.accommodation_id === accommodationId);
-    if (!accommodation) return;
-
+    console.log('Contact owner clicked for accommodation ID:', accommodationId);
+    
+    // Convert the ID to the same type to ensure accurate comparison
+    accommodationId = parseInt(accommodationId, 10);
+    
+    // Find the accommodation with matching ID
+    const accommodation = accommodations.find(acc => parseInt(acc.accommodation_id, 10) === accommodationId);
+    
+    if (!accommodation) {
+        console.error('Accommodation not found with ID:', accommodationId);
+        showNotification('Error', 'Could not find accommodation contact information', 'error');
+        return;
+    }
+    
     showNotification('Contact Info', accommodation.contact_info, 'info');
 }; 

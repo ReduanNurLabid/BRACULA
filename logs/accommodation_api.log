@@ -1,0 +1,68 @@
+[2025-05-15 23:06:09] Starting accommodations.php API call
+[2025-05-15 23:06:09] Database connection established
+[2025-05-15 23:06:09] Checking if user is logged in
+[2025-05-15 23:06:09] User ID from session: 5
+[2025-05-15 23:06:09] Request method: GET
+[2025-05-15 23:06:09] Error in accommodations.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause'
+Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->execute(Array)
+#1 {main}
+[2025-05-15 23:10:14] Starting accommodations.php API call
+[2025-05-15 23:10:14] Database connection established
+[2025-05-15 23:10:14] Checking if user is logged in
+[2025-05-15 23:10:14] User ID from session: 5
+[2025-05-15 23:10:14] Request method: GET
+[2025-05-15 23:10:25] Starting accommodations.php API call
+[2025-05-15 23:10:25] Database connection established
+[2025-05-15 23:10:25] Checking if user is logged in
+[2025-05-15 23:10:25] User ID from session: 5
+[2025-05-15 23:10:25] Request method: GET
+[2025-05-15 23:13:34] Starting accommodations.php API call
+[2025-05-15 23:13:34] Database connection established
+[2025-05-15 23:13:34] Checking if user is logged in
+[2025-05-15 23:13:34] User ID from session: 5
+[2025-05-15 23:13:34] Request method: GET
+[2025-05-15 23:14:02] Starting accommodations.php API call
+[2025-05-15 23:14:02] Database connection established
+[2025-05-15 23:14:02] Checking if user is logged in
+[2025-05-15 23:14:10] Starting accommodations.php API call
+[2025-05-15 23:14:10] Database connection established
+[2025-05-15 23:14:10] Checking if user is logged in
+[2025-05-15 23:14:14] Starting accommodations.php API call
+[2025-05-15 23:14:14] Database connection established
+[2025-05-15 23:14:14] Checking if user is logged in
+[2025-05-15 23:14:14] User ID from session: 5
+[2025-05-15 23:14:14] Request method: GET
+[2025-05-15 23:14:15] Starting accommodations.php API call
+[2025-05-15 23:14:15] Database connection established
+[2025-05-15 23:14:15] Checking if user is logged in
+[2025-05-15 23:14:15] User ID from session: 5
+[2025-05-15 23:14:15] Request method: GET
+[2025-05-15 23:14:16] Starting accommodations.php API call
+[2025-05-15 23:14:16] Database connection established
+[2025-05-15 23:14:16] Checking if user is logged in
+[2025-05-15 23:14:16] User ID from session: 5
+[2025-05-15 23:14:16] Request method: GET
+[2025-05-15 23:14:21] Starting accommodations.php API call
+[2025-05-15 23:14:21] Database connection established
+[2025-05-15 23:14:21] Checking if user is logged in
+[2025-05-15 23:15:50] Starting accommodations.php API call
+[2025-05-15 23:15:50] Database connection established
+[2025-05-15 23:15:50] Checking if user is logged in
+[2025-05-15 23:15:50] User ID from session: 5
+[2025-05-15 23:15:50] Request method: GET
+[2025-05-15 23:16:04] Starting accommodations.php API call
+[2025-05-15 23:16:04] Database connection established
+[2025-05-15 23:16:04] Checking if user is logged in
+[2025-05-15 23:16:43] Starting accommodations.php API call
+[2025-05-15 23:16:43] Database connection established
+[2025-05-15 23:16:43] Checking if user is logged in
+[2025-05-15 23:16:57] Starting accommodations.php API call
+[2025-05-15 23:16:57] Database connection established
+[2025-05-15 23:16:57] Checking if user is logged in
+[2025-05-15 23:16:57] User ID from session: 5
+[2025-05-15 23:16:57] Request method: GET
+[2025-05-15 23:17:09] Starting accommodations.php API call
+[2025-05-15 23:17:09] Database connection established
+[2025-05-15 23:17:09] Checking if user is logged in
+[2025-05-15 23:17:09] User ID from session: 5
+[2025-05-15 23:17:09] Request method: GET

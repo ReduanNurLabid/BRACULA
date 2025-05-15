@@ -262,20 +262,20 @@
 }
 
 .view-details-btn:hover {
-    background-color: #1e88e5;
+    background-color: #1976D2;
 }
 
 .contact-owner-btn {
-    background-color: #FF9800;
+    background-color: #4CAF50;
     color: white;
 }
 
 .contact-owner-btn:hover {
-    background-color: #fb8c00;
+    background-color: #388E3C;
 }
 
 .view-details-btn i, .contact-owner-btn i {
-    margin-right: 6px;
+    margin-right: 5px;
 }
 
 /* Navbar z-index */
@@ -294,35 +294,38 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    animation: modalFadeIn 0.3s;
 }
 
 .modal-content {
     background-color: #fff;
     margin: 80px auto 20px;
-    padding: 20px;
+    padding: 25px;
     border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     width: 90%;
-    max-width: 600px;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
     position: relative;
-    animation: modalFadeIn 0.3s;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {opacity: 0;}
+    to {opacity: 1;}
 }
 
 .close-modal {
     position: absolute;
     top: 15px;
-    right: 20px;
-    font-size: 24px;
-    color: #888;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.2s;
 }
 
 .close-modal:hover {
@@ -330,226 +333,95 @@
 }
 
 .modal-content h2 {
-    margin-top: 0;
-    color: #333;
+    margin-top: 5px;
     margin-bottom: 20px;
+    color: #333;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
+    font-size: 24px;
 }
 
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #555;
-}
-
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 4px;
-    color: #888;
-    font-size: 12px;
-}
-
-.submit-accommodation {
-    width: 100%;
-    padding: 12px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
+/* Details view styles */
+.details-images {
     display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.submit-accommodation:hover {
-    background-color: #45a049;
-}
-
-.submit-accommodation i {
-    margin-right: 8px;
-}
-
-/* Accommodation Details Modal */
-.accommodation-details {
-    padding: 0;
-}
-
-.details-header {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px 8px 0 0;
-}
-
-.details-header h2 {
-    margin: 0;
-    color: #333;
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.details-body {
-    padding: 20px;
-}
-
-.details-image-gallery {
-    display: flex;
-    overflow-x: auto;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
-    padding-bottom: 10px;
 }
 
-.gallery-image {
-    width: 150px;
-    height: 100px;
+.details-images img {
+    width: calc(33.333% - 7px);
+    height: 180px;
     object-fit: cover;
     border-radius: 4px;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: transform 0.2s;
 }
 
-.gallery-image:hover {
+.details-images img:hover {
     transform: scale(1.05);
 }
 
-.details-info-section {
+.details-content {
     margin-bottom: 20px;
 }
 
-.details-info-section h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    color: #333;
-    font-size: 18px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
-}
-
-.detail-row {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.detail-label {
-    flex: 0 0 120px;
-    font-weight: 500;
-    color: #555;
-}
-
-.detail-value {
-    flex: 1;
-    color: #333;
-}
-
-.details-description {
-    margin-bottom: 20px;
-}
-
-.details-description p {
-    margin: 0;
+.details-content p {
+    margin: 12px 0;
     line-height: 1.6;
     color: #555;
 }
 
-.contact-form-section {
-    background-color: #f5f5f5;
-    padding: 15px;
-    border-radius: 4px;
-    margin-top: 20px;
-}
-
-.contact-form-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
+.details-content p strong {
+    display: inline-block;
+    min-width: 120px;
     color: #333;
 }
 
-.contact-form textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-    min-height: 80px;
-    margin-bottom: 10px;
+.details-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
 }
 
-.send-message-btn {
+.details-actions button {
+    flex: 1;
     padding: 10px 15px;
-    background-color: #2196F3;
-    color: white;
     border: none;
     border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.details-actions button i {
+    margin-right: 8px;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.view-details-btn, .contact-owner-btn {
+    flex: 1;
+    padding: 8px 0;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
-}
-
-.send-message-btn:hover {
-    background-color: #1e88e5;
-}
-
-/* Responsive styles */
-@media (max-width: 992px) {
-    .accommodation-container {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        flex: none;
-        width: 100%;
-        position: static;
-    }
-}
-
-@media (max-width: 768px) {
-    .accommodations-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-    
-    .modal-content {
-        width: 95%;
-        padding: 15px;
-    }
-}
-
-@media (max-width: 576px) {
-    .accommodations-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .card-actions {
-        flex-direction: column;
-    }
-    
-    .view-details-btn, .contact-owner-btn {
-        width: 100%;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* My Accommodations Styles */
@@ -826,4 +698,42 @@
 
 .status-badge.inactive {
     background-color: #f44336;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+    .accommodation-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        flex: none;
+        width: 100%;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .accommodations-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .accommodations-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .view-details-btn, .contact-owner-btn {
+        width: 100%;
+    }
 } 

@@ -1,6 +1,6 @@
 <?php
-// Include database connection
-require_once '../config/database.php';
+// Create driver_reviews table if not exists
+require_once __DIR__ . '/../config/database.php';
 
 // Create a database connection
 $database = new Database();

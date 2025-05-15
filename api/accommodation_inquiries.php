@@ -1,6 +1,6 @@
 <?php
 require_once '../config/database.php';
-session_start();
+require_once '../includes/session_check.php'; // Include session check utility
 header('Content-Type: application/json');
 
 // Enable error reporting for debugging
@@ -23,14 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
-    exit;
-}
+// Require login for all operations
+require_login();
 
-$user_id = $_SESSION['user_id'];
+// Get user ID from session
+$user_id = get_user_id();
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {

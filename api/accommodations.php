@@ -1,39 +1,51 @@
 <?php
 require_once '../config/database.php';
-session_start();
+require_once '../includes/session_check.php'; // Include session check utility
 header('Content-Type: application/json');
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Initialize database connection
-$database = new Database();
-$conn = $database->getConnection();
+// Create log file for debugging
+$logFile = __DIR__ . '/../logs/accommodation_api.log';
 
-// Enable CORS for development
-header('Access-Control-Allow-Origin: http://localhost:8081');
-header('Access-Control-Allow-Credentials: true');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Accept');
-
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+function log_error($message) {
+    global $logFile;
+    $timestamp = date('Y-m-d H:i:s');
+    $logMessage = "[$timestamp] $message\n";
+    error_log($logMessage, 3, $logFile);
 }
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];
-$method = $_SERVER['REQUEST_METHOD'];
 
 try {
+    // Initialize database connection
+    log_error("Starting accommodations.php API call");
+    $database = new Database();
+    $conn = $database->getConnection();
+    log_error("Database connection established");
+
+    // Enable CORS for development
+    header('Access-Control-Allow-Origin: http://localhost:8081');
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Accept');
+
+    // Handle preflight requests
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit();
+    }
+
+    // Require login for all operations
+    log_error("Checking if user is logged in");
+    require_login();
+    
+    // Get user ID from session
+    $user_id = get_user_id();
+    log_error("User ID from session: " . $user_id);
+    $method = $_SERVER['REQUEST_METHOD'];
+    log_error("Request method: " . $method);
+
     switch($method) {
         case 'GET':
             if (isset($_GET['owner']) && $_GET['owner'] === 'me') {
@@ -92,7 +104,6 @@ try {
                     (SELECT COUNT(*) FROM accommodation_favorites WHERE accommodation_id = a.accommodation_id AND user_id = :user_id) as isFavorite
                     FROM accommodations a 
                     JOIN users u ON a.owner_id = u.user_id 
-                    WHERE a.status = 'active'
                     ORDER BY a.created_at DESC";
                 
                 $stmt = $conn->prepare($query);
@@ -352,6 +363,8 @@ try {
             break;
     }
 } catch (Exception $e) {
+    log_error("Error in accommodations.php: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+    
     http_response_code(500);
     echo json_encode([
         'status' => 'error',

@@ -1,5 +1,5 @@
 <?php
-// Include database connection
+// Fix notes column in ride_requests table
 require_once __DIR__ . '/../config/database.php';
 
 // Create a database connection
