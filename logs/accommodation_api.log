@@ -127,6 +127,7 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 12:37:46] User ID from session: 5
 [2025-05-16 12:37:46] Request method: GET
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 [2025-05-16 12:41:21] Starting accommodations.php API call
 [2025-05-16 12:41:21] Database connection established
 [2025-05-16 12:41:21] Checking if user is logged in
@@ -453,6 +454,8 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 13:19:43] User ID from session: 5
 [2025-05-16 13:19:43] Request method: GET
 =======
+=======
+>>>>>>> Stashed changes
 [2025-05-16 12:39:00] Starting accommodations.php API call
 [2025-05-16 12:39:00] Database connection established
 [2025-05-16 12:39:00] Checking if user is logged in
@@ -463,6 +466,7 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 12:53:06] Checking if user is logged in
 [2025-05-16 12:53:06] User ID from session: 5
 [2025-05-16 12:53:06] Request method: GET
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
 [2025-05-16 13:24:56] Starting accommodations.php API call
 [2025-05-16 13:24:56] Database connection established
@@ -484,3 +488,5 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 13:25:01] Checking if user is logged in
 [2025-05-16 13:25:01] User ID from session: 5
 [2025-05-16 13:25:01] Request method: GET
+=======
+>>>>>>> Stashed changes
