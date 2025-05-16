@@ -81,18 +81,26 @@ async function loadUserActivitiesById(userId) {
 
 function displayUserProfile(userData) {
     // Update profile information
+    const fullName = userData.full_name && userData.full_name.trim() !== '' ? userData.full_name : DEFAULT_USER_PROFILE.full_name;
+    const bio = userData.bio && userData.bio.trim() !== '' ? userData.bio : DEFAULT_USER_PROFILE.bio;
+    const department = userData.department && userData.department.trim() !== '' ? userData.department : DEFAULT_USER_PROFILE.department;
+    const avatarUrl = userData.avatar_url && userData.avatar_url.trim() !== '' ? userData.avatar_url : DEFAULT_USER_PROFILE.avatar_url;
+    const interests = userData.interests && userData.interests.trim() !== '' ? userData.interests : DEFAULT_USER_PROFILE.interests;
     document.querySelector('.profile-info h1').textContent = userData.full_name;
     document.querySelector('.profile-info .bio').textContent = userData.bio || 'No bio added yet';
     document.querySelector('.profile-info .department').textContent = userData.department;
-    
+
     // Update profile pictures
-    const profilePics = document.querySelectorAll('.profile-picture img');
-    profilePics.forEach(img => {
-        img.src = userData.avatar_url || 'https://avatar.iran.liara.run/public';
-    });
+    const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
+profilePics.forEach(img => {
+    if (img) {
+            const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
+    profilePics.forEach(img => img.src = avatarUrl);
+    }
+})
 
     // Display interests
-    displayInterests(userData.interests);
+    displayInterests(interests);
     
     // For demo purposes, we'll set a random status
     setRandomStatus();

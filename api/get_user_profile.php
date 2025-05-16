@@ -21,29 +21,51 @@ try {
     $db = $database->getConnection();
 
     // Create user object
-    $user = new User($db);
+   // $user = new User($db);
     
     // Get user data
-    $userData = $user->getById($userId);
-    
-    if ($userData) {
-        // Remove sensitive data
-        unset($userData['password_hash']);
-        
-        http_response_code(200);
-        echo json_encode([
-            "status" => "success",
-            "user" => $userData
-        ]);
+    $user = new User($conn);
+    $user->user_id = $data['user_id'];
+    $user->full_name = $data['full_name'] ?? '';
+    $user->bio = $data['bio'] ?? '';
+    $user->avatar_url = $data['avatar_url'] ?? '';
+    $user->interests = $data['interests'] ?? '';
+
+    error_log("Attempting to update profile for user: " . $user->user_id);
+    error_log("Profile data: " . print_r([
+        'full_name' => $user->full_name,
+        'bio' => $user->bio,
+        'avatar_url' => $user->avatar_url,
+        'interests' => $user->interests
+    ], true));
+
+    if ($user->update()) {
+        $response = [
+            'success' => true,
+            'message' => 'Profile updated successfully',
+            'data' => [
+                'user_id' => $user->user_id,
+                'full_name' => $user->full_name,
+                'bio' => $user->bio,
+                'avatar_url' => $user->avatar_url,
+                'interests' => $user->interests
+            ]
+        ];
+        error_log("Profile updated successfully");
+        echo json_encode($response);
     } else {
-        throw new Exception("User not found");
+        throw new Exception('Failed to update profile');
     }
 
 } catch (Exception $e) {
-    http_response_code(400);
+    error_log("Error in update_profile.php: " . $e->getMessage());
+    http_response_code(500);
     echo json_encode([
-        "status" => "error",
-        "message" => $e->getMessage()
+        'success' => false,
+        'error' => 'An error occurred while updating profile'
     ]);
 }
-?> 
+
+// Ensure no extra output
+ob_end_flush();
+?>
