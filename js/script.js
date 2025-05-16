@@ -1,6 +1,7 @@
 // Common functionality across pages
 document.addEventListener('DOMContentLoaded', () => {
     initializeProfileDropdown();
+    initializeNotificationDropdown();
     updateNavigation();
 });
 
@@ -54,6 +55,215 @@ function initializeProfileDropdown() {
     } else {
         console.warn('Profile dropdown elements not found');
     }
+}
+
+// Notification Dropdown Functionality
+function initializeNotificationDropdown() {
+    const notificationToggle = document.getElementById('notificationToggle');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    
+    if (notificationToggle && notificationDropdown) {
+        // Toggle notification dropdown
+        notificationToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Notification toggle clicked');
+            
+            // Toggle show class on the dropdown
+            notificationDropdown.classList.toggle('show');
+            
+            // If opened, fetch notifications (commented for now until API is ready)
+            if (notificationDropdown.classList.contains('show')) {
+                // fetchNotifications();
+                loadSampleNotifications();
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            // Check if the click was outside the notification area
+            if (!notificationToggle.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.remove('show');
+            }
+        });
+        
+        // Handle notification tab switching
+        const notificationTabs = notificationDropdown.querySelectorAll('.notification-tab');
+        if (notificationTabs.length > 0) {
+            notificationTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    notificationTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Filter notifications based on tab
+                    const tabType = tab.dataset.tab;
+                    filterNotifications(tabType);
+                });
+            });
+        }
+        
+        // Handle "Mark all as read" button
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', () => {
+                markAllNotificationsAsRead();
+            });
+        }
+        
+        // Handle "View all" notifications button
+        const viewAllBtn = document.getElementById('viewAllNotificationsBtn');
+        if (viewAllBtn) {
+            viewAllBtn.addEventListener('click', () => {
+                // Redirect to all notifications page (if implemented)
+                console.log('View all notifications clicked');
+                // window.location.href = 'notifications.html';
+                
+                // For now, just close the dropdown
+                notificationDropdown.classList.remove('show');
+            });
+        }
+    } else {
+        console.warn('Notification dropdown elements not found');
+    }
+}
+
+// Load sample notifications for demonstration
+function loadSampleNotifications() {
+    const notificationList = document.getElementById('notificationList');
+    if (!notificationList) return;
+    
+    // Clear existing notifications
+    notificationList.innerHTML = '';
+    
+    // Sample notifications data
+    const sampleNotifications = [
+        {
+            id: 1,
+            type: 'comment',
+            read: false,
+            sender: 'Tanvir Ahmed',
+            message: 'commented on your post',
+            time: '2 hours ago',
+            avatar: 'https://avatar.iran.liara.run/public'
+        },
+        {
+            id: 2,
+            type: 'like',
+            read: true,
+            sender: 'Raisa Rahman',
+            message: 'liked your accommodation listing',
+            time: '1 day ago',
+            avatar: 'https://avatar.iran.liara.run/public/21'
+        },
+        {
+            id: 3,
+            type: 'inquiry',
+            read: false,
+            sender: 'Fahmid Khan',
+            message: 'sent an inquiry about your accommodation',
+            time: '3 days ago',
+            avatar: 'https://avatar.iran.liara.run/public/44'
+        }
+    ];
+    
+    // Render notifications
+    sampleNotifications.forEach(notification => {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+        notificationItem.dataset.id = notification.id;
+        
+        notificationItem.innerHTML = `
+            <div class="notification-avatar">
+                <img src="${notification.avatar}" alt="${notification.sender}">
+            </div>
+            <div class="notification-content">
+                <div class="notification-text">
+                    <strong>${notification.sender}</strong> ${notification.message}
+                </div>
+                <div class="notification-time">${notification.time}</div>
+            </div>
+        `;
+        
+        // Add click event to mark as read
+        notificationItem.addEventListener('click', () => {
+            markNotificationAsRead(notification.id);
+            // Handle navigation to the relevant item if needed
+        });
+        
+        notificationList.appendChild(notificationItem);
+    });
+    
+    // Update notification count
+    updateNotificationCount(sampleNotifications.filter(n => !n.read).length);
+}
+
+// Update the notification badge count
+function updateNotificationCount(count) {
+    const notificationCount = document.getElementById('notificationCount');
+    if (notificationCount) {
+        notificationCount.textContent = count;
+        
+        // Show/hide the badge based on count
+        if (count > 0) {
+            notificationCount.style.display = 'flex';
+            // Add a subtle animation to the bell icon
+            const notificationIcon = document.querySelector('.notification-icon');
+            if (notificationIcon) {
+                notificationIcon.classList.add('animate');
+                setTimeout(() => {
+                    notificationIcon.classList.remove('animate');
+                }, 1000);
+            }
+        } else {
+            notificationCount.style.display = 'none';
+        }
+    }
+}
+
+// Filter notifications based on tab (all/unread)
+function filterNotifications(type) {
+    const notificationItems = document.querySelectorAll('.notification-item');
+    
+    notificationItems.forEach(item => {
+        if (type === 'all') {
+            item.style.display = 'flex';
+        } else if (type === 'unread') {
+            item.style.display = item.classList.contains('unread') ? 'flex' : 'none';
+        }
+    });
+}
+
+// Mark a single notification as read
+function markNotificationAsRead(id) {
+    const notification = document.querySelector(`.notification-item[data-id="${id}"]`);
+    if (notification) {
+        notification.classList.remove('unread');
+        
+        // Update the notification count
+        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+        updateNotificationCount(unreadCount);
+        
+        // In a real app, you would also update this on the server
+        console.log(`Marked notification ${id} as read`);
+    }
+}
+
+// Mark all notifications as read
+function markAllNotificationsAsRead() {
+    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+    
+    unreadNotifications.forEach(notification => {
+        notification.classList.remove('unread');
+    });
+    
+    // Update the notification count
+    updateNotificationCount(0);
+    
+    // In a real app, you would also update this on the server
+    console.log('Marked all notifications as read');
 }
 
 function handleProfileAction(action) {
