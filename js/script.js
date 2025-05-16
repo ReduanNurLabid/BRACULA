@@ -99,12 +99,16 @@ function updateNavigation() {
     if (userData) {
         // User is logged in
         const user = JSON.parse(userData);
-        if (profileSection) {
-            const profileImage = profileSection.querySelector('.profile-dropdown-toggle');
-            if (profileImage) {
+        
+        // Update all profile images across the site
+        const profileImages = document.querySelectorAll('.profile-dropdown-toggle, .profile-picture img, .profile-section img');
+        if (profileImages && profileImages.length > 0) {
+            profileImages.forEach(img => {
                 // Use the stored avatar_url if available, otherwise use default
-                profileImage.src = user.avatar_url || 'https://avatar.iran.liara.run/public';
-            }
+                img.src = user.avatar_url || 'https://avatar.iran.liara.run/public';
+            });
+        } else {
+            console.warn('No profile images found to update');
         }
     } else {
         // User is not logged in
@@ -137,55 +141,8 @@ function formatTimestamp(timestamp) {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
 }
 
-// Common UI functionality for BRACULA
+// Add styles for profile dropdown menu
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle profile dropdown toggle
-    const profileToggle = document.querySelector('.profile-dropdown-toggle');
-    const profileMenu = document.querySelector('.profile-dropdown-menu');
-    
-    if (profileToggle && profileMenu) {
-        profileToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            profileMenu.classList.toggle('show');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            profileMenu.classList.remove('show');
-        });
-        
-        // Prevent clicks within dropdown from closing it
-        profileMenu.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // Handle dropdown actions
-        const dropdownItems = profileMenu.querySelectorAll('.dropdown-item');
-        dropdownItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const action = this.getAttribute('data-action');
-                
-                switch(action) {
-                    case 'profile':
-                        window.location.href = 'profile.html';
-                        break;
-                    case 'settings':
-                        window.location.href = 'settings.html';
-                        break;
-                    case 'logout':
-                        // You might want to call a logout API here
-                        window.location.href = 'login.html';
-                        break;
-                    case 'my-accommodations':
-                        window.location.href = 'my_accommodations.html';
-                        break;
-                }
-                
-                profileMenu.classList.remove('show');
-            });
-        });
-    }
-    
     // Add 'show' class to profile dropdown menu for proper styling
     const style = document.createElement('style');
     style.textContent = `
