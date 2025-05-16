@@ -126,6 +126,7 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 12:37:46] Checking if user is logged in
 [2025-05-16 12:37:46] User ID from session: 5
 [2025-05-16 12:37:46] Request method: GET
+<<<<<<< Updated upstream
 [2025-05-16 12:41:21] Starting accommodations.php API call
 [2025-05-16 12:41:21] Database connection established
 [2025-05-16 12:41:21] Checking if user is logged in
@@ -451,3 +452,35 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-16 13:19:43] Checking if user is logged in
 [2025-05-16 13:19:43] User ID from session: 5
 [2025-05-16 13:19:43] Request method: GET
+=======
+[2025-05-16 12:39:00] Starting accommodations.php API call
+[2025-05-16 12:39:00] Database connection established
+[2025-05-16 12:39:00] Checking if user is logged in
+[2025-05-16 12:39:00] User ID from session: 5
+[2025-05-16 12:39:00] Request method: GET
+[2025-05-16 12:53:06] Starting accommodations.php API call
+[2025-05-16 12:53:06] Database connection established
+[2025-05-16 12:53:06] Checking if user is logged in
+[2025-05-16 12:53:06] User ID from session: 5
+[2025-05-16 12:53:06] Request method: GET
+>>>>>>> Stashed changes
+[2025-05-16 13:24:56] Starting accommodations.php API call
+[2025-05-16 13:24:56] Database connection established
+[2025-05-16 13:24:56] Checking if user is logged in
+[2025-05-16 13:24:56] User ID from session: 5
+[2025-05-16 13:24:56] Request method: GET
+[2025-05-16 13:24:57] Starting accommodations.php API call
+[2025-05-16 13:24:57] Database connection established
+[2025-05-16 13:24:57] Checking if user is logged in
+[2025-05-16 13:24:57] User ID from session: 5
+[2025-05-16 13:24:57] Request method: GET
+[2025-05-16 13:24:58] Starting accommodations.php API call
+[2025-05-16 13:24:58] Database connection established
+[2025-05-16 13:24:58] Checking if user is logged in
+[2025-05-16 13:24:58] User ID from session: 5
+[2025-05-16 13:24:58] Request method: GET
+[2025-05-16 13:25:01] Starting accommodations.php API call
+[2025-05-16 13:25:01] Database connection established
+[2025-05-16 13:25:01] Checking if user is logged in
+[2025-05-16 13:25:01] User ID from session: 5
+[2025-05-16 13:25:01] Request method: GET
