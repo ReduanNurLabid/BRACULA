@@ -40,3 +40,5 @@ BRACULA is a comprehensive community platform for Brown University students, pro
 ## Test Credentials
 - Username: test@example.com
 - Password: password123 
+
+### Contributor: Reduan Nur, Mahim Kabir, Anika Ferdous, Jerin khan
