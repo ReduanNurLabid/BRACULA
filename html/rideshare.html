@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Share - BRACULA</title>
+    <link href="../public/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="accommodation.html">Accommodation</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Notification Section -->
+                <div class="notification-section">
+                    <div class="notification-icon" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-tabs">
+                                <button class="notification-tab active" data-tab="all">All</button>
+                                <button class="notification-tab" data-tab="unread">Unread</button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <!-- Notifications will be added here dynamically -->
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllReadBtn">Mark all as read</button>
+                            <a href="#" id="viewAllNotificationsBtn">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="saved-posts">
+                            <i class="fas fa-bookmark"></i> Saved Posts
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="materials-container">
+        <!-- Sidebar Filters -->
+        <div class="sidebar">
+            <h4>Filters</h4>
+            <div class="filter-section">
+                <label>Transport Type</label>
+                <div class="vehicle-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="car">
+                        <i class="fas fa-car"></i> Car
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="bike">
+                        <i class="fas fa-motorcycle"></i> Bike
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="cng">
+                        <i class="fas fa-taxi"></i> CNG
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="vehicle" value="rickshaw">
+                        <i class="fas fa-bicycle"></i> Rickshaw
+                    </label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <label for="seats">Minimum Seats</label>
+                <input type="number" id="seats" min="1" max="4" value="1">
+            </div>
+            <div class="filter-section">
+                <label for="max-fare">Maximum Fare (BDT)</label>
+                <input type="number" id="max-fare" min="0" step="10">
+            </div>
+            <div class="filter-section">
+                <label for="pickup-location">Pickup Location</label>
+                <input type="text" id="pickup-location" placeholder="Enter pickup location">
+            </div>
+            <div class="filter-section">
+                <label for="destination-location">Destination</label>
+                <input type="text" id="destination-location" placeholder="Enter destination">
+            </div>
+            <button class="apply-filters">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search rides...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+
+            <!-- Offer Ride Section -->
+            <div class="upload-section">
+                <h3>Ride Sharing Platform</h3>
+                <button class="upload-material-btn offer-ride-btn">
+                    <i class="fas fa-car"></i> Offer a Ride
+                </button>
+            </div>
+
+            <!-- Tabs for different ride views -->
+            <div class="ride-tabs">
+                <button class="tab-button active" data-tab="available">Available Rides</button>
+                <button class="tab-button" data-tab="my-offers">My Ride Offers</button>
+                <button class="tab-button" data-tab="my-requests">My Ride Requests</button>
+            </div>
+
+            <!-- Ride Listings -->
+            <div class="materials-gallery ride-listings">
+                <div class="tab-content" id="available-tab">
+                    <h3>Available Rides</h3>
+                    <div class="materials-grid rides-grid" id="ridesContainer">
+                        <!-- Rides will be added here dynamically -->
+                    </div>
+                </div>
+
+                <div class="tab-content" id="my-offers-tab" style="display: none;">
+                    <h3>My Ride Offers</h3>
+                    <div class="materials-grid rides-grid" id="myOffersContainer">
+                        <!-- My offered rides will be added here dynamically -->
+                    </div>
+                </div>
+
+                <div class="tab-content" id="my-requests-tab" style="display: none;">
+                    <h3>My Ride Requests</h3>
+                    <div class="materials-grid rides-grid" id="myRequestsContainer">
+                        <!-- My ride requests will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer Ride Modal -->
+    <div id="offerRideModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Offer a Ride</h2>
+            <form id="offerRideForm">
+                <div class="form-group">
+                    <label for="vehicleType">Transport Type</label>
+                    <select id="vehicleType" name="vehicleType" required>
+                        <option value="">Select Type</option>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                        <option value="cng">CNG</option>
+                        <option value="rickshaw">Rickshaw</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="seats">Available Seats</label>
+                    <input type="number" id="seats" name="seats" min="1" max="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="fare">Fare (BDT)</label>
+                    <input type="number" id="fare" name="fare" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="pickup">Pickup Location</label>
+                    <input type="text" id="pickup" name="pickup" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" name="destination" required>
+                </div>
+                <div class="form-group">
+                    <label for="departure_time">Departure Time</label>
+                    <input type="datetime-local" id="departure_time" name="departure_time" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact_info">Contact Information</label>
+                    <input type="text" id="contact_info" name="contact_info" placeholder="Phone number or email" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Any additional information about the ride"></textarea>
+                </div>
+                <button type="submit" class="upload-button">
+                    <i class="fas fa-check"></i> Submit Offer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Request Ride Modal -->
+    <div id="requestRideModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Request a Ride</h2>
+            <div id="requestRideDetails"></div>
+            <form id="requestRideForm">
+                <input type="hidden" id="request-ride-id" name="ride_id">
+                <div class="form-group">
+                    <label for="request-seats">Number of Seats</label>
+                    <input type="number" id="request-seats" name="seats" min="1" max="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="request-pickup">Pickup Location</label>
+                    <input type="text" id="request-pickup" name="pickup" required>
+                </div>
+                <div class="form-group">
+                    <label for="request-notes">Message to Driver</label>
+                    <textarea id="request-notes" name="notes" placeholder="Any special instructions or requests"></textarea>
+                </div>
+                <button type="submit" class="upload-button">
+                    <i class="fas fa-paper-plane"></i> Send Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Ride Requests Modal -->
+    <div id="viewRequestsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Ride Requests</h2>
+            <div id="rideRequestsList"></div>
+        </div>
+    </div>
+
+    <!-- Review Driver Modal -->
+    <div id="reviewDriverModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Review Driver</h2>
+            <form id="reviewDriverForm">
+                <input type="hidden" id="review-ride-id" name="ride_id">
+                <input type="hidden" id="review-driver-id" name="driver_id">
+                <div class="form-group">
+                    <label for="rating">Rating</label>
+                    <div class="star-rating">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" id="rating" name="rating" required>
+                </div>
+                <div class="form-group">
+                    <label for="review-comment">Comment</label>
+                    <textarea id="review-comment" name="comment" placeholder="Share your experience with this driver"></textarea>
+                </div>
+                <button type="submit" class="upload-button">
+                    <i class="fas fa-check"></i> Submit Review
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>All Notifications</h2>
+            <div class="notification-filters">
+                <button class="notification-filter active" data-filter="all">All</button>
+                <button class="notification-filter" data-filter="unread">Unread</button>
+                <button class="notification-filter" data-filter="read">Read</button>
+            </div>
+            <div class="all-notifications-list" id="allNotificationsList">
+                <!-- All notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../public/js/script.js"></script>
+    <script src="../public/js/rideshare.js"></script>
+    <script src="../public/js/notifications.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<?php
+// Redirect to new location
+header("Location: /api/posts/get_saved_posts.php");
+exit;
+?>

@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imageUrl = accommodation.images && accommodation.images.length > 0 
             ? accommodation.images[0] 
-            : 'images/placeholder.jpg';
+            : 'images/placeholder.png';
 
         card.innerHTML = `
             <div class="card-image">

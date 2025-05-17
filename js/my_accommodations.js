@@ -1,7 +1,6 @@
 // Global variables
 let myAccommodations = [];
 let myFavorites = [];
-let inquiries = [];
 let API_BASE_URL = 'http://localhost:8081/BRACULA/api';
 
 // Utility Functions
@@ -40,22 +39,32 @@ function formatTimestamp(timestamp) {
     return date.toLocaleString();
 }
 
+// Function to fix image URLs to work with our directory structure
+function fixImageUrl(imageUrl) {
+    if (!imageUrl) return '../public/images/placeholder.jpg';
+    
+    // If the URL starts with /uploads/, prepend .. to make it relative to the current directory
+    if (imageUrl.startsWith('/uploads/')) {
+        return '..' + imageUrl;
+    }
+    
+    // If it's already a full URL (https://) or a relative path, return as is
+    return imageUrl;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const postModal = document.getElementById('postAccommodationModal');
     const editModal = document.getElementById('editAccommodationModal');
-    const inquiryModal = document.getElementById('inquiryResponseModal');
     const confirmDialog = document.getElementById('confirmationDialog');
     
     const postBtns = document.querySelectorAll('.post-accommodation-btn');
     const closeBtns = document.querySelectorAll('.close-modal');
     
     const myListingsTab = document.getElementById('my-listings-tab');
-    const inquiriesTab = document.getElementById('inquiries-tab');
     const favoritesTab = document.getElementById('favorites-tab');
     
     const myListingsSection = document.getElementById('my-listings-section');
-    const inquiriesSection = document.getElementById('inquiries-section');
     const favoritesSection = document.getElementById('favorites-section');
     
     // Initialize tabs
@@ -63,11 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         myListingsTab.addEventListener('click', (e) => {
             e.preventDefault();
             showSection(myListingsSection, myListingsTab);
-        });
-        
-        inquiriesTab.addEventListener('click', (e) => {
-            e.preventDefault();
-            showSection(inquiriesSection, inquiriesTab);
         });
         
         favoritesTab.addEventListener('click', (e) => {
@@ -161,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = listing.accommodation_id;
             
             const imageUrl = listing.images && listing.images.length > 0 
-                ? listing.images[0] 
-                : 'images/placeholder.jpg';
+                ? fixImageUrl(listing.images[0]) 
+                : '../public/images/placeholder.jpg';
                 
             const statusBadge = listing.status === 'active' 
                 ? '<span class="status-badge active">Active</span>' 
@@ -170,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             card.innerHTML = `
                 <div class="card-image">
-                    <img src="${imageUrl}" alt="${escapeHtml(listing.title)}" onerror="this.src='images/placeholder.jpg'">
+                    <img src="${imageUrl}" alt="${escapeHtml(listing.title)}" onerror="this.src='../public/images/placeholder.jpg'">
                     ${statusBadge}
                 </div>
                 <div class="card-content">
@@ -178,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(listing.location)}</p>
                     <p class="room-type"><i class="fas fa-bed"></i> ${escapeHtml(listing.room_type)}</p>
                     <p class="price"><i class="fas fa-tag"></i> BDT ${formatPrice(listing.price)}/month</p>
+                    <p class="contact-info"><i class="fas fa-address-card"></i> Contact: ${escapeHtml(listing.contact_info)}</p>
                     <p class="time"><i class="fas fa-clock"></i> Posted: ${formatTimestamp(listing.created_at)}</p>
                     <div class="card-actions">
                         <button class="edit-listing-btn" onclick="editListing(${listing.accommodation_id})">
@@ -194,107 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Fetch inquiries
-    async function fetchInquiries() {
-        try {
-            const loadingIndicator = document.getElementById('loading-inquiries');
-            const noInquiriesMessage = document.getElementById('no-inquiries-message');
-            const container = document.getElementById('inquiries-container');
-            
-            loadingIndicator.style.display = 'block';
-            
-            const response = await fetch(`${API_BASE_URL}/accommodation_inquiries.php?role=owner`, {
-                credentials: 'include'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            loadingIndicator.style.display = 'none';
-            
-            if (result.status === 'success') {
-                inquiries = result.data || [];
-                
-                // Update inquiries count badge
-                const pendingCount = inquiries.filter(inq => inq.status === 'pending').length;
-                const countBadge = document.getElementById('pending-inquiries-count');
-                if (countBadge) {
-                    countBadge.textContent = pendingCount;
-                    countBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
-                }
-                
-                if (inquiries.length === 0) {
-                    noInquiriesMessage.style.display = 'block';
-                    return;
-                }
-                
-                displayInquiries(inquiries);
-            } else {
-                throw new Error(result.message || 'Failed to fetch inquiries');
-            }
-        } catch (error) {
-            console.error('Error fetching inquiries:', error);
-            showNotification('Error', 'Failed to fetch your inquiries', 'error');
-        }
-    }
-    
-    // Display inquiries
-    function displayInquiries(inquiriesList) {
-        const container = document.getElementById('inquiries-container');
-        container.innerHTML = '';
-        
-        inquiriesList.forEach(inquiry => {
-            const inquiryCard = document.createElement('div');
-            inquiryCard.className = `inquiry-card ${inquiry.status}`;
-            inquiryCard.dataset.id = inquiry.inquiry_id;
-            
-            let statusText = '';
-            let statusClass = '';
-            
-            switch(inquiry.status) {
-                case 'pending':
-                    statusText = 'Pending';
-                    statusClass = 'pending';
-                    break;
-                case 'responded':
-                    statusText = 'Responded';
-                    statusClass = 'responded';
-                    break;
-                case 'closed':
-                    statusText = 'Closed';
-                    statusClass = 'closed';
-                    break;
-            }
-            
-            inquiryCard.innerHTML = `
-                <div class="inquiry-header">
-                    <h3>${escapeHtml(inquiry.accommodation_title)}</h3>
-                    <span class="inquiry-status ${statusClass}">${statusText}</span>
-                </div>
-                <div class="inquiry-body">
-                    <p><strong>From:</strong> ${escapeHtml(inquiry.sender_name)}</p>
-                    <p class="inquiry-message">${escapeHtml(inquiry.message)}</p>
-                    <p class="inquiry-date"><i class="fas fa-clock"></i> ${formatTimestamp(inquiry.created_at)}</p>
-                </div>
-                <div class="inquiry-actions">
-                    <button class="respond-btn" onclick="respondToInquiry(${inquiry.inquiry_id})">
-                        <i class="fas fa-reply"></i> Respond
-                    </button>
-                </div>
-            `;
-            
-            container.appendChild(inquiryCard);
-        });
-    }
-    
     // Initialize
     initTabs();
     initModals();
     fetchMyListings();
-    fetchInquiries();
     
     // Add form submission handlers
     const postForm = document.getElementById('postAccommodationForm');
@@ -420,103 +328,4 @@ window.deleteListing = function(accommodationId) {
     };
     
     confirmDialog.style.display = 'block';
-};
-
-window.respondToInquiry = function(inquiryId) {
-    const modal = document.getElementById('inquiryResponseModal');
-    const inquiryDetails = document.getElementById('inquiry-details');
-    const senderElement = document.getElementById('inquiry-sender');
-    const accommodationElement = document.getElementById('inquiry-accommodation');
-    const messageElement = document.getElementById('inquiry-message');
-    const dateElement = document.getElementById('inquiry-date');
-    const responseInput = document.getElementById('response-message');
-    const sendBtn = document.getElementById('send-response-btn');
-    const respondedBtn = document.getElementById('mark-as-responded-btn');
-    const closedBtn = document.getElementById('mark-as-closed-btn');
-    
-    // Find the inquiry in the list
-    const inquiry = inquiries.find(i => i.inquiry_id == inquiryId);
-    
-    if (inquiry) {
-        senderElement.textContent = inquiry.sender_name;
-        accommodationElement.textContent = inquiry.accommodation_title;
-        messageElement.textContent = inquiry.message;
-        dateElement.textContent = formatTimestamp(inquiry.created_at);
-        responseInput.value = '';
-        
-        // Set up action buttons
-        sendBtn.onclick = function() {
-            // Here we would send an email or notification to the user
-            // For now, just mark as responded
-            updateInquiryStatus(inquiryId, 'responded');
-        };
-        
-        respondedBtn.onclick = function() {
-            updateInquiryStatus(inquiryId, 'responded');
-        };
-        
-        closedBtn.onclick = function() {
-            updateInquiryStatus(inquiryId, 'closed');
-        };
-        
-        modal.style.display = 'block';
-    } else {
-        showNotification('Error', 'Inquiry not found', 'error');
-    }
-};
-
-function updateInquiryStatus(inquiryId, status) {
-    fetch(`${API_BASE_URL}/accommodation_inquiries.php`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            inquiry_id: inquiryId,
-            status: status
-        }),
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(result => {
-        const modal = document.getElementById('inquiryResponseModal');
-        modal.style.display = 'none';
-        
-        if (result.status === 'success') {
-            showNotification('Success', `Inquiry marked as ${status}`, 'success');
-            
-            // Update the inquiry in DOM
-            const card = document.querySelector(`.inquiry-card[data-id="${inquiryId}"]`);
-            if (card) {
-                card.className = `inquiry-card ${status}`;
-                const statusElement = card.querySelector('.inquiry-status');
-                if (statusElement) {
-                    statusElement.className = `inquiry-status ${status}`;
-                    statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-                }
-            }
-            
-            // Update in-memory list
-            const inquiryIndex = inquiries.findIndex(i => i.inquiry_id == inquiryId);
-            if (inquiryIndex !== -1) {
-                inquiries[inquiryIndex].status = status;
-            }
-            
-            // Update badge count
-            const pendingCount = inquiries.filter(inq => inq.status === 'pending').length;
-            const countBadge = document.getElementById('pending-inquiries-count');
-            if (countBadge) {
-                countBadge.textContent = pendingCount;
-                countBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
-            }
-        } else {
-            showNotification('Error', result.message || 'Failed to update inquiry status', 'error');
-        }
-    })
-    .catch(error => {
-        const modal = document.getElementById('inquiryResponseModal');
-        modal.style.display = 'none';
-        console.error('Error updating inquiry status:', error);
-        showNotification('Error', 'Failed to update inquiry status', 'error');
-    });
-} 
+}; 

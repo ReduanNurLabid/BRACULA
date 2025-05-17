@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - BRACULA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="accommodation.html">Accommodation</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                <!-- Notification Section -->
+                <div class="notification-section">
+                    <div class="notification-icon" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-tabs">
+                                <button class="notification-tab active" data-tab="all">All</button>
+                                <button class="notification-tab" data-tab="unread">Unread</button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <!-- Notifications will be added here dynamically -->
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllReadBtn">Mark all as read</button>
+                            <a href="#" id="viewAllNotificationsBtn">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="saved-posts">
+                            <i class="fas fa-bookmark"></i> Saved Posts
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="events-container">
+        <!-- Sidebar Filters -->
+        <div class="sidebar">
+            <h3>Event Filters</h3>
+            <div class="filter-section">
+                <label>Event Type</label>
+                <div class="event-checkboxes">
+                    <label>
+                        <input type="checkbox" name="event-type" value="workshop"> Workshop
+                    </label>
+                    <label>
+                        <input type="checkbox" name="event-type" value="seminar"> Seminar
+                    </label>
+                    <label>
+                        <input type="checkbox" name="event-type" value="social"> Social Event
+                    </label>
+                    <label>
+                        <input type="checkbox" name="event-type" value="sports"> Sports
+                    </label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <label for="date">Event Date</label>
+                <input type="date" id="date">
+            </div>
+            <button class="apply-filters">Apply Filters</button>
+        </div>
+
+        <!-- Main Events Content -->
+        <div class="main-content">
+            <!-- Create Event Button -->
+            <div class="create-event-section">
+                <button class="create-event-btn" data-toggle="modal" data-target="#createEventModal">
+                    <i class="fas fa-plus"></i> Create Event
+                </button>
+            </div>
+
+            <!-- Event Listings -->
+            <div class="event-listings">
+                <h2>Upcoming Events</h2>
+                <div class="events-grid" id="eventsContainer">
+                    <!-- Event cards will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div id="createEventModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createEventModalLabel">Create a New Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createEventForm">
+                        <div class="form-group">
+                            <label>Event Name</label>
+                            <input type="text" name="eventName" placeholder="Enter event name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cover Picture Link</label>
+                            <input type="text" name="coverImage" placeholder="cover image link" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Event Type</label>
+                            <select name="eventType" required>
+                                <option value="">Select Event Type</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="seminar">Seminar</option>
+                                <option value="social">Social Event</option>
+                                <option value="sports">Sports</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Event Date</label>
+                            <input type="date" name="eventDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Event Location</label>
+                            <input type="text" name="eventLocation" placeholder="Enter event location" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="createEventForm" class="btn btn-primary">Create Event</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>All Notifications</h2>
+            <div class="notification-filters">
+                <button class="notification-filter active" data-filter="all">All</button>
+                <button class="notification-filter" data-filter="unread">Unread</button>
+                <button class="notification-filter" data-filter="read">Read</button>
+            </div>
+            <div class="all-notifications-list" id="allNotificationsList">
+                <!-- All notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/events.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/notifications.js"></script>
+</body>
+</html>
