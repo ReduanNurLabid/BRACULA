@@ -208,9 +208,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Modal functionality
-    offerRideBtn.addEventListener('click', () => {
-        offerRideModal.style.display = 'block';
-    });
+    if (offerRideBtn) {
+        offerRideBtn.addEventListener('click', () => {
+            // Set default departure time to current time + 1 hour
+            const departureDate = document.getElementById('departure_date');
+            const departureTimeInput = document.getElementById('departure_time_input');
+            
+            if (departureDate && departureTimeInput) {
+                const now = new Date();
+                now.setHours(now.getHours() + 1); // Add 1 hour from now
+                
+                // Format date as YYYY/MM/DD for the date input
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                departureDate.value = `${year}/${month}/${day}`;
+                
+                // Format time as HH:MM for the time input
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                departureTimeInput.value = `${hours}:${minutes}`;
+            }
+            
+            offerRideModal.style.display = 'block';
+        });
+    }
     
     closeModalBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -239,6 +261,20 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         
         try {
+            // Combine date and time inputs into the hidden departure_time field
+            const departureDate = document.getElementById('departure_date').value;
+            const departureTime = document.getElementById('departure_time_input').value;
+            
+            if (!departureDate || !departureTime) {
+                throw new Error('Please select both departure date and time');
+            }
+            
+            // Convert from YYYY/MM/DD to YYYY-MM-DD for ISO format
+            const formattedDate = departureDate.replace(/\//g, '-');
+            
+            // Combine into ISO format for the backend
+            document.getElementById('departure_time').value = `${formattedDate}T${departureTime}`;
+            
             // Get form data
             const formData = new FormData(offerRideForm);
             
@@ -938,7 +974,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatDateTime(dateTimeStr) {
         if (!dateTimeStr) return 'Not specified';
         const date = new Date(dateTimeStr);
-        return date.toLocaleString();
+        
+        // Format as DD/MM/YYYY HH:MM
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+    
+    function formatDateToISO(date = new Date()) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
     
     function showNotification(message, type = 'success') {

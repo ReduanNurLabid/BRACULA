@@ -1,3 +1,4 @@
 *.jpg
 logs/accommodation_api.log
 *.log
+*.log

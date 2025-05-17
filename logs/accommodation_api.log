@@ -1443,3 +1443,81 @@ Trace: #0 C:\xampp\htdocs\BRACULA\api\accommodations.php(111): PDOStatement->exe
 [2025-05-17 16:42:39] Checking if user is logged in
 [2025-05-17 16:42:39] User ID from session: 6
 [2025-05-17 16:42:39] Request method: GET
+[2025-05-17 19:00:52] Starting accommodations.php API call
+[2025-05-17 19:00:52] Database connection established
+[2025-05-17 19:00:52] Checking if user is logged in
+[2025-05-17 19:00:52] User ID from session: 6
+[2025-05-17 19:00:52] Request method: GET
+[2025-05-17 19:00:52] Starting accommodations.php API call
+[2025-05-17 19:00:52] Database connection established
+[2025-05-17 19:00:52] Checking if user is logged in
+[2025-05-17 19:00:52] User ID from session: 6
+[2025-05-17 19:00:52] Request method: GET
+[2025-05-17 19:00:52] Starting accommodations.php API call
+[2025-05-17 19:00:52] Database connection established
+[2025-05-17 19:00:52] Checking if user is logged in
+[2025-05-17 19:00:52] User ID from session: 6
+[2025-05-17 19:00:52] Request method: GET
+[2025-05-17 19:59:04] Starting accommodations.php API call
+[2025-05-17 19:59:04] Database connection established
+[2025-05-17 19:59:04] Checking if user is logged in
+[2025-05-17 19:59:04] User ID from session: 6
+[2025-05-17 19:59:04] Request method: GET
+[2025-05-17 19:59:04] Starting accommodations.php API call
+[2025-05-17 19:59:04] Database connection established
+[2025-05-17 19:59:04] Checking if user is logged in
+[2025-05-17 19:59:04] User ID from session: 6
+[2025-05-17 19:59:04] Request method: GET
+[2025-05-17 19:59:04] Starting accommodations.php API call
+[2025-05-17 19:59:04] Database connection established
+[2025-05-17 19:59:04] Checking if user is logged in
+[2025-05-17 19:59:04] User ID from session: 6
+[2025-05-17 19:59:04] Request method: GET
+[2025-05-17 20:02:07] Starting accommodations.php API call
+[2025-05-17 20:02:07] Database connection established
+[2025-05-17 20:02:07] Checking if user is logged in
+[2025-05-17 20:02:07] User ID from session: 6
+[2025-05-17 20:02:07] Request method: GET
+[2025-05-17 20:02:07] Starting accommodations.php API call
+[2025-05-17 20:02:07] Database connection established
+[2025-05-17 20:02:07] Checking if user is logged in
+[2025-05-17 20:02:07] User ID from session: 6
+[2025-05-17 20:02:07] Request method: GET
+[2025-05-17 20:02:10] Starting accommodations.php API call
+[2025-05-17 20:02:10] Database connection established
+[2025-05-17 20:02:10] Checking if user is logged in
+[2025-05-17 20:02:10] User ID from session: 6
+[2025-05-17 20:02:10] Request method: GET
+[2025-05-17 20:02:10] Starting accommodations.php API call
+[2025-05-17 20:02:10] Database connection established
+[2025-05-17 20:02:10] Checking if user is logged in
+[2025-05-17 20:02:10] User ID from session: 6
+[2025-05-17 20:02:10] Request method: GET
+[2025-05-17 20:06:45] Starting accommodations.php API call
+[2025-05-17 20:06:45] Starting accommodations.php API call
+[2025-05-17 20:06:45] Database connection established
+[2025-05-17 20:06:45] Checking if user is logged in
+[2025-05-17 20:06:45] Database connection established
+[2025-05-17 20:06:45] Checking if user is logged in
+[2025-05-17 20:06:47] Starting accommodations.php API call
+[2025-05-17 20:06:47] Database connection established
+[2025-05-17 20:06:47] Checking if user is logged in
+[2025-05-17 20:06:47] Starting accommodations.php API call
+[2025-05-17 20:06:47] Database connection established
+[2025-05-17 20:06:47] Checking if user is logged in
+[2025-05-17 20:06:53] Starting accommodations.php API call
+[2025-05-17 20:06:53] Database connection established
+[2025-05-17 20:06:53] Checking if user is logged in
+[2025-05-17 20:06:53] User ID from session: 6
+[2025-05-17 20:06:53] Request method: GET
+[2025-05-17 20:06:53] Starting accommodations.php API call
+[2025-05-17 20:06:53] Database connection established
+[2025-05-17 20:06:53] Checking if user is logged in
+[2025-05-17 20:06:53] User ID from session: 6
+[2025-05-17 20:06:53] Request method: GET
+[2025-05-17 20:10:18] Starting accommodations.php API call
+[2025-05-17 20:10:18] Starting accommodations.php API call
+[2025-05-17 20:10:18] Database connection established
+[2025-05-17 20:10:18] Checking if user is logged in
+[2025-05-17 20:10:18] Database connection established
+[2025-05-17 20:10:18] Checking if user is logged in
