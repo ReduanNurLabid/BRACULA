@@ -2,7 +2,36 @@
 
 BRACULA is a comprehensive community platform for Brown University students, providing features for social interaction, resource sharing, and campus engagement.
 
-## New Features: Enhanced Post and Comment Management
+## Project Structure
+
+The project follows a simple MVC-like architecture:
+
+```
+BRACULA/
+├── api/                  # API endpoints (controllers)
+├── config/               # Configuration files
+├── models/               # Data models
+├── includes/             # Shared PHP utilities
+├── database/             # Database scripts and migrations
+├── uploads/              # User uploaded files
+├── public/               # Public assets
+│   ├── css/              # Stylesheets (primary location)
+│   ├── js/               # JavaScript files
+│   └── images/           # Image assets
+├── css/                  # CSS redirect for backward compatibility
+├── js/                   # JS redirect for backward compatibility
+├── test/                 # Unit tests and test utilities
+└── logs/                 # Application logs
+```
+
+## Recent Changes
+
+### CSS Consolidation
+- All CSS files have been consolidated to the `/public/css/` directory
+- The root `/css/` directory now only contains a redirect for backward compatibility
+- See `docs/css_consolidation.md` for details
+
+## Features
 
 ### Post Management
 - **Edit Posts**: Users can now edit their own posts, including the caption, content, and community.
@@ -41,4 +70,4 @@ BRACULA is a comprehensive community platform for Brown University students, pro
 - Username: test@example.com
 - Password: password123 
 
-### Contributor: Reduan Nur, Mahim Kabir, Anika Ferdous, Jerin khan
+### Contributors: Reduan Nur, Mahim Kabir, Anika Ferdous, Jerin khan

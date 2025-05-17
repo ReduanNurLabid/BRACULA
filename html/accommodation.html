@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accommodation Listings - BRACULA</title>
+    <link href="../public/css/style.css" rel="stylesheet">
+    <link href="../public/css/accommodation.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="feed.html" class="logo">BRACULA</a>
+            <div class="nav-links">
+                <a href="feed.html">Feed</a>
+                <a href="resources.html">Resources</a>
+                <a href="accommodation.html" class="active">Accommodation</a>
+                <a href="rideshare.html">Ride Share</a>
+                <a href="events.html">Events</a>
+
+                 <!-- Notification Section -->
+                 <div class="notification-section">
+                    <div class="notification-icon" id="notificationToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notificationCount">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-tabs">
+                                <button class="notification-tab active" data-tab="all">All</button>
+                                <button class="notification-tab" data-tab="unread">Unread</button>
+                            </div>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <!-- Notifications will be added here dynamically -->
+                        </div>
+                        <div class="notification-footer">
+                            <button id="markAllReadBtn">Mark all as read</button>
+                            <a href="#" id="viewAllNotificationsBtn">View all</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://avatar.iran.liara.run/public" alt="Profile" class="profile-dropdown-toggle">
+                    <div class="profile-dropdown-menu">
+                        <div class="dropdown-item" data-action="profile">
+                            <i class="fas fa-user"></i> My Profile
+                        </div>
+                        <div class="dropdown-item" data-action="saved-posts">
+                            <i class="fas fa-bookmark"></i> Saved Posts
+                        </div>
+                        <div class="dropdown-item" data-action="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </div>
+                        <div class="dropdown-item" data-action="logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Top Navigation Tabs -->
+    <div class="page-tab-navigation">
+        <button class="page-tab active" data-section="browse-section">
+            <i class="fas fa-search"></i> Browse Accommodations
+        </button>
+        <button class="page-tab" data-section="my-listings-section">
+            <i class="fas fa-home"></i> My Listings
+        </button>
+        <button class="page-tab" data-section="favorites-section">
+            <i class="fas fa-heart"></i> Favorites
+        </button>
+    </div>
+
+    <!-- SECTION 1: Browse Accommodations -->
+    <div class="page-section active" id="browse-section">
+        <div class="accommodation-container">
+            <!-- Sidebar Filters -->
+            <div class="sidebar">
+                <h3>Filters</h3>
+                <div class="filter-section">
+                    <label>Room Type</label>
+                    <div class="room-type-checkboxes">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roomType" value="single">
+                            <i class="fas fa-bed"></i> Single Room
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roomType" value="shared">
+                            <i class="fas fa-users"></i> Shared Room
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roomType" value="apartment">
+                            <i class="fas fa-home"></i> Apartment
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="roomType" value="studio">
+                            <i class="fas fa-building"></i> Studio
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Search by location...">
+                </div>
+                <div class="filter-section">
+                    <label for="price-range">Price Range (BDT)</label>
+                    <div class="price-inputs">
+                        <input type="number" id="min-price" placeholder="Min" min="0">
+                        <input type="number" id="max-price" placeholder="Max" min="0">
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <label class="favorites-checkbox">
+                        <input type="checkbox" id="show-favorites-only">
+                        <i class="fas fa-heart"></i> Show Favorites Only
+                    </label>
+                </div>
+                <button class="apply-filters">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+                <button class="reset-filters">
+                    <i class="fas fa-undo"></i> Reset Filters
+                </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="post-accommodation-section">
+                    <button class="post-accommodation-btn">
+                        <i class="fas fa-plus"></i> Post Accommodation
+                    </button>
+                    
+                    <div class="view-controls">
+                        <button class="view-control-btn grid-view active" title="Grid View">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-control-btn list-view" title="List View">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="search-results-info" style="display: none;">
+                    <p>Showing <span id="results-count">0</span> results for your search</p>
+                    <button id="clear-search">
+                        <i class="fas fa-times"></i> Clear search
+                    </button>
+                </div>
+
+                <div class="accommodation-listings">
+                    <h2>Available Accommodations</h2>
+                    <div class="accommodations-grid" id="accommodationsContainer">
+                        <!-- Loading indicator -->
+                        <div id="loading-indicator" style="grid-column: 1 / -1; text-align: center; padding: 30px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: #4CAF50;"></i>
+                            <p>Loading accommodations...</p>
+                        </div>
+                        
+                        <!-- Accommodations will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: My Listings -->
+    <div class="page-section" id="my-listings-section">
+        <div class="accommodation-container">
+            <div class="main-content" style="width: 100%">
+                <div class="content-header">
+                    <h2>My Accommodation Listings</h2>
+                    <button class="post-accommodation-btn" style="margin-bottom: 20px;">
+                        <i class="fas fa-plus"></i> Post New Accommodation
+                    </button>
+                </div>
+                <div class="section-description">
+                    <p>Manage your accommodation listings. You can edit, delete, or mark listings as unavailable.</p>
+                </div>
+                <div class="accommodations-grid" id="my-listings-container">
+                    <!-- Loading indicator -->
+                    <div id="loading-my-listings" class="loading-indicator">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading your accommodations...</p>
+                    </div>
+                    <!-- Listings will be loaded here -->
+                </div>
+                <div id="no-listings-message" class="no-results" style="display: none;">
+                    <i class="fas fa-home" style="font-size: 48px; color: #ccc;"></i>
+                    <h3>You don't have any accommodation listings yet</h3>
+                    <p>Start by posting your first accommodation!</p>
+                    <button class="post-accommodation-btn" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Post Accommodation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: Favorites -->
+    <div class="page-section" id="favorites-section">
+        <div class="accommodation-container">
+            <div class="main-content" style="width: 100%">
+                <h2>Favorite Accommodations</h2>
+                <div class="section-description">
+                    <p>View your saved favorite accommodations.</p>
+                </div>
+                <div class="accommodations-grid" id="favorites-container">
+                    <!-- Loading indicator -->
+                    <div id="loading-favorites" class="loading-indicator">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading your favorites...</p>
+                    </div>
+                    <!-- Favorites will be loaded here -->
+                </div>
+                <div id="no-favorites-message" class="no-results" style="display: none;">
+                    <i class="fas fa-heart" style="font-size: 48px; color: #ccc;"></i>
+                    <h3>No favorite accommodations yet</h3>
+                    <p>Browse and save accommodations you're interested in.</p>
+                    <button class="page-tab-link" data-section="browse-section" style="display: inline-block; margin-top: 15px; padding: 10px 16px; background-color: #4CAF50; color: white; border-radius: 4px; text-decoration: none; border: none; cursor: pointer;">
+                        <i class="fas fa-search"></i> Browse Accommodations
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Accommodation Modal -->
+    <div id="postAccommodationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Post Accommodation</h2>
+            <form id="postAccommodationForm">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" required placeholder="e.g., Cozy Single Room near BRACU">
+                </div>
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" name="roomType" required>
+                        <option value="">Select Type</option>
+                        <option value="single">Single Room</option>
+                        <option value="shared">Shared Room</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price (BDT/month)</label>
+                    <input type="number" id="price" name="price" min="0" required placeholder="e.g., 8000">
+                </div>
+                <div class="form-group">
+                    <label for="form-location">Location</label>
+                    <input type="text" id="form-location" name="location" required placeholder="e.g., Mohakhali, Dhaka">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" required placeholder="Describe the accommodation, including amenities, rules, etc."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="images">Images (Required)</label>
+                    <input type="file" id="images" name="images[]" multiple accept="image/*" required>
+                    <div id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
+                    <small>Supported formats: JPG, PNG, GIF. Max size: 5MB per image</small>
+                </div>
+                <div class="form-group">
+                    <label for="contactInfo">Contact Information</label>
+                    <input type="text" id="contactInfo" name="contactInfo" required placeholder="e.g., Phone: 01712345678, Email: you@example.com">
+                </div>
+                <button type="submit" class="submit-accommodation">
+                    <i class="fas fa-check"></i> Post Accommodation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Accommodation Details Modal -->
+    <div id="accommodationDetailsModal" class="modal">
+        <div class="modal-content accommodation-details">
+            <span class="close-modal">&times;</span>
+            <div class="details-header">
+                <h2 id="details-title">Accommodation Title</h2>
+                <p class="details-location"><i class="fas fa-map-marker-alt"></i> <span id="details-location">Location</span></p>
+            </div>
+            <div class="details-body">
+                <div class="details-image-gallery" id="details-gallery">
+                    <!-- Images will be added here dynamically -->
+                </div>
+                
+                <div class="contact-form-section">
+                    <h3>Contact Information</h3>
+                    <div class="contact-info-box">
+                        <p><i class="fas fa-address-card"></i> <span id="details-contact-info"></span></p>
+                        <p class="contact-note">Please contact the owner directly using the information above.</p>
+                    </div>
+                </div>
+                
+                <div class="details-info-section">
+                    <h3>Details</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Room Type:</div>
+                        <div class="detail-value" id="details-room-type"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Price:</div>
+                        <div class="detail-value" id="details-price"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Posted By:</div>
+                        <div class="detail-value" id="details-owner"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Posted On:</div>
+                        <div class="detail-value" id="details-date"></div>
+                    </div>
+                </div>
+                
+                <div class="details-description">
+                    <h3>Description</h3>
+                    <p id="details-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Accommodation Modal -->
+    <div id="editAccommodationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Accommodation</h2>
+            <form id="editAccommodationForm">
+                <input type="hidden" id="edit-accommodation-id" name="accommodation_id">
+                <div class="form-group">
+                    <label for="edit-title">Title</label>
+                    <input type="text" id="edit-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-roomType">Room Type</label>
+                    <select id="edit-roomType" name="roomType" required>
+                        <option value="single">Single Room</option>
+                        <option value="shared">Shared Room</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-price">Price (BDT/month)</label>
+                    <input type="number" id="edit-price" name="price" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-location">Location</label>
+                    <input type="text" id="edit-location" name="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" name="description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="unavailable">Unavailable</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-contactInfo">Contact Information</label>
+                    <input type="text" id="edit-contactInfo" name="contactInfo" required>
+                </div>
+                <button type="submit" class="submit-accommodation">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmationDialog" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h3 id="confirmation-title">Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to proceed?</p>
+            <div class="confirmation-buttons">
+                <button id="confirm-yes" class="btn-danger">Yes, proceed</button>
+                <button id="confirm-no" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>All Notifications</h2>
+            <div class="notification-filters">
+                <button class="notification-filter active" data-filter="all">All</button>
+                <button class="notification-filter" data-filter="unread">Unread</button>
+                <button class="notification-filter" data-filter="read">Read</button>
+            </div>
+            <div class="all-notifications-list" id="allNotificationsList">
+                <!-- All notifications will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../public/js/script.js"></script>
+    <script src="../public/js/unified_accommodation.js"></script>
+    <script src="../public/js/notifications.js"></script>
+</body>
+</html> 

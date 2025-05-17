@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Accommodations - BRACULA</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/accommodation.css">
+    <link href="../public/css/style.css" rel="stylesheet">
+    <link href="../public/css/accommodation.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -72,10 +72,6 @@
                 <a href="#my-listings" class="sidebar-nav-item active" id="my-listings-tab">
                     <i class="fas fa-home"></i> My Listings
                 </a>
-                <a href="#inquiries" class="sidebar-nav-item" id="inquiries-tab">
-                    <i class="fas fa-envelope"></i> Inquiries
-                    <span class="badge" id="pending-inquiries-count">0</span>
-                </a>
                 <a href="#favorites" class="sidebar-nav-item" id="favorites-tab">
                     <i class="fas fa-heart"></i> Favorites
                 </a>
@@ -108,27 +104,6 @@
                     <button class="post-accommodation-btn" style="margin-top: 15px;">
                         <i class="fas fa-plus"></i> Post Accommodation
                     </button>
-                </div>
-            </div>
-
-            <!-- Inquiries Section -->
-            <div class="content-section" id="inquiries-section" style="display: none;">
-                <h2>Accommodation Inquiries</h2>
-                <div class="section-description">
-                    <p>Manage inquiries about your accommodation listings.</p>
-                </div>
-                <div class="inquiries-container" id="inquiries-container">
-                    <!-- Loading indicator -->
-                    <div id="loading-inquiries" class="loading-indicator">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Loading inquiries...</p>
-                    </div>
-                    <!-- Inquiries will be loaded here -->
-                </div>
-                <div id="no-inquiries-message" class="no-results" style="display: none;">
-                    <i class="fas fa-envelope" style="font-size: 48px; color: #ccc;"></i>
-                    <h3>No inquiries yet</h3>
-                    <p>When someone is interested in your accommodation, their messages will appear here.</p>
                 </div>
             </div>
 
@@ -254,36 +229,6 @@
                     <i class="fas fa-save"></i> Save Changes
                 </button>
             </form>
-        </div>
-    </div>
-
-    <!-- Inquiry Response Modal -->
-    <div id="inquiryResponseModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Respond to Inquiry</h2>
-            <div id="inquiry-details">
-                <p><strong>From:</strong> <span id="inquiry-sender"></span></p>
-                <p><strong>Accommodation:</strong> <span id="inquiry-accommodation"></span></p>
-                <p><strong>Message:</strong></p>
-                <div id="inquiry-message" class="inquiry-message-box"></div>
-                <p><strong>Received:</strong> <span id="inquiry-date"></span></p>
-            </div>
-            <div class="form-group">
-                <label for="response-message">Your Response</label>
-                <textarea id="response-message" rows="4" placeholder="Write your response here..."></textarea>
-            </div>
-            <div class="response-actions">
-                <button id="send-response-btn" class="btn-primary">
-                    <i class="fas fa-paper-plane"></i> Send Response
-                </button>
-                <button id="mark-as-responded-btn" class="btn-secondary">
-                    <i class="fas fa-check"></i> Mark as Responded
-                </button>
-                <button id="mark-as-closed-btn" class="btn-secondary">
-                    <i class="fas fa-times-circle"></i> Close Inquiry
-                </button>
-            </div>
         </div>
     </div>
 
