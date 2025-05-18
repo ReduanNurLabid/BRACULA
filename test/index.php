@@ -62,6 +62,18 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">Accommodation Tests</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Tests for the accommodation functionality including creating and managing accommodations.</p>
+                        <a href="accommodation_test.php" class="btn btn-danger">Run Accommodation Tests</a>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="row mt-4">
@@ -79,6 +91,8 @@
                             <li>Handling of very long content</li>
                             <li>Foreign key constraints with invalid user IDs</li>
                             <li>API endpoint functionality</li>
+                            <li>Accommodation creation and management</li>
+                            <li>Accommodation inquiries and search</li>
                         </ul>
                         <p><strong>Note:</strong> The tests automatically clean up any data created during the testing process.</p>
                     </div>
