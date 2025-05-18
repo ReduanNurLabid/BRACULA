@@ -141,6 +141,11 @@ function createPostElement(post) {
     postEl.className = 'feed-post compact';
     postEl.dataset.postId = post.id;
     
+    // Add post overlay for clickable area
+    const postOverlay = document.createElement('div');
+    postOverlay.className = 'post-overlay';
+    postEl.appendChild(postOverlay);
+    
     // Create vote section
     const voteSection = document.createElement('div');
     voteSection.className = 'vote-section';
@@ -157,6 +162,30 @@ function createPostElement(post) {
     // Create post content section
     const postContent = document.createElement('div');
     postContent.className = 'post-content';
+    postContent.style.position = 'relative'; // Add relative positioning for dropdown positioning
+    
+    // Create a container for the options button and dropdown - positioned at top right
+    const optionsBtnContainer = document.createElement('div');
+    optionsBtnContainer.className = 'options-container';
+    optionsBtnContainer.style.position = 'absolute';
+    optionsBtnContainer.style.top = '10px';
+    optionsBtnContainer.style.right = '10px';
+    optionsBtnContainer.style.zIndex = '100';
+    
+    // Add options button
+    const optionsBtn = document.createElement('button');
+    optionsBtn.className = 'action-btn options-btn';
+    optionsBtn.innerHTML = `<i class="fas fa-ellipsis-h"></i>`;
+    optionsBtn.style.padding = '5px 10px';
+    optionsBtn.style.background = 'transparent';
+    optionsBtn.style.border = 'none';
+    optionsBtn.style.cursor = 'pointer';
+    
+    // Add options button to container
+    optionsBtnContainer.appendChild(optionsBtn);
+    
+    // Add options container to post content
+    postContent.appendChild(optionsBtnContainer);
     
     // Add post title if exists
     if (post.caption) {
@@ -173,9 +202,9 @@ function createPostElement(post) {
     // Format post info like Reddit but without the u/ and r/ prefixes
     postMeta.innerHTML = `
         <span class="post-author-prefix">Posted by </span>
-        <a class="post-author" data-user-id="${post.user_id}">${post.author || 'Anonymous'}</a>
+        <a class="author-name" data-user-id="${post.user_id}">${post.author || 'Anonymous'}</a>
         <span class="post-community-prefix">in </span>
-        <a class="post-community">${post.community || 'general'}</a>
+        <a class="post-community" data-community-id="${post.community_id || post.community}">${post.community || 'general'}</a>
         <span class="post-time-separator">•</span>
         <span class="post-time">${formatTimestamp(post.timestamp)}</span>
     `;
@@ -220,14 +249,25 @@ function createPostElement(post) {
         ${post.is_saved ? 'Saved' : 'Save'}
     `;
     
-    // Add options button
-    const optionsBtn = document.createElement('button');
-    optionsBtn.className = 'action-btn options-btn';
-    optionsBtn.innerHTML = `<i class="fas fa-ellipsis-h"></i>`;
+    // Add button event listeners
+    commentsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCommentModal(post.id);
+    });
     
+    saveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log("Save button clicked");
+        const isSaved = saveBtn.querySelector('i').classList.contains('fas');
+        console.log("Current saved state:", isSaved);
+        
+        // Call the savePost function without UI update (it will be handled by the function)
+        savePost(post.id, isSaved);
+    });
+    
+    // Add buttons to actions
     postActions.appendChild(commentsBtn);
     postActions.appendChild(saveBtn);
-    postActions.appendChild(optionsBtn);
     
     // Add actions to content
     postContent.appendChild(postActions);
@@ -235,6 +275,18 @@ function createPostElement(post) {
     // Add options dropdown
     const optionsDropdown = document.createElement('div');
     optionsDropdown.className = 'options-dropdown';
+    optionsDropdown.style.display = 'none'; // Explicitly set display to none initially
+    optionsDropdown.style.position = 'absolute'; // Ensure absolute positioning
+    optionsDropdown.style.zIndex = '9999'; // Very high z-index to show above all elements
+    optionsDropdown.style.top = '30px'; // Position it below the button
+    optionsDropdown.style.right = '0'; // Align to the right of the button
+    optionsDropdown.style.width = '150px'; // Set a fixed width
+    optionsDropdown.style.minWidth = '120px'; // Ensure minimum width
+    optionsDropdown.style.background = '#fff'; // Ensure background color
+    optionsDropdown.style.border = '1px solid #ddd'; // Add border
+    optionsDropdown.style.borderRadius = '4px'; // Rounded corners
+    optionsDropdown.style.padding = '5px 0'; // Add some padding top/bottom only
+    optionsDropdown.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; // Subtle shadow
     
     // Add appropriate options based on authorship
     if (isAuthor) {
@@ -242,6 +294,51 @@ function createPostElement(post) {
             <button class="edit-post-btn" data-post-id="${post.id}">Edit</button>
             <button class="delete-post-btn" data-post-id="${post.id}">Delete</button>
         `;
+        
+        // Add event listeners directly to the dropdown buttons
+        setTimeout(() => {
+            const editBtn = optionsDropdown.querySelector('.edit-post-btn');
+            if (editBtn) {
+                // Add inline styling
+                editBtn.style.padding = '8px 16px';
+                editBtn.style.margin = '2px 0';
+                editBtn.style.width = '100%';
+                editBtn.style.textAlign = 'left';
+                editBtn.style.display = 'block';
+                editBtn.style.cursor = 'pointer';
+                editBtn.style.border = 'none';
+                editBtn.style.background = 'none';
+                editBtn.style.fontSize = '14px';
+                editBtn.style.color = '#333';
+                
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editPost(post.id);
+                    optionsDropdown.style.display = 'none'; // Hide dropdown after action
+                });
+            }
+            
+            const deleteBtn = optionsDropdown.querySelector('.delete-post-btn');
+            if (deleteBtn) {
+                // Add inline styling
+                deleteBtn.style.padding = '8px 16px';
+                deleteBtn.style.margin = '2px 0';
+                deleteBtn.style.width = '100%';
+                deleteBtn.style.textAlign = 'left';
+                deleteBtn.style.display = 'block';
+                deleteBtn.style.cursor = 'pointer';
+                deleteBtn.style.border = 'none';
+                deleteBtn.style.background = 'none';
+                deleteBtn.style.fontSize = '14px';
+                deleteBtn.style.color = '#333';
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deletePost(post.id);
+                    optionsDropdown.style.display = 'none'; // Hide dropdown after action
+                });
+            }
+        }, 0);
     } else {
         optionsDropdown.innerHTML = `
             <button class="save-post-btn" data-post-id="${post.id}" data-saved="${post.is_saved ? 'true' : 'false'}">
@@ -249,18 +346,76 @@ function createPostElement(post) {
                 </button>
             <button class="report-post-btn" data-post-id="${post.id}">Report</button>
         `;
+        
+        // Add event listeners directly to the dropdown buttons
+        setTimeout(() => {
+            const savePostBtn = optionsDropdown.querySelector('.save-post-btn');
+            if (savePostBtn) {
+                // Add inline styling
+                savePostBtn.style.padding = '8px 16px';
+                savePostBtn.style.margin = '2px 0';
+                savePostBtn.style.width = '100%';
+                savePostBtn.style.textAlign = 'left';
+                savePostBtn.style.display = 'block';
+                savePostBtn.style.cursor = 'pointer';
+                savePostBtn.style.border = 'none';
+                savePostBtn.style.background = 'none';
+                savePostBtn.style.fontSize = '14px';
+                savePostBtn.style.color = '#333';
+                
+                savePostBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log("Dropdown save button clicked");
+                    const isSaved = savePostBtn.dataset.saved === 'true';
+                    console.log("Dropdown current saved state:", isSaved);
+                    savePost(post.id, isSaved);
+                    optionsDropdown.style.display = 'none'; // Hide dropdown after action
+                });
+            }
+            
+            const reportBtn = optionsDropdown.querySelector('.report-post-btn');
+            if (reportBtn) {
+                // Add inline styling
+                reportBtn.style.padding = '8px 16px';
+                reportBtn.style.margin = '2px 0';
+                reportBtn.style.width = '100%';
+                reportBtn.style.textAlign = 'left';
+                reportBtn.style.display = 'block';
+                reportBtn.style.cursor = 'pointer';
+                reportBtn.style.border = 'none';
+                reportBtn.style.background = 'none';
+                reportBtn.style.fontSize = '14px';
+                reportBtn.style.color = '#333';
+                
+                reportBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    reportPost(post.id);
+                    optionsDropdown.style.display = 'none'; // Hide dropdown after action
+                });
+            }
+        }, 0);
     }
     
-    optionsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        optionsDropdown.style.display = optionsDropdown.style.display === 'block' ? 'none' : 'block';
-    });
+    // Add the dropdown to the options button container
+    optionsBtnContainer.appendChild(optionsDropdown);
     
-    postContent.appendChild(optionsDropdown);
+    // Use setupOptionsButton to handle the options button behavior
+    setupOptionsButton(optionsBtn, optionsDropdown, post);
     
     // Add vote section and content to post
     postEl.appendChild(voteSection);
     postEl.appendChild(postContent);
+    
+    // Add click event listener to post for details page
+    postEl.addEventListener('click', (e) => {
+        // Don't navigate if clicking on buttons or links
+        if (e.target.closest('button') || e.target.closest('a')) {
+            return;
+        }
+        
+        // Open the comment modal instead of redirecting
+        openCommentModal(post.id);
+    });
     
     return postEl;
 }
@@ -482,18 +637,9 @@ function initializeCreatePostFeature() {
 
 // Initialize Post Actions
 function initializePostActions() {
-    document.querySelector('.main-feed').addEventListener('click', async (e) => {
-        const postElement = e.target.closest('.feed-post');
-        if (!postElement) return;
-
-        const postId = postElement.dataset.postId;
-        
-        // Handle comment button click
-        if (e.target.closest('.comments-btn')) {
-            // Add your comment handling logic here
-            console.log('Comment button clicked for post:', postId);
-        }
-    });
+    // We're now handling most actions directly on the buttons
+    // This function remains as a placeholder for potential future global actions
+    console.log("Post actions initialized");
 }
 
 // Initialize Filters
@@ -629,38 +775,25 @@ function refreshFeed() {
 // Attach Post Event Listeners
 function attachPostEventListeners() {
     document.querySelectorAll('.feed-post').forEach(post => {
-        // Make the entire post clickable to open comment modal
-        post.addEventListener('click', (e) => {
-            // Only trigger if the click is directly on the post or post-content
-            // and not on any interactive elements
-            if (!e.target.closest('.vote-btn') && 
-                !e.target.closest('.options-btn') && 
-                !e.target.closest('.options-dropdown') && 
-                !e.target.closest('.action-btn') &&
-                !e.target.closest('.post-author') &&
-                !e.target.closest('.post-community')) {
-                const postId = post.dataset.postId;
+        // Get the post ID
+        const postId = post.dataset.postId;
+        
+        // Add click handler to the post overlay
+        const postOverlay = post.querySelector('.post-overlay');
+        if (postOverlay) {
+            postOverlay.addEventListener('click', (e) => {
+                e.stopPropagation();
                 openCommentModal(postId);
-            }
-        });
+            });
+        }
         
         // Vote button event listeners
         post.querySelectorAll('.vote-btn').forEach(btn => {
             btn.addEventListener('click', handleVote);
         });
         
-        // Comment button event listener
-        const commentBtn = post.querySelector('.comments-btn');
-        if (commentBtn) {
-            commentBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = post.dataset.postId;
-                openCommentModal(postId);
-            });
-        }
-        
         // Author click event listener for profile view
-        const authorLink = post.querySelector('.post-author');
+        const authorLink = post.querySelector('.author-name');
         if (authorLink) {
             authorLink.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -676,7 +809,7 @@ function attachPostEventListeners() {
         if (communityLink) {
             communityLink.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const community = e.target.textContent;
+                const community = e.target.dataset.communityId;
                 if (community) {
                     // Set community filter and reload posts
                     STATE.filters.community = community;
@@ -693,99 +826,14 @@ function attachPostEventListeners() {
             });
         }
         
-        // Edit post button event listener
-        const editPostBtn = post.querySelector('.edit-post-btn');
-        if (editPostBtn) {
-            editPostBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = editPostBtn.dataset.postId;
-                editPost(postId);
-            });
-        }
-        
-        // Delete post button event listener
-        const deletePostBtn = post.querySelector('.delete-post-btn');
-        if (deletePostBtn) {
-            deletePostBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = deletePostBtn.dataset.postId;
-                deletePost(postId);
-            });
-        }
-        
-        // Add save button event listener
-        const saveBtn = post.querySelector('.save-btn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent triggering the post click
-                const postId = post.dataset.postId;
-                // Check if already saved by checking if the icon is solid
-                const isSaved = saveBtn.querySelector('i').classList.contains('fas');
-                savePost(postId, isSaved);
-                
-                // Toggle icon and text immediately for better UX
-                const saveIcon = saveBtn.querySelector('i');
-                if (isSaved) {
-                    saveIcon.classList.remove('fas');
-                    saveIcon.classList.add('far');
-                    saveBtn.textContent = ' Save';
-                    saveBtn.prepend(saveIcon);
-                } else {
-                    saveIcon.classList.remove('far');
-                    saveIcon.classList.add('fas');
-                    saveBtn.textContent = ' Saved';
-                    saveBtn.prepend(saveIcon);
-                }
-            });
-        }
-        
-        // Save post button event listener (in dropdown)
-        const savePostBtn = post.querySelector('.save-post-btn');
-        if (savePostBtn) {
-            savePostBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent triggering the post click
-                const postId = savePostBtn.dataset.postId;
-                const isSaved = savePostBtn.dataset.saved === 'true';
-                savePost(postId, isSaved);
-            });
-        }
-        
-        // Report post button event listener
-        const reportPostBtn = post.querySelector('.report-post-btn');
-        if (reportPostBtn) {
-            reportPostBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const postId = reportPostBtn.dataset.postId;
-                reportPost(postId);
-            });
-        }
-        
-        // Options button event listener
-        const optionsBtn = post.querySelector('.options-btn');
-        const optionsDropdown = post.querySelector('.options-dropdown');
-        if (optionsBtn && optionsDropdown) {
-            optionsBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent event bubbling
-                
-                // Close all other open dropdowns first
-                document.querySelectorAll('.options-dropdown').forEach(dropdown => {
-                    if (dropdown !== optionsDropdown && dropdown.style.display === 'block') {
-                        dropdown.style.display = 'none';
-                    }
-                });
-                
-                // Toggle this dropdown
-                optionsDropdown.style.display = optionsDropdown.style.display === 'block' ? 'none' : 'block';
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function closeDropdown(e) {
-                    if (!optionsBtn.contains(e.target) && !optionsDropdown.contains(e.target)) {
-                        optionsDropdown.style.display = 'none';
-                        document.removeEventListener('click', closeDropdown);
-                    }
-                });
-            });
-        }
+        // We don't need to attach events to these elements anymore since they have direct event listeners:
+        // - options-btn
+        // - save-btn
+        // - comments-btn
+        // - edit-post-btn
+        // - delete-post-btn
+        // - save-post-btn
+        // - report-post-btn
     });
 }
 
@@ -883,6 +931,89 @@ async function openCommentModal(postId) {
 
         // Display post in modal
         postDetailContainer.innerHTML = createPostElement(post).outerHTML;
+        
+        // Find and set up the options button in the modal
+        const modalOptionsBtn = postDetailContainer.querySelector('.options-btn');
+        const modalOptionsDropdown = postDetailContainer.querySelector('.options-dropdown');
+        if (modalOptionsBtn && modalOptionsDropdown) {
+            // Set up the options button again since we lost the event listeners when using innerHTML
+            setupOptionsButton(modalOptionsBtn, modalOptionsDropdown, post);
+            
+            // Get the options container to ensure the dropdown is correctly positioned
+            const modalOptionsContainer = postDetailContainer.querySelector('.options-container');
+            if (modalOptionsContainer) {
+                modalOptionsContainer.style.position = 'absolute';
+                modalOptionsContainer.style.top = '10px';
+                modalOptionsContainer.style.right = '10px';
+                modalOptionsContainer.style.zIndex = '100';
+            }
+            
+            // Re-attach event listeners to the dropdown buttons
+            const isAuthor = post.user_id === STATE.currentUser?.user_id;
+            
+            if (isAuthor) {
+                // Set up edit and delete buttons
+                const editBtn = modalOptionsDropdown.querySelector('.edit-post-btn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editPost(post.id);
+                        modalOptionsDropdown.style.display = 'none';
+                    });
+                }
+                
+                const deleteBtn = modalOptionsDropdown.querySelector('.delete-post-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deletePost(post.id);
+                        modal.style.display = 'none';
+                    });
+                }
+            } else {
+                // Set up save and report buttons
+                const saveBtn = modalOptionsDropdown.querySelector('.save-post-btn');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isSaved = saveBtn.dataset.saved === 'true';
+                        savePost(post.id, isSaved);
+                        modalOptionsDropdown.style.display = 'none';
+                    });
+                }
+                
+                const reportBtn = modalOptionsDropdown.querySelector('.report-post-btn');
+                if (reportBtn) {
+                    reportBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        reportPost(post.id);
+                        modalOptionsDropdown.style.display = 'none';
+                    });
+                }
+            }
+        }
+        
+        // Reattach event listeners to the save button in the modal
+        const modalSaveBtn = postDetailContainer.querySelector('.save-btn');
+        if (modalSaveBtn) {
+            modalSaveBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log("Modal save button clicked");
+                const isSaved = modalSaveBtn.querySelector('i').classList.contains('fas');
+                console.log("Modal current saved state:", isSaved);
+                savePost(post.id, isSaved);
+            });
+        }
+
+        // Reattach event listeners to the comments button in the modal
+        const modalCommentsBtn = postDetailContainer.querySelector('.comments-btn');
+        if (modalCommentsBtn) {
+            modalCommentsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Scroll to comments section
+                commentsContainer.scrollIntoView({behavior: 'smooth'});
+            });
+        }
 
         // Attach vote event listeners to the modal's vote buttons
         const modalVoteButtons = postDetailContainer.querySelectorAll('.vote-btn');
@@ -898,43 +1029,6 @@ async function openCommentModal(postId) {
                 }
             });
         });
-
-            // Attach post edit and delete event listeners
-            const editPostBtn = postDetailContainer.querySelector('.edit-post-btn');
-            if (editPostBtn) {
-                editPostBtn.addEventListener('click', () => {
-                    const postId = editPostBtn.dataset.postId;
-                    editPost(postId);
-                });
-            }
-            
-            const deletePostBtn = postDetailContainer.querySelector('.delete-post-btn');
-            if (deletePostBtn) {
-                deletePostBtn.addEventListener('click', () => {
-                    const postId = deletePostBtn.dataset.postId;
-                    deletePost(postId);
-                    // Close modal after deletion
-                    modal.style.display = 'none';
-                });
-            }
-            
-            // Dropdown toggle in modal
-            const dropdownToggle = postDetailContainer.querySelector('.dropdown-toggle');
-            if (dropdownToggle) {
-                dropdownToggle.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent event bubbling
-                    const dropdownMenu = dropdownToggle.nextElementSibling;
-                    dropdownMenu.classList.toggle('show');
-                    
-                    // Close dropdown when clicking outside
-                    document.addEventListener('click', function closeDropdown(e) {
-                        if (!dropdownToggle.contains(e.target)) {
-                            dropdownMenu.classList.remove('show');
-                            document.removeEventListener('click', closeDropdown);
-                        }
-                    });
-                });
-            }
 
         // Fetch comments
         const response = await fetch(`${BASE_URL}/api/comments/comments.php?post_id=${postId}`);
@@ -1669,86 +1763,110 @@ function attachCommentEventListeners(container, postId) {
 // Function to save or unsave a post
 async function savePost(postId, isSaved) {
     try {
+        console.log("Save post called with postId:", postId, "isSaved:", isSaved);
+        
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user) {
             throw new Error('You must be logged in to save posts');
         }
         
-        if (isSaved) {
-            // Confirm before unsaving
-            createConfirmModal(
-                'Unsave Post',
-                'Are you sure you want to remove this post from your saved items?',
-                async () => {
-                    try {
-                        const response = await fetch(`${BASE_URL}/api/posts/save_post.php`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                post_id: parseInt(postId),
-                                user_id: parseInt(user.user_id),
-                                action: 'unsave'
-                            })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (data.status === 'success') {
-                            showNotification('Post removed from saved items', 'success');
-                            
-                            // Update the post in the UI
-                            const post = document.querySelector(`.post[data-post-id="${postId}"]`);
-                            if (post) {
-                                const saveOption = post.querySelector('.save-post-option');
-                                if (saveOption) {
-                                    saveOption.textContent = 'Save Post';
-                                    saveOption.dataset.saved = 'false';
-                                }
-                            }
-                        } else {
-                            throw new Error(data.message || 'Failed to unsave post');
-                        }
-                        return true; // Close the modal
-                    } catch (error) {
-                        console.error('Error unsaving post:', error);
-                        showNotification(error.message, 'error');
-                        return true; // Close the modal anyway
+        // Determine action based on current state
+        const action = isSaved ? 'unsave' : 'save';
+        
+        // Send request to server
+        console.log(`Sending ${action} request to server for post ID: ${postId}`);
+        const response = await fetch(`${BASE_URL}/api/posts/save_post.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                post_id: parseInt(postId),
+                user_id: parseInt(user.user_id),
+                action: action
+            })
+        });
+        
+        const data = await response.json();
+        console.log("Server response:", data);
+        
+        if (data.status === 'success') {
+            // Update post in state
+            const post = STATE.posts.get(parseInt(postId));
+            if (post) {
+                post.is_saved = !isSaved;
+            }
+            
+            // Update UI elements
+            const feedPost = document.querySelector(`.feed-post[data-post-id="${postId}"]`);
+            if (feedPost) {
+                // Update main save button
+                const saveBtn = feedPost.querySelector('.save-btn');
+                if (saveBtn) {
+                    const saveIcon = saveBtn.querySelector('i');
+                    if (isSaved) {
+                        saveIcon.classList.remove('fas');
+                        saveIcon.classList.add('far');
+                        saveBtn.innerHTML = '';
+                        saveBtn.appendChild(saveIcon);
+                        saveBtn.appendChild(document.createTextNode(' Save'));
+                    } else {
+                        saveIcon.classList.remove('far');
+                        saveIcon.classList.add('fas');
+                        saveBtn.innerHTML = '';
+                        saveBtn.appendChild(saveIcon);
+                        saveBtn.appendChild(document.createTextNode(' Saved'));
                     }
                 }
+                
+                // Update dropdown save button if exists
+                const dropdownSaveBtn = feedPost.querySelector('.save-post-btn');
+                if (dropdownSaveBtn) {
+                    dropdownSaveBtn.textContent = isSaved ? 'Save' : 'Unsave';
+                    dropdownSaveBtn.dataset.saved = isSaved ? 'false' : 'true';
+                }
+            }
+            
+            // Also update the save button in the modal if it exists
+            const modal = document.getElementById('postDetailModal');
+            if (modal && modal.style.display === 'block') {
+                const modalPost = modal.querySelector(`.feed-post[data-post-id="${postId}"]`);
+                if (modalPost) {
+                    // Update modal save button
+                    const modalSaveBtn = modalPost.querySelector('.save-btn');
+                    if (modalSaveBtn) {
+                        const modalSaveIcon = modalSaveBtn.querySelector('i');
+                        if (isSaved) {
+                            modalSaveIcon.classList.remove('fas');
+                            modalSaveIcon.classList.add('far');
+                            modalSaveBtn.innerHTML = '';
+                            modalSaveBtn.appendChild(modalSaveIcon);
+                            modalSaveBtn.appendChild(document.createTextNode(' Save'));
+                        } else {
+                            modalSaveIcon.classList.remove('far');
+                            modalSaveIcon.classList.add('fas');
+                            modalSaveBtn.innerHTML = '';
+                            modalSaveBtn.appendChild(modalSaveIcon);
+                            modalSaveBtn.appendChild(document.createTextNode(' Saved'));
+                        }
+                    }
+                    
+                    // Update modal dropdown save button if exists
+                    const modalDropdownSaveBtn = modalPost.querySelector('.save-post-btn');
+                    if (modalDropdownSaveBtn) {
+                        modalDropdownSaveBtn.textContent = isSaved ? 'Save' : 'Unsave';
+                        modalDropdownSaveBtn.dataset.saved = isSaved ? 'false' : 'true';
+                    }
+                }
+            }
+            
+            // Show success notification
+            showNotification(
+                isSaved ? 'Post removed from saved items' : 'Post saved successfully', 
+                'success'
             );
         } else {
-            // No confirmation needed for saving
-            const response = await fetch(`${BASE_URL}/api/posts/save_post.php`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_id: parseInt(postId),
-                    user_id: parseInt(user.user_id),
-                    action: 'save'
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                showNotification('Post saved successfully', 'success');
-                
-                // Update the post in the UI
-                const post = document.querySelector(`.post[data-post-id="${postId}"]`);
-                if (post) {
-                    const saveOption = post.querySelector('.save-post-option');
-                    if (saveOption) {
-                        saveOption.textContent = 'Unsave Post';
-                        saveOption.dataset.saved = 'true';
-                    }
-                }
-            } else {
-                throw new Error(data.message || 'Failed to save post');
-            }
+            throw new Error(data.message || 'Failed to save post');
         }
     } catch (error) {
         console.error('Error saving post:', error);
@@ -1923,4 +2041,61 @@ function initializeSearchFeature() {
             loadInitialPosts();
         }
     });
+}
+
+// Function to set up options button functionality
+function setupOptionsButton(optionsBtn, optionsDropdown, post) {
+    // Remove existing event listeners (if any)
+    const newOptionsBtn = optionsBtn.cloneNode(true);
+    optionsBtn.parentNode.replaceChild(newOptionsBtn, optionsBtn);
+    
+    newOptionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Add visual feedback when clicked
+        newOptionsBtn.style.opacity = '0.7';
+        setTimeout(() => {
+            newOptionsBtn.style.opacity = '1';
+        }, 150);
+        
+        // Toggle dropdown visibility
+        if (optionsDropdown.style.display === 'block') {
+            optionsDropdown.style.display = 'none';
+        } else {
+            // Close all open dropdowns first
+            document.querySelectorAll('.options-dropdown').forEach(dropdown => {
+                if (dropdown !== optionsDropdown) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
+            // Ensure proper styling and positioning
+            optionsDropdown.style.display = 'block';
+            optionsDropdown.style.position = 'absolute';
+            optionsDropdown.style.zIndex = '9999';
+            optionsDropdown.style.top = '100%'; // Position right below the button
+            optionsDropdown.style.right = '0';  // Align to the right edge
+            optionsDropdown.style.background = '#fff';
+            optionsDropdown.style.border = '1px solid #ddd';
+            optionsDropdown.style.borderRadius = '4px';
+            optionsDropdown.style.padding = '5px 0';
+            optionsDropdown.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            optionsDropdown.style.minWidth = '120px';
+            optionsDropdown.style.width = '150px';
+            
+            // Add click outside handler to close dropdown
+            setTimeout(() => {
+                const handleOutsideClick = (event) => {
+                    if (!newOptionsBtn.contains(event.target) && !optionsDropdown.contains(event.target)) {
+                        optionsDropdown.style.display = 'none';
+                        document.removeEventListener('click', handleOutsideClick);
+                    }
+                };
+                document.addEventListener('click', handleOutsideClick);
+            }, 0);
+        }
+    });
+    
+    return newOptionsBtn;
 }

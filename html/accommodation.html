@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accommodation Listings - BRACULA</title>
     <link href="../public/css/style.css" rel="stylesheet">
-    <link href="../public/css/accommodation.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -83,6 +82,9 @@
         <div class="accommodation-container">
             <!-- Sidebar Filters -->
             <div class="sidebar">
+                <button class="post-accommodation-btn">
+                    <i class="fas fa-plus"></i> Post Accommodation
+                </button>
                 <h3>Filters</h3>
                 <div class="filter-section">
                     <label>Room Type</label>
@@ -116,12 +118,7 @@
                         <input type="number" id="max-price" placeholder="Max" min="0">
                     </div>
                 </div>
-                <div class="filter-section">
-                    <label class="favorites-checkbox">
-                        <input type="checkbox" id="show-favorites-only">
-                        <i class="fas fa-heart"></i> Show Favorites Only
-                    </label>
-                </div>
+
                 <button class="apply-filters">
                     <i class="fas fa-filter"></i> Apply Filters
                 </button>
@@ -133,9 +130,7 @@
             <!-- Main Content -->
             <div class="main-content">
                 <div class="post-accommodation-section">
-                    <button class="post-accommodation-btn">
-                        <i class="fas fa-plus"></i> Post Accommodation
-                    </button>
+
                     
                     <div class="view-controls">
                         <button class="view-control-btn grid-view active" title="Grid View">
@@ -192,10 +187,10 @@
                     <!-- Listings will be loaded here -->
                 </div>
                 <div id="no-listings-message" class="no-results" style="display: none;">
-                    <i class="fas fa-home" style="font-size: 48px; color: #ccc;"></i>
+                    <i class="fas fa-home"></i>
                     <h3>You don't have any accommodation listings yet</h3>
                     <p>Start by posting your first accommodation!</p>
-                    <button class="post-accommodation-btn" style="margin-top: 15px;">
+                    <button class="post-accommodation-btn">
                         <i class="fas fa-plus"></i> Post Accommodation
                     </button>
                 </div>
@@ -220,10 +215,10 @@
                     <!-- Favorites will be loaded here -->
                 </div>
                 <div id="no-favorites-message" class="no-results" style="display: none;">
-                    <i class="fas fa-heart" style="font-size: 48px; color: #ccc;"></i>
+                    <i class="fas fa-heart"></i>
                     <h3>No favorite accommodations yet</h3>
                     <p>Browse and save accommodations you're interested in.</p>
-                    <button class="page-tab-link" data-section="browse-section" style="display: inline-block; margin-top: 15px; padding: 10px 16px; background-color: #4CAF50; color: white; border-radius: 4px; text-decoration: none; border: none; cursor: pointer;">
+                    <button class="page-tab-link" data-section="browse-section">
                         <i class="fas fa-search"></i> Browse Accommodations
                     </button>
                 </div>

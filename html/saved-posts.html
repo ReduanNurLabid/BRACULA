@@ -14,6 +14,7 @@
             <div class="nav-links">
                 <a href="feed.html">Feed</a>
                 <a href="resources.html">Resources</a>
+                <a href="accommodation.html">Accommodation</a>
                 <a href="rideshare.html">Ride Share</a>
                 <a href="events.html">Events</a>
 
@@ -64,11 +65,7 @@
     </nav>
 
     <div class="feed-container">
-        <aside class="sidebar">
-            <button class="create-post-btn" id="createPostBtn">
-                <i class="fas fa-plus"></i> Create Post
-            </button>
-            
+        <aside class="sidebar">   
             <div class="sidebar-section">
                 <h4>Menu</h4>
                 <div class="sidebar-item" onclick="window.location.href='feed.html'">
@@ -87,14 +84,20 @@
         </aside>
         
         <main class="main-feed">
-            <div class="post-filter">
-                <span>Saved Posts</span>
+            <!-- New Header Section -->
+            <div class="saved-posts-header">
+                <h1><i class="fas fa-bookmark"></i> Saved Posts</h1>
+                <p>View and manage all the posts you've saved for later.</p>
             </div>
             
-            <div class="posts-container" id="postsContainer">
-                <!-- Saved posts will be loaded here -->
-                <div class="loading-indicator">
-                    <i class="fas fa-spinner fa-pulse"></i> Loading your saved posts...
+            <!-- Improved Posts Container -->
+            <div class="saved-posts-container">
+                <div class="posts-container" id="postsContainer">
+                    <!-- Saved posts will be loaded here -->
+                    <div class="loading-indicator">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Loading your saved posts...</p>
+                    </div>
                 </div>
             </div>
             
@@ -110,22 +113,6 @@
         </main>
     </div>
 
-    <!-- Create Post Modal (reused from feed.html) -->
-    <div id="createPostModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeCreatePostModal">&times;</span>
-            <h2>Create a Post</h2>
-            <textarea id="postContent" placeholder="What's on your mind?"></textarea>
-            <select id="community" class="community-select">
-                <option value="">Select a community</option>
-                <option value="general">General</option>
-                <option value="academic">Academic</option>
-                <option value="events">Events</option>
-                <option value="questions">Questions</option>
-            </select>
-            <button class="submit-post" id="submitPost">Post</button>
-        </div>
-    </div>
     
     <!-- Post Detail Modal (for comments) -->
     <div id="postDetailModal" class="modal">

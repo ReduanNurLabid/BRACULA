@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Direct URL to the API endpoint
-            const response = await fetch('api/auth/register.php', {
+            const response = await fetch('/BRACULA/api/auth/register.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

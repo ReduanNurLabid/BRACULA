@@ -1,10 +1,4 @@
 <?php
-/**
- * BRACULA - Brown University Community Platform
- * 
- * Main entry point for the application
- */
-
 // Include session configuration
 require_once __DIR__ . '/config/session_config.php';
 

@@ -1,11 +1,12 @@
 // Base URL for API calls
-const BASE_URL = window.location.origin;
+const BASE_URL = window.location.origin + '/bracula';
 
 // Global state
 let state = {
     posts: [],
     currentPost: null,
-    loading: true
+    loading: true,
+    filter: 'all' // Default filter
 };
 
 // DOM Elements
@@ -18,6 +19,7 @@ const submitPostBtn = document.getElementById('submitPost');
 const postDetailModal = document.getElementById('postDetailModal');
 const closePostDetailModal = document.getElementById('closePostDetailModal');
 const commentForm = document.getElementById('commentForm');
+const filterOptions = document.querySelectorAll('.filter-option');
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initializePage() {
     loadSavedPosts();
     initializeCreatePostFeature();
+    initializeFilterOptions();
     
     // Close modals on click outside
     window.addEventListener('click', (e) => {
@@ -56,6 +59,73 @@ function initializePage() {
             }
         });
     }
+}
+
+// Initialize filter options
+function initializeFilterOptions() {
+    if (filterOptions) {
+        filterOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Update active class
+                filterOptions.forEach(btn => btn.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Update filter state
+                state.filter = option.dataset.filter;
+                
+                // Apply filter
+                applyFilter();
+            });
+        });
+    }
+}
+
+// Apply current filter to posts
+function applyFilter() {
+    if (!state.posts || state.posts.length === 0) return;
+    
+    let filteredPosts = [...state.posts];
+    
+    switch (state.filter) {
+        case 'recent':
+            filteredPosts.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return dateB - dateA;
+            });
+            break;
+        case 'popular':
+            filteredPosts.sort((a, b) => {
+                return (b.net_votes || 0) - (a.net_votes || 0);
+            });
+            break;
+        case 'all':
+        default:
+            // Keep original order
+            break;
+    }
+    
+    // Update UI with filtered posts
+    renderPosts(filteredPosts);
+}
+
+// Render posts to the UI
+function renderPosts(posts) {
+    postsContainer.innerHTML = '';
+    
+    if (posts.length === 0) {
+        emptyStateMessage.style.display = 'block';
+        return;
+    }
+    
+    emptyStateMessage.style.display = 'none';
+    
+    posts.forEach(post => {
+        const postElement = createPostElement(post);
+        postsContainer.appendChild(postElement);
+    });
+    
+    attachPostEventListeners();
 }
 
 // Initialize the create post feature
@@ -97,7 +167,7 @@ function initializeCreatePostFeature() {
                 }
                 
                 // Make API request to create post (reusing the feed.js functionality)
-                const response = await fetch(`${BASE_URL}/BRACULA/api/posts/create_post.php`, {
+                const response = await fetch(`${BASE_URL}/api/posts/create_post.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -141,11 +211,45 @@ async function loadSavedPosts() {
             throw new Error('You must be logged in to view saved posts');
         }
         
-        const response = await fetch(`${BASE_URL}/BRACULA/api/posts/get_saved_posts.php?user_id=${user.user_id}`);
+        // Fetch the saved posts
+        console.log('Fetching saved posts for user:', user.user_id);
+        const response = await fetch(`${BASE_URL}/api/posts/get_saved_posts.php?user_id=${user.user_id}`);
+        
+        // Check if response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        // Check content type to ensure it's JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Response is not JSON:', await response.text());
+            throw new Error('Server returned non-JSON response. Please check server configuration.');
+        }
+        
         const data = await response.json();
         
+        console.log('API response:', data);
+        
         if (data.status === 'success') {
-            state.posts = data.saved_posts;
+            // Validate that posts are returned and have post_id values
+            if (Array.isArray(data.saved_posts)) {
+                console.log('Received', data.saved_posts.length, 'saved posts');
+                
+                // Validate each post has a post_id
+                data.saved_posts.forEach(post => {
+                    if (!post.post_id) {
+                        console.warn('Post without post_id:', post);
+                    }
+                });
+                
+                // Filter out any posts without post_id
+                state.posts = data.saved_posts.filter(post => post.post_id);
+            } else {
+                console.error('Saved posts is not an array:', data.saved_posts);
+                state.posts = [];
+            }
+            
             state.loading = false;
             updateUI();
         } else {
@@ -155,6 +259,7 @@ async function loadSavedPosts() {
         console.error('Error loading saved posts:', error);
         showNotification(error.message, 'error');
         state.loading = false;
+        state.posts = [];
         updateUI();
     }
 }
@@ -164,7 +269,8 @@ function updateUI() {
     if (state.loading) {
         postsContainer.innerHTML = `
             <div class="loading-indicator">
-                <i class="fas fa-spinner fa-pulse"></i> Loading your saved posts...
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Loading your saved posts...</p>
             </div>
         `;
         emptyStateMessage.style.display = 'none';
@@ -172,15 +278,7 @@ function updateUI() {
         postsContainer.innerHTML = '';
         emptyStateMessage.style.display = 'block';
     } else {
-        postsContainer.innerHTML = '';
-        emptyStateMessage.style.display = 'none';
-        
-        state.posts.forEach(post => {
-            const postElement = createPostElement(post);
-            postsContainer.appendChild(postElement);
-        });
-        
-        attachPostEventListeners();
+        applyFilter(); // Apply current filter and render posts
     }
 }
 
@@ -258,7 +356,7 @@ function createPostElement(post) {
 // Attach event listeners to posts
 function attachPostEventListeners() {
     document.querySelectorAll('.feed-post').forEach(post => {
-        // Make the entire post clickable to open comment modal
+        // Make the entire post clickable to redirect to post page
         post.addEventListener('click', (e) => {
             // Only trigger if the click is directly on the post or post-content
             // and not on any interactive elements
@@ -267,7 +365,14 @@ function attachPostEventListeners() {
                 !e.target.closest('.options-dropdown') && 
                 !e.target.closest('.action-btn')) {
                 const postId = post.dataset.postId;
-                openCommentModal(postId);
+                if (postId) {
+                    // Redirect to feed.html with post_id parameter
+                    window.location.href = `${BASE_URL}/html/feed.html?post_id=${postId}`;
+                    console.log('Opening post with ID:', postId);
+                } else {
+                    console.error('Post ID not found in post element');
+                    showNotification('Error: Could not open post details', 'error');
+                }
             }
         });
         
@@ -279,9 +384,17 @@ function attachPostEventListeners() {
         // Comment button event listener
         const commentBtn = post.querySelector('.comments-btn');
         if (commentBtn) {
-            commentBtn.addEventListener('click', () => {
+            commentBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering the post click
                 const postId = post.dataset.postId;
-                openCommentModal(postId);
+                if (postId) {
+                    // Redirect to feed.html with post_id parameter
+                    window.location.href = `${BASE_URL}/html/feed.html?post_id=${postId}`;
+                    console.log('Opening post with ID:', postId);
+                } else {
+                    console.error('Post ID not found in post element');
+                    showNotification('Error: Could not open post details', 'error');
+                }
             });
         }
         
@@ -403,7 +516,7 @@ async function handleVote(e) {
         // If button is active, we're removing the vote. If not, we're adding a vote
         const action = isActive ? 'remove' : 'add';
         
-        const response = await fetch(`${BASE_URL}/BRACULA/api/posts/vote_post.php`, {
+        const response = await fetch(`${BASE_URL}/api/posts/vote_post.php`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -450,11 +563,24 @@ async function handleVote(e) {
     }
 }
 
-// Open the comment modal
+// Update the openCommentModal function to fix the post ID validation
 async function openCommentModal(postId) {
     try {
+        // Ensure postId is valid
+        if (!postId || postId === 'undefined' || postId === 'null') {
+            throw new Error('Post ID is required');
+        }
+        
+        // Convert postId to integer to ensure consistent comparison
+        const numericPostId = parseInt(postId);
+        if (isNaN(numericPostId)) {
+            throw new Error('Invalid Post ID');
+        }
+        
+        console.log('Opening comment modal for post ID:', numericPostId);
+        
         // Find the post in state
-        const post = state.posts.find(p => parseInt(p.post_id) === parseInt(postId));
+        const post = state.posts.find(p => parseInt(p.post_id) === numericPostId);
         if (!post) {
             throw new Error('Post not found');
         }
@@ -472,27 +598,40 @@ async function openCommentModal(postId) {
         const commentsContainer = document.getElementById('commentsContainer');
         commentsContainer.innerHTML = '<div class="loading">Loading comments...</div>';
         
-        const response = await fetch(`${BASE_URL}/BRACULA/api/comments/get_comments.php?post_id=${postId}`);
+        // Use the correct API endpoint path and parameter name
+        const url = `${BASE_URL}/api/comments/comments.php?post_id=${numericPostId}`;
+        console.log('Fetching comments from:', url);
+        
+        const response = await fetch(url);
         const data = await response.json();
+        
+        console.log('Comments API response:', data);
         
         if (data.status === 'success') {
             commentsContainer.innerHTML = '';
             
-            if (data.comments.length === 0) {
+            // Check for comments in both 'comments' and 'data' properties
+            const comments = data.comments || data.data || [];
+            
+            if (!comments || comments.length === 0) {
                 commentsContainer.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
             } else {
-                // Sort comments by timestamp (newest first)
-                const comments = data.comments.sort((a, b) => 
-                    new Date(b.created_at) - new Date(a.created_at)
-                );
+                console.log('Found', comments.length, 'comments');
                 
-                comments.forEach(comment => {
+                // Sort comments by timestamp (newest first)
+                const sortedComments = comments.sort((a, b) => {
+                    const dateA = new Date(b.timestamp || b.created_at);
+                    const dateB = new Date(a.timestamp || a.created_at);
+                    return dateA - dateB;
+                });
+                
+                sortedComments.forEach(comment => {
                     const commentElement = createCommentElement(comment);
                     commentsContainer.appendChild(commentElement);
                 });
                 
                 // Attach event listeners to comments
-                attachCommentEventListeners(commentsContainer, postId);
+                attachCommentEventListeners(commentsContainer, numericPostId);
             }
         } else {
             throw new Error(data.message || 'Failed to load comments');
@@ -525,7 +664,7 @@ async function savePost(postId, isSaved) {
             'Are you sure you want to remove this post from your saved items?',
             async () => {
                 try {
-                    const response = await fetch(`${BASE_URL}/BRACULA/api/posts/save_post.php`, {
+                    const response = await fetch(`${BASE_URL}/api/posts/save_post.php`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -574,7 +713,7 @@ async function deletePost(postId) {
                     throw new Error('You must be logged in to delete a post');
                 }
                 
-                const response = await fetch(`${BASE_URL}/BRACULA/api/posts/delete_post.php`, {
+                const response = await fetch(`${BASE_URL}/api/posts/delete_post.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -757,4 +896,480 @@ function showNotification(message, type = 'info') {
             notificationElement.remove();
         }, 500);
     }, 4000);
+}
+
+// Create a comment element
+function createCommentElement(comment) {
+    try {
+        if (!comment) {
+            console.error('Cannot create element for undefined comment');
+            return document.createElement('div');
+        }
+        
+        console.log('Creating comment element for:', comment);
+        
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('comment');
+        
+        // Handle different API response formats
+        const commentId = comment.comment_id || comment.id;
+        if (!commentId) {
+            console.warn('Comment has no ID:', comment);
+        }
+        
+        commentElement.dataset.commentId = commentId;
+        
+        // Check if current user is the author of the comment
+        const currentUser = JSON.parse(localStorage.getItem('user')) || {};
+        const commentUserId = comment.user_id || comment.authorId;
+        const isAuthor = currentUser.user_id && commentUserId && 
+                         parseInt(currentUser.user_id) === parseInt(commentUserId);
+        
+        // Determine if this is a reply (has parent_id) and add appropriate class
+        if (comment.parent_id) {
+            commentElement.classList.add('comment-reply');
+        }
+        
+        // Handle different API response formats
+        const authorName = comment.author || comment.full_name || comment.username || 'Unknown User';
+        const avatarUrl = comment.avatar_url || comment.avatar || 'https://avatar.iran.liara.run/public';
+        const commentTime = comment.created_at || comment.timestamp || new Date().toISOString();
+        const commentContent = comment.content || '';
+        
+        commentElement.innerHTML = `
+            <div class="comment-header">
+                <img src="${avatarUrl}" alt="${authorName}" class="comment-avatar" data-user-id="${commentUserId}">
+                <div class="comment-meta">
+                    <strong class="comment-author" data-user-id="${commentUserId}">${authorName}</strong>
+                    <span class="comment-time">${commentTime}</span>
+                </div>
+                ${isAuthor ? `
+                    <div class="comment-options">
+                        <button class="comment-options-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="comment-options-dropdown dropdown-menu">
+                            <button class="edit-comment-btn" data-comment-id="${commentId}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="delete-comment-btn" data-comment-id="${commentId}">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="comment-content">
+                <p>${commentContent}</p>
+            </div>
+            <div class="comment-actions">
+                <button class="reply-comment-btn" data-comment-id="${commentId}">
+                    <i class="fas fa-reply"></i> Reply
+                </button>
+            </div>
+            <div class="reply-form-container" data-comment-id="${commentId}" style="display: none;">
+                <form class="reply-form">
+                    <textarea placeholder="Write a reply..." required></textarea>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-reply-btn">Cancel</button>
+                        <button type="submit" class="submit-reply-btn">Reply</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        
+        return commentElement;
+    } catch (error) {
+        console.error('Error creating comment element:', error);
+        return document.createElement('div');
+    }
+}
+
+// Attach event listeners to comments
+function attachCommentEventListeners(container, postId) {
+    // Reply button event listeners
+    container.querySelectorAll('.reply-comment-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const commentId = btn.dataset.commentId;
+            const replyContainer = container.querySelector(`.reply-form-container[data-comment-id="${commentId}"]`);
+            
+            // Hide all other reply forms first
+            container.querySelectorAll('.reply-form-container').forEach(form => {
+                if (form !== replyContainer) {
+                    form.style.display = 'none';
+                }
+            });
+            
+            // Toggle this reply form
+            replyContainer.style.display = replyContainer.style.display === 'none' ? 'block' : 'none';
+            
+            // Focus on textarea if showing
+            if (replyContainer.style.display === 'block') {
+                replyContainer.querySelector('textarea').focus();
+            }
+        });
+    });
+    
+    // Cancel reply button event listeners
+    container.querySelectorAll('.cancel-reply-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const replyForm = btn.closest('.reply-form-container');
+            replyForm.style.display = 'none';
+        });
+    });
+    
+    // Reply form submission event listeners
+    container.querySelectorAll('.reply-form').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const commentId = form.closest('.reply-form-container').dataset.commentId;
+            await submitReply(postId, commentId, form);
+        });
+    });
+    
+    // Comment author and avatar click event listeners
+    container.querySelectorAll('.comment-author, .comment-avatar').forEach(el => {
+        el.addEventListener('click', () => {
+            const userId = el.dataset.userId;
+            if (userId) {
+                viewUserProfile(userId);
+            }
+        });
+    });
+    
+    // Comment options dropdown toggle
+    container.querySelectorAll('.comment-options-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = btn.nextElementSibling;
+            
+            // Close all other dropdowns
+            container.querySelectorAll('.comment-options-dropdown.show').forEach(menu => {
+                if (menu !== dropdown) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            // Toggle this dropdown
+            dropdown.classList.toggle('show');
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!btn.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        });
+    });
+    
+    // Edit comment button event listeners
+    container.querySelectorAll('.edit-comment-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const commentId = btn.dataset.commentId;
+            editComment(commentId, postId);
+        });
+    });
+    
+    // Delete comment button event listeners
+    container.querySelectorAll('.delete-comment-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const commentId = btn.dataset.commentId;
+            deleteComment(commentId, postId);
+        });
+    });
+}
+
+// Submit a reply to a comment
+async function submitReply(postId, parentCommentId, form) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            throw new Error('You must be logged in to reply');
+        }
+        
+        const content = form.querySelector('textarea').value.trim();
+        if (!content) {
+            throw new Error('Reply cannot be empty');
+        }
+        
+        // Convert IDs to integers
+        const numericPostId = parseInt(postId);
+        const numericParentId = parseInt(parentCommentId);
+        
+        if (isNaN(numericPostId)) {
+            throw new Error('Invalid Post ID');
+        }
+        
+        if (isNaN(numericParentId)) {
+            throw new Error('Invalid Parent Comment ID');
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.submit-reply-btn');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        
+        console.log('Submitting reply for post ID:', numericPostId, 'parent comment ID:', numericParentId);
+        
+        // Use the correct API endpoint
+        const url = `${BASE_URL}/api/comments/comments.php`;
+        console.log('Submitting to URL:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                post_id: numericPostId,
+                user_id: parseInt(user.user_id),
+                content: content,
+                parent_id: numericParentId
+            })
+        });
+        
+        const data = await response.json();
+        console.log('Reply submission response:', data);
+        
+        if (data.status === 'success') {
+            showNotification('Reply added successfully', 'success');
+            
+            // Refresh comments
+            openCommentModal(numericPostId);
+        } else {
+            throw new Error(data.message || 'Failed to add reply');
+        }
+    } catch (error) {
+        console.error('Error submitting reply:', error);
+        showNotification(error.message, 'error');
+        
+        // Reset submit button
+        const submitBtn = form.querySelector('.submit-reply-btn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Reply';
+    }
+}
+
+// Submit a comment
+async function submitComment(postId, form) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            throw new Error('You must be logged in to comment');
+        }
+        
+        const content = document.getElementById('commentContent').value.trim();
+        if (!content) {
+            throw new Error('Comment cannot be empty');
+        }
+        
+        // Convert postId to integer
+        const numericPostId = parseInt(postId);
+        if (isNaN(numericPostId)) {
+            throw new Error('Invalid Post ID');
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.submit-comment');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        
+        console.log('Submitting comment for post ID:', numericPostId);
+        
+        // Use the correct API endpoint
+        const url = `${BASE_URL}/api/comments/comments.php`;
+        console.log('Submitting to URL:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                post_id: numericPostId,
+                user_id: parseInt(user.user_id),
+                content: content
+            })
+        });
+        
+        const data = await response.json();
+        console.log('Comment submission response:', data);
+        
+        if (data.status === 'success') {
+            showNotification('Comment added successfully', 'success');
+            
+            // Clear form
+            document.getElementById('commentContent').value = '';
+            
+            // Refresh comments
+            openCommentModal(numericPostId);
+        } else {
+            throw new Error(data.message || 'Failed to add comment');
+        }
+    } catch (error) {
+        console.error('Error submitting comment:', error);
+        showNotification(error.message, 'error');
+    } finally {
+        // Reset submit button
+        const submitBtn = form.querySelector('.submit-comment');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText || 'Post Comment';
+    }
+}
+
+// Edit a comment
+async function editComment(commentId, postId) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            throw new Error('You must be logged in to edit a comment');
+        }
+        
+        // Find the comment element
+        const commentElement = document.querySelector(`.comment[data-comment-id="${commentId}"]`);
+        if (!commentElement) {
+            throw new Error('Comment not found');
+        }
+        
+        // Get the current comment content
+        const commentContentElement = commentElement.querySelector('.comment-content p');
+        const currentContent = commentContentElement.textContent;
+        
+        // Create edit form
+        const editForm = document.createElement('form');
+        editForm.classList.add('edit-comment-form');
+        editForm.innerHTML = `
+            <textarea required>${currentContent}</textarea>
+            <div class="form-actions">
+                <button type="button" class="cancel-edit-btn">Cancel</button>
+                <button type="submit" class="submit-edit-btn">Save</button>
+            </div>
+        `;
+        
+        // Replace comment content with edit form
+        const commentContent = commentElement.querySelector('.comment-content');
+        commentContent.innerHTML = '';
+        commentContent.appendChild(editForm);
+        
+        // Focus on textarea
+        const textarea = editForm.querySelector('textarea');
+        textarea.focus();
+        
+        // Position cursor at the end of the text
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        
+        // Cancel edit button event listener
+        const cancelBtn = editForm.querySelector('.cancel-edit-btn');
+        cancelBtn.addEventListener('click', () => {
+            commentContent.innerHTML = `<p>${currentContent}</p>`;
+        });
+        
+        // Submit edit form event listener
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newContent = textarea.value.trim();
+            if (!newContent) {
+                showNotification('Comment cannot be empty', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = editForm.querySelector('.submit-edit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+            
+            try {
+                // Use the correct API endpoint
+                const url = `${BASE_URL}/api/comments/edit_comment.php`;
+                console.log('Submitting to URL:', url);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        comment_id: parseInt(commentId),
+                        user_id: parseInt(user.user_id),
+                        content: newContent
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Comment edit response:', data);
+                
+                if (data.status === 'success') {
+                    showNotification('Comment updated successfully', 'success');
+                    
+                    // Update comment content
+                    commentContent.innerHTML = `<p>${newContent}</p>`;
+                } else {
+                    throw new Error(data.message || 'Failed to update comment');
+                }
+            } catch (error) {
+                console.error('Error updating comment:', error);
+                showNotification(error.message, 'error');
+                
+                // Reset submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save';
+            }
+        });
+    } catch (error) {
+        console.error('Error editing comment:', error);
+        showNotification(error.message, 'error');
+    }
+}
+
+// Delete a comment
+async function deleteComment(commentId, postId) {
+    createConfirmModal(
+        'Delete Comment',
+        'Are you sure you want to delete this comment? This action cannot be undone.',
+        async () => {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (!user) {
+                    throw new Error('You must be logged in to delete a comment');
+                }
+                
+                // Use the correct API endpoint
+                const url = `${BASE_URL}/api/comments/delete_comment.php`;
+                console.log('Submitting to URL:', url);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        comment_id: parseInt(commentId),
+                        user_id: parseInt(user.user_id)
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Comment delete response:', data);
+                
+                if (data.status === 'success') {
+                    showNotification('Comment deleted successfully', 'success');
+                    
+                    // Refresh comments
+                    openCommentModal(postId);
+                } else {
+                    throw new Error(data.message || 'Failed to delete comment');
+                }
+                return true; // Close the modal
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                showNotification(error.message, 'error');
+                return true; // Close the modal anyway
+            }
+        }
+    );
 } 

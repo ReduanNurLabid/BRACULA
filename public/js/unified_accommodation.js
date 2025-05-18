@@ -190,12 +190,10 @@ function initializeAccommodationPage() {
         resetFilterBtn.addEventListener('click', resetFilters);
     }
     
-    // Favorites filter
-    const favoritesToggle = document.getElementById('show-favorites-only');
-    if (favoritesToggle) {
-        favoritesToggle.addEventListener('change', () => {
-            applyFilters();
-        });
+    // Clear search button
+    const clearSearchBtn = document.getElementById('clear-search');
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', resetFilters);
     }
 }
 
@@ -618,13 +616,9 @@ function displayFavorites(favorites) {
 function applyFilters() {
     // Get filter values
     const roomTypeFilters = [...document.querySelectorAll('input[name="roomType"]:checked')].map(input => input.value);
-    const locationFilter = document.getElementById('location').value.toLowerCase().trim();
-    const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
-    const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
-    const showFavoritesOnly = document.getElementById('show-favorites-only').checked;
-    
-    // Get favorites from localStorage
-    const favorites = JSON.parse(localStorage.getItem('favoriteAccommodations') || '[]');
+    const locationFilter = document.getElementById('location')?.value.toLowerCase().trim() || '';
+    const minPrice = parseFloat(document.getElementById('min-price')?.value) || 0;
+    const maxPrice = parseFloat(document.getElementById('max-price')?.value) || Infinity;
     
     // Filter accommodations
     const filteredAccommodations = accommodations.filter(accommodation => {
@@ -641,11 +635,6 @@ function applyFilters() {
         // Price filter
         const price = parseFloat(accommodation.price);
         if (price < minPrice || price > maxPrice) {
-            return false;
-        }
-        
-        // Favorites filter
-        if (showFavoritesOnly && !favorites.includes(accommodation.accommodation_id.toString())) {
             return false;
         }
         
@@ -673,10 +662,13 @@ function resetFilters() {
     });
     
     // Reset text and number inputs
-    document.getElementById('location').value = '';
-    document.getElementById('min-price').value = '';
-    document.getElementById('max-price').value = '';
-    document.getElementById('show-favorites-only').checked = false;
+    const locationInput = document.getElementById('location');
+    const minPriceInput = document.getElementById('min-price');
+    const maxPriceInput = document.getElementById('max-price');
+    
+    if (locationInput) locationInput.value = '';
+    if (minPriceInput) minPriceInput.value = '';
+    if (maxPriceInput) maxPriceInput.value = '';
     
     // Hide filter results info
     const searchResultsInfo = document.querySelector('.search-results-info');
@@ -935,11 +927,6 @@ function toggleFavorite(accommodationId, buttonElement) {
     
     // Save updated favorites to localStorage
     localStorage.setItem('favoriteAccommodations', JSON.stringify(favorites));
-    
-    // If "Show Favorites Only" is checked, reapply filters
-    if (document.getElementById('show-favorites-only')?.checked) {
-        applyFilters();
-    }
     
     // Refresh favorites section if it's visible
     const favoritesSection = document.getElementById('favorites-section');

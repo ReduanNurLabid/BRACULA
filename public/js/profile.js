@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Viewing own profile
         loadUserProfile();
         loadUserActivities();
-        initializeProfilePictureUpdate();
     }
 });
 
@@ -92,12 +91,11 @@ function displayUserProfile(userData) {
 
     // Update profile pictures
     const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
-profilePics.forEach(img => {
-    if (img) {
-            const profilePics = document.querySelectorAll('.profile-picture img, .profile-section img');
-    profilePics.forEach(img => img.src = avatarUrl);
-    }
-})
+    profilePics.forEach(img => {
+        if (img) {
+            img.src = avatarUrl;
+        }
+    });
 
     // Display interests
     displayInterests(interests);
@@ -179,41 +177,7 @@ function setRandomStatus() {
 }
 
 function initializeProfilePictureUpdate() {
-    const editButton = document.querySelector('.edit-profile-picture');
-    const modal = document.getElementById('profile-picture-modal');
-    const closeBtn = modal.querySelector('.close');
-    const form = document.getElementById('profile-picture-form');
-    
-    // Open modal when clicking the edit button
-    editButton.addEventListener('click', () => {
-        openModal(modal);
-    });
-    
-    // Close modal when clicking the X
-    closeBtn.addEventListener('click', () => {
-        closeModal(modal);
-    });
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal(modal);
-        }
-    });
-    
-    // Handle form submission
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const avatarUrl = document.getElementById('avatar-url').value.trim();
-        if (!avatarUrl) {
-            showNotification('Please enter a valid image URL', 'error');
-            return;
-        }
-        
-        await updateProfilePicture(avatarUrl);
-        closeModal(modal);
-    });
+    // Function removed as the profile picture update functionality has been moved to settings page
 }
 
 async function updateProfilePicture(avatarUrl) {
@@ -376,4 +340,19 @@ function formatTimestamp(timestamp) {
             day: 'numeric'
         });
     }
+}
+
+// Helper functions for modal handling
+function openModal(modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+}
+
+function closeModal(modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = ''; // Restore scrolling
+    
+    // Clear any form inputs
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => form.reset());
 } 

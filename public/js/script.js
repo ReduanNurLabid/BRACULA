@@ -361,15 +361,14 @@ document.addEventListener('DOMContentLoaded', function() {
             position: absolute;
             right: 0;
             top: 100%;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            min-width: 180px;
             z-index: 1000;
+            min-width: 180px;
+            border-radius: 8px;
         }
         
         .profile-dropdown-menu.show {
             display: block;
+            animation: fadeIn 0.2s ease;
         }
         
         .dropdown-item {
@@ -378,16 +377,6 @@ document.addEventListener('DOMContentLoaded', function() {
             transition: background-color 0.3s;
             display: flex;
             align-items: center;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .dropdown-item i {
-            margin-right: 10px;
-            width: 16px;
-            text-align: center;
         }
         
         .profile-dropdown-toggle {

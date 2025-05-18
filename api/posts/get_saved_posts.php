@@ -32,6 +32,12 @@ try {
     $database = new Database();
     $conn = $database->getConnection();
     
+    // Check if database connection is successful
+    if (!$conn) {
+        echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+        exit();
+    }
+    
     // Query to get saved posts with post details
     $query = "SELECT p.*, u.full_name as author, u.avatar_url, 
               CASE WHEN sp.post_id IS NOT NULL THEN 1 ELSE 0 END as is_saved,
