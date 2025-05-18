@@ -1,4 +1,4 @@
-# BRACULA - Brown University Community Platform
+# BRACULA - BRAC University Community Platform
 
 BRACULA is a comprehensive community platform for Brown University students, providing features for social interaction, resource sharing, and campus engagement.
 
@@ -65,9 +65,5 @@ BRACULA/
 1. Start XAMPP and ensure Apache and MySQL are running.
 2. Run the database update script: `php database/update_comments_table.php`
 3. Access the application through your web browser at `http://localhost/BRACULA/`
-
-## Test Credentials
-- Username: test@example.com
-- Password: password123 
 
 ### Contributors: Reduan Nur, Mahim Kabir, Anika Ferdous, Jerin khan
