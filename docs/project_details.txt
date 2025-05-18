@@ -1,0 +1,142 @@
+# BRACULA - Brown University Community Platform
+
+## Project Overview
+
+BRACULA is a comprehensive web-based community platform designed specifically for Brown University students. The platform facilitates social interaction, resource sharing, campus engagement, and coordination of various student activities through a unified interface.
+
+## System Architecture
+
+BRACULA employs a custom MVC (Model-View-Controller) architecture implemented in PHP:
+
+- **Models**: Encapsulate business logic and data persistence
+- **Views**: HTML templates with embedded PHP for dynamic content rendering
+- **Controllers**: API endpoints that handle HTTP requests and orchestrate data flow
+
+### Technology Stack
+
+- **Backend**: PHP 7.4+
+- **Database**: MySQL 8.0
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla JS)
+- **Server**: Apache (via XAMPP)
+- **Authentication**: Custom JWT-based authentication system
+
+## Directory Structure
+
+```
+BRACULA/
+├── api/                  # Controllers handling various endpoints
+│   ├── auth/             # Authentication endpoints
+│   ├── posts/            # Post management endpoints
+│   ├── comments/         # Comment management endpoints
+│   ├── rides/            # Ride sharing endpoints
+│   ├── events/           # Event management endpoints
+│   ├── accommodations/   # Accommodation endpoints
+│   ├── resources/        # Resource sharing endpoints
+│   └── users/            # User management endpoints
+├── models/               # Data models with business logic
+├── config/               # Configuration files for database, sessions
+├── includes/             # Utility functions and shared components
+├── database/             # Database scripts and migrations
+├── uploads/              # User uploaded files and content
+├── public/               # Public assets (images, CSS, JS)
+├── css/                  # CSS (legacy, redirects to public/css)
+├── js/                   # JavaScript (legacy, redirects to public/js)
+├── test/                 # Unit and integration tests
+└── logs/                 # Application logs
+```
+
+## Core Features
+
+### User Management
+- **Registration & Authentication**: Email-based registration with secure password handling
+- **Profile Management**: Edit personal information, profile pictures, and privacy settings
+- **Activity Tracking**: Monitor user engagement across the platform
+
+### Post Management
+- **Create/Edit/Delete Posts**: Full CRUD operations for user-generated content
+- **Content Categories**: Organize posts by communities and topics
+- **Voting System**: Upvote/downvote functionality for content curation
+- **Save Posts**: Bookmark functionality for later reference
+
+### Social Interaction
+- **Comments**: Comment on posts with support for rich text
+- **Nested Comments**: Reply to existing comments with unlimited nesting
+- **Notifications**: Real-time notification system for interactions
+
+### Resource Sharing
+- **Material Upload/Download**: Share academic resources and materials
+- **Content Categorization**: Organize materials by course, subject, or type
+
+### Event Management
+- **Event Creation**: Create and publish campus events
+- **Registration**: RSVP functionality for event attendance
+- **Calendar Integration**: View events in calendar format
+
+### Ride Sharing
+- **Ride Offers**: Post available rides for carpooling
+- **Ride Requests**: Request rides from other community members
+- **Driver Reviews**: Rate and review drivers for quality assurance
+
+### Accommodation
+- **Listing Management**: Post and manage accommodation listings
+- **Inquiries**: Send and respond to accommodation inquiries
+- **Filtering**: Search accommodations by criteria (price, location, etc.)
+
+## MVC Implementation Details
+
+### Models
+The system includes well-defined model classes for each domain entity:
+- **User.php**: User account management and authentication
+- **Post.php**: Content creation and management
+- **Comment.php**: Discussion thread management
+- **Event.php**: Campus event coordination
+- **Ride.php**: Ride sharing functionality
+- **Accommodation.php**: Housing and accommodation listings
+
+### Controllers (API Endpoints)
+Controllers are implemented as PHP files in the API directory, handling:
+- Request validation and sanitization
+- Business logic orchestration
+- Database interactions via models
+- Response formatting and error handling
+
+### Views
+Views are implemented as HTML templates with embedded PHP, following a clean separation of concerns:
+- Presentation logic isolated from business logic
+- Consistent styling through centralized CSS
+- Client-side interactivity via JavaScript
+
+## Database Schema
+
+The database design follows relational principles with proper foreign key constraints between:
+- Users and their content (posts, comments)
+- Posts and associated comments
+- Events and registrations
+- Ride offers and requests
+- Accommodations and inquiries
+
+## Security Measures
+
+- **Input Validation**: Server-side validation of all user inputs
+- **SQL Injection Prevention**: Prepared statements for database queries
+- **XSS Protection**: Output escaping for user-generated content
+- **CSRF Protection**: Token-based protection for form submissions
+- **Session Management**: Secure session handling with proper timeout
+
+## Future Enhancements
+
+- Implementation of a formal router for improved URL handling
+- Enhanced authentication with multi-factor options
+- Integration with university SSO systems
+- API documentation using Swagger
+- Potential migration to a lightweight PHP framework
+- Mobile application development for improved accessibility
+
+## Development and Deployment
+
+- **Development Environment**: XAMPP for local development
+- **Version Control**: Git for source code management
+- **Testing**: PHP unit tests for core functionality
+- **Deployment**: Apache server configuration for production
+
+This comprehensive platform provides Brown University students with a centralized hub for community engagement, academic collaboration, and campus resource sharing in a user-friendly, secure environment.
