@@ -1,8 +1,8 @@
-# BRACULA - Brown University Community Platform
+# BRACULA - BRAC University Community Platform
 
 ## Project Overview
 
-BRACULA is a comprehensive web-based community platform designed specifically for Brown University students. The platform facilitates social interaction, resource sharing, campus engagement, and coordination of various student activities through a unified interface.
+BRACULA is a comprehensive web-based community platform designed specifically for BRAC University students. The platform facilitates social interaction, resource sharing, campus engagement, and coordination of various student activities through a unified interface.
 
 ## System Architecture
 
@@ -139,4 +139,4 @@ The database design follows relational principles with proper foreign key constr
 - **Testing**: PHP unit tests for core functionality
 - **Deployment**: Apache server configuration for production
 
-This comprehensive platform provides Brown University students with a centralized hub for community engagement, academic collaboration, and campus resource sharing in a user-friendly, secure environment.
+This comprehensive platform provides BRAC University students with a centralized hub for community engagement, academic collaboration, and campus resource sharing in a user-friendly, secure environment.

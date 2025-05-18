@@ -24,6 +24,11 @@ try {
     if (!isset($data->user_id) || !isset($data->content)) {
         throw new Exception("Missing required fields: user_id and content are required.");
     }
+    
+    // Validate that content is not empty
+    if (empty(trim($data->content))) {
+        throw new Exception("Content cannot be empty.");
+    }
 
     // Include database configuration
     require_once '../config/database.php';

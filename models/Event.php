@@ -4,7 +4,14 @@ class Event {
     private $table_name = "events";
     
     // Properties
-    public $event_id, public $user_id, public $title, public $description, public $location, public $date_time, public $created_at, public $updated_at;
+    public $event_id;
+    public $user_id;
+    public $title;
+    public $description;
+    public $location;
+    public $date_time;
+    public $created_at;
+    public $updated_at;
     
     // Constructor with DB
     public function __construct($db) {

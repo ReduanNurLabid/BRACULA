@@ -18,4 +18,3 @@ if ($loggedIn) {
     header('Location: html/login.html');
     exit;
 }
-?> 

@@ -4,7 +4,13 @@ class Comment {
     private $table_name = "comments";
     
     // Properties
-    public $comment_id, public $post_id, public $user_id, public $content, public $created_at, public $updated_at, public $parent_id;
+    public $comment_id;
+    public $post_id;
+    public $user_id;
+    public $content;
+    public $created_at;
+    public $updated_at;
+    public $parent_id;
     
     // Constructor with DB
     public function __construct($db) {

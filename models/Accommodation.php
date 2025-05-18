@@ -4,7 +4,15 @@ class Accommodation {
     private $table_name = "accommodations";
     
     // Properties
-    public $accommodation_id, public $user_id, public $title, public $description, public $location, public $price, public $availability, public $created_at, public $updated_at;
+    public $accommodation_id;
+    public $user_id;
+    public $title;
+    public $description;
+    public $location;
+    public $price;
+    public $availability;
+    public $created_at;
+    public $updated_at;
     
     // Constructor with DB
     public function __construct($db) {
