@@ -1,6 +1,6 @@
 # BRACULA - BRAC University Community Platform
 
-BRACULA is a comprehensive community platform for Brown University students, providing features for social interaction, resource sharing, and campus engagement.
+BRACULA is a comprehensive community platform for BRACU University students, providing features for social interaction, resource sharing, and campus engagement.
 
 ## Project Structure
 
