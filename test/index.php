@@ -77,6 +77,20 @@
         </div>
         
         <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0">Resources Tests</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Automated tests for resources functionality including upload, download and search.</p>
+                        <a href="run_cmd.php?test=main_test.py" class="btn btn-info">Run Resources Tests</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-info text-white">
@@ -93,6 +107,8 @@
                             <li>API endpoint functionality</li>
                             <li>Accommodation creation and management</li>
                             <li>Accommodation inquiries and search</li>
+                            <li>Login and authentication</li>
+                            <li>Resources upload and download</li>
                         </ul>
                         <p><strong>Note:</strong> The tests automatically clean up any data created during the testing process.</p>
                     </div>
