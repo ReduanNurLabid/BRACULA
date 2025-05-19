@@ -65,7 +65,7 @@
             document.getElementById('response').innerText = 'Fetching profile...';
             
             try {
-                const response = await fetch(`api/profile.php?id=${userId}`, {
+                const response = await fetch(`api/users/get_user_profile.php?id=${userId}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
@@ -80,7 +80,7 @@
                     
                     // If successful, populate the update form
                     if (response.ok && data) {
-                        document.getElementById('name').value = data.name || '';
+                        document.getElementById('name').value = data.full_name || '';
                         document.getElementById('bio').value = data.bio || '';
                         document.getElementById('phone').value = data.phone || '';
                         document.getElementById('address').value = data.address || '';
@@ -97,7 +97,7 @@
             event.preventDefault();
             
             const formData = {
-                name: document.getElementById('name').value,
+                full_name: document.getElementById('name').value,
                 bio: document.getElementById('bio').value,
                 phone: document.getElementById('phone').value,
                 address: document.getElementById('address').value
@@ -106,8 +106,8 @@
             document.getElementById('response').innerText = 'Sending request...';
             
             try {
-                const response = await fetch('api/profile.php', {
-                    method: 'PUT',
+                const response = await fetch('api/users/update_profile.php', {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
