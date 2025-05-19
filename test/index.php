@@ -91,6 +91,31 @@
         </div>
         
         <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header bg-purple text-white" style="background-color:#8e24aa!important;">
+                        <h3 class="mb-0">Event Tests</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Tests for event creation, listing, and management functionality.</p>
+                        <a href="test_event.php" class="btn" style="background-color:#8e24aa;color:#fff;">Run Event Tests</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card test-card">
+                    <div class="card-header bg-brown text-white" style="background-color:#5d4037!important;">
+                        <h3 class="mb-0">Profile Tests</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Tests for viewing and updating user profile information.</p>
+                        <a href="test_profile.php" class="btn" style="background-color:#5d4037;color:#fff;">Run Profile Tests</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header bg-info text-white">

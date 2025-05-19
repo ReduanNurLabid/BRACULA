@@ -66,8 +66,4 @@ BRACULA/
 2. Run the database update script: `php database/update_comments_table.php`
 3. Access the application through your web browser at `http://localhost/BRACULA/`
 
-## Test Credentials
-- Username: test@example.com
-- Password: password123 
-
 ### Contributors: Reduan Nur, Mahim Kabir, Anika Ferdous, Jerin khan
