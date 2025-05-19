@@ -6,11 +6,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 try {
     // Include database and user model
-    require_once __DIR__ . '/../config/database.php';
-    require_once __DIR__ . '/../models/User.php';
+    require_once __DIR__ . '/../../config/database.php';
+    require_once __DIR__ . '/../../models/User.php';
 
     // Get user ID from query parameter
-    $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
+    $userId = isset($_GET['id']) ? $_GET['id'] : null;
 
     if (!$userId) {
         throw new Exception("User ID is required");
@@ -18,54 +18,37 @@ try {
 
     // Get database connection
     $database = new Database();
-    $db = $database->getConnection();
+    $conn = $database->getConnection();
 
-    // Create user object
-   // $user = new User($db);
-    
-    // Get user data
-    $user = new User($conn);
-    $user->user_id = $data['user_id'];
-    $user->full_name = $data['full_name'] ?? '';
-    $user->bio = $data['bio'] ?? '';
-    $user->avatar_url = $data['avatar_url'] ?? '';
-    $user->interests = $data['interests'] ?? '';
-
-    error_log("Attempting to update profile for user: " . $user->user_id);
-    error_log("Profile data: " . print_r([
-        'full_name' => $user->full_name,
-        'bio' => $user->bio,
-        'avatar_url' => $user->avatar_url,
-        'interests' => $user->interests
-    ], true));
-
-    if ($user->update()) {
-        $response = [
-            'success' => true,
-            'message' => 'Profile updated successfully',
-            'data' => [
-                'user_id' => $user->user_id,
-                'full_name' => $user->full_name,
-                'bio' => $user->bio,
-                'avatar_url' => $user->avatar_url,
-                'interests' => $user->interests
-            ]
-        ];
-        error_log("Profile updated successfully");
-        echo json_encode($response);
-    } else {
-        throw new Exception('Failed to update profile');
+    if (!$conn) {
+        throw new Exception("Database connection failed");
     }
 
+    // Query to get user profile
+    $query = "SELECT u.user_id, u.full_name, u.email, p.bio, p.phone, p.address, p.avatar_url 
+              FROM users u 
+              LEFT JOIN profiles p ON u.user_id = p.user_id 
+              WHERE u.user_id = ?";
+
+    $stmt = $conn->prepare($query);
+    $stmt->execute([$userId]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$profile) {
+        throw new Exception("User profile not found");
+    }
+
+    echo json_encode([
+        'success' => true,
+        'data' => $profile
+    ]);
+
 } catch (Exception $e) {
-    error_log("Error in update_profile.php: " . $e->getMessage());
+    error_log("Error in get_user_profile.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'An error occurred while updating profile'
+        'error' => $e->getMessage()
     ]);
 }
-
-// Ensure no extra output
-ob_end_flush();
 ?>

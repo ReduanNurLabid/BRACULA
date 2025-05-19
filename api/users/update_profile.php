@@ -6,13 +6,10 @@ error_reporting(E_ALL);
 // Ensure clean output
 ob_start();
 
-require_once '../config/database.php';
-require_once '../models/User.php';
-
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // Clear any previous output
 ob_clean();
@@ -27,52 +24,83 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $raw_data = file_get_contents('php://input');
-    error_log("Raw input data: " . $raw_data);
-    
-    $data = json_decode($raw_data, true);
-    
-    if (!isset($data['user_id'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'User ID is required']);
-        error_log("Missing user_id in request");
-        exit;
+    // Include database configuration
+    require_once __DIR__ . '/../../config/database.php';
+
+    // Get database connection
+    $database = new Database();
+    $conn = $database->getConnection();
+
+    if (!$conn) {
+        throw new Exception("Database connection failed");
     }
 
-    $db = new Database();
-    $conn = $db->getConnection();
-    
-    $user = new User($conn);
-    $user->user_id = $data['user_id'];
-    $user->full_name = $data['full_name'] ?? '';
-    $user->bio = $data['bio'] ?? '';
-    $user->avatar_url = $data['avatar_url'] ?? '';
-    $user->interests = $data['interests'] ?? '';
+    // Get POST data
+    $data = json_decode(file_get_contents("php://input"), true);
 
-    error_log("Attempting to update profile for user: " . $user->user_id);
-    error_log("Profile data: " . print_r([
-        'full_name' => $user->full_name,
-        'bio' => $user->bio,
-        'avatar_url' => $user->avatar_url,
-        'interests' => $user->interests
-    ], true));
+    if (!$data) {
+        throw new Exception("No data received");
+    }
 
-    if ($user->update()) {
-        $response = [
+    // Validate required fields
+    if (empty($data['full_name'])) {
+        throw new Exception("Full name is required");
+    }
+
+    // Start transaction
+    $conn->beginTransaction();
+
+    try {
+        // Update users table
+        $query = "UPDATE users SET full_name = ? WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->execute([$data['full_name'], $data['user_id']]);
+
+        // Check if profile exists
+        $query = "SELECT COUNT(*) FROM profiles WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->execute([$data['user_id']]);
+        $profileExists = $stmt->fetchColumn() > 0;
+
+        if ($profileExists) {
+            // Update existing profile
+            $query = "UPDATE profiles SET 
+                     bio = ?, 
+                     phone = ?, 
+                     address = ? 
+                     WHERE user_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->execute([
+                $data['bio'] ?? null,
+                $data['phone'] ?? null,
+                $data['address'] ?? null,
+                $data['user_id']
+            ]);
+        } else {
+            // Insert new profile
+            $query = "INSERT INTO profiles (user_id, bio, phone, address) 
+                     VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->execute([
+                $data['user_id'],
+                $data['bio'] ?? null,
+                $data['phone'] ?? null,
+                $data['address'] ?? null
+            ]);
+        }
+
+        // Commit transaction
+        $conn->commit();
+
+        echo json_encode([
             'success' => true,
-            'message' => 'Profile updated successfully',
-            'data' => [
-                'user_id' => $user->user_id,
-                'full_name' => $user->full_name,
-                'bio' => $user->bio,
-                'avatar_url' => $user->avatar_url,
-                'interests' => $user->interests
-            ]
-        ];
-        error_log("Profile updated successfully");
-        echo json_encode($response);
-    } else {
-        throw new Exception('Failed to update profile');
+            'message' => 'Profile updated successfully'
+        ]);
+
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        $conn->rollBack();
+        throw $e;
     }
 
 } catch (Exception $e) {
@@ -80,7 +108,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'An error occurred while updating profile'
+        'error' => $e->getMessage()
     ]);
 }
 
