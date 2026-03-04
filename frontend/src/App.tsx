@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
+import { ShoutboxProvider } from './contexts/ShoutboxContext'
 
 import { HomeFeed } from './pages/forums/HomeFeed'
 
@@ -23,51 +24,53 @@ const App = () => {
     const isShoutbox = location.pathname === '/shoutbox'
 
     return (
-        <>
-            <Toaster
-                position="top-center"
-                toastOptions={{
-                    style: {
-                        background: 'rgba(30, 30, 40, 0.95)',
-                        color: '#fff',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid var(--border-glass)',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    }
-                }}
-            />
-            <div className="bg-blob bg-blob-1"></div>
-            <div className="bg-blob bg-blob-2"></div>
+        <ShoutboxProvider>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
+                <Toaster
+                    position="top-center"
+                    toastOptions={{
+                        style: {
+                            background: 'rgba(30, 30, 40, 0.95)',
+                            color: '#fff',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid var(--border-glass)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                        }
+                    }}
+                />
+                <div className="bg-blob bg-blob-1"></div>
+                <div className="bg-blob bg-blob-2"></div>
 
-            <Navbar />
+                <Navbar />
 
-            <main style={{
-                paddingTop: '5rem',
-                minHeight: isShoutbox ? '100dvh' : 'calc(100vh - 100px)',
-                height: isShoutbox ? '100dvh' : 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: isShoutbox ? 'hidden' : 'visible'
-            }}>
-                <Routes>
-                    <Route path="/" element={<HomeFeed />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/study" element={<Materials />} />
-                    <Route path="/rides" element={<Rides />} />
-                    <Route path="/to-let" element={<ToLet />} />
-                    <Route path="/clubs" element={<Clubs />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/:userId" element={<Profile />} />
-                    <Route path="/shoutbox" element={<Shoutbox />} />
-                    <Route path="/feedback" element={<Feedback />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                </Routes>
-            </main>
+                <main style={{
+                    paddingTop: '5rem',
+                    flex: 1,
+                    height: isShoutbox ? '100dvh' : 'auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: isShoutbox ? 'hidden' : 'visible'
+                }}>
+                    <Routes>
+                        <Route path="/" element={<HomeFeed />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/study" element={<Materials />} />
+                        <Route path="/rides" element={<Rides />} />
+                        <Route path="/to-let" element={<ToLet />} />
+                        <Route path="/clubs" element={<Clubs />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/profile/:userId" element={<Profile />} />
+                        <Route path="/shoutbox" element={<Shoutbox />} />
+                        <Route path="/feedback" element={<Feedback />} />
+                        <Route path="/admin" element={<AdminDashboard />} />
+                    </Routes>
+                </main>
 
-            {!isShoutbox && <Footer />}
-        </>
+                {!isShoutbox && <Footer />}
+            </div>
+        </ShoutboxProvider>
     )
 }
 

@@ -4,6 +4,7 @@ import { useAuth } from '../../../contexts/AuthContext'
 import { ChevronDown, ChevronUp, MessageSquare } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import { useShoutbox } from '../../../contexts/ShoutboxContext'
 
 type Community = {
     id: string
@@ -25,6 +26,7 @@ export const Sidebar = ({ onSelectCommunity, activeCommunity }: SidebarProps) =>
     const [creating, setCreating] = useState(false)
     const [expanded, setExpanded] = useState(false)
     const navigate = useNavigate()
+    const { hasUnread } = useShoutbox()
 
     const fetchCommunities = async () => {
         const { data } = await supabase.from('communities').select('*').order('is_general', { ascending: false }).order('name')
@@ -91,7 +93,7 @@ export const Sidebar = ({ onSelectCommunity, activeCommunity }: SidebarProps) =>
             <button
                 onClick={() => navigate('/shoutbox')}
                 style={{
-                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'relative',
                     width: '100%', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)',
                     cursor: 'pointer', padding: '0.85rem', color: 'var(--accent-primary)',
                     borderRadius: 'var(--radius-md)', marginTop: '1rem',
@@ -100,7 +102,12 @@ export const Sidebar = ({ onSelectCommunity, activeCommunity }: SidebarProps) =>
                 }}
                 className="hover-lift"
             >
-                <MessageSquare size={18} />
+                <div style={{ position: 'relative' }}>
+                    <MessageSquare size={18} />
+                    {hasUnread && (
+                        <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)' }}></span>
+                    )}
+                </div>
                 Anondopur Shoutbox
             </button>
 

@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Menu, X, Home } from 'lucide-react'
+import { Menu, X, Home, MessageSquare } from 'lucide-react'
+import { useShoutbox } from '../../contexts/ShoutboxContext'
 
 export const Navbar = () => {
     const { user } = useAuth()
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const [menuOpen, setMenuOpen] = useState(false)
+    const { hasUnread } = useShoutbox()
 
     useEffect(() => {
         if (!user) { setAvatarUrl(null); return }
@@ -35,6 +37,13 @@ export const Navbar = () => {
                         <Link to="/rides" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Rides</Link>
                         <Link to="/clubs" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Clubs</Link>
                         <Link to="/to-let" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">To-Let</Link>
+                        <Link to="/shoutbox" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem', position: 'relative' }} className="hover-white">
+                            <MessageSquare size={18} />
+                            Shoutbox
+                            {hasUnread && (
+                                <span style={{ position: 'absolute', top: '-2px', right: '-8px', width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)' }}></span>
+                            )}
+                        </Link>
                     </div>
                     {user ? (
                         <Link to="/profile" className="hover-lift" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
@@ -78,6 +87,12 @@ export const Navbar = () => {
                     <Link to="/rides" className="nav-mobile-link">🚗 Ride Sharing</Link>
                     <Link to="/clubs" className="nav-mobile-link">🎭 Clubs</Link>
                     <Link to="/to-let" className="nav-mobile-link">🏠 To-Let</Link>
+                    <Link to="/shoutbox" className="nav-mobile-link" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        💬 Shoutbox
+                        {hasUnread && (
+                            <span style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)' }}></span>
+                        )}
+                    </Link>
                     <Link to="/feedback" className="nav-mobile-link">💬 Feedback</Link>
                     <div style={{ borderTop: '1px solid var(--border-glass)', marginTop: '0.25rem', paddingTop: '0.5rem' }}>
                         {user ? (

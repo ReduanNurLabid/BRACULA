@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { useAuth } from '../../../contexts/AuthContext'
 import { timeAgo } from '../../../utils/dateFormatter'
@@ -37,9 +37,24 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
     // History Modal State
     const [showHistoryModal, setShowHistoryModal] = useState<'post' | string | null>(null)
 
-    // A simplified helper to calculate net votes. 
-    // In a production app, you might want to fetch whether the current user has upvoted/downvoted 
-    // to highlight the arrow colors. For brevity, we are just executing the RPC toggle.
+    const [userVote, setUserVote] = useState<number>(0)
+
+    useEffect(() => {
+        if (!user) return;
+        const fetchUserVote = async () => {
+            const { data } = await supabase
+                .from('post_votes')
+                .select('vote_type')
+                .eq('post_id', post.id)
+                .eq('user_id', user.id)
+                .single()
+            if (data) {
+                setUserVote(data.vote_type)
+            }
+        }
+        fetchUserVote()
+    }, [user, post.id])
+
     const netVotes = (post.upvotes || 0) - (post.downvotes || 0)
 
     const handleVote = async (voteType: 1 | -1) => {
@@ -49,6 +64,9 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
         }
 
         setLoadingVote(true)
+
+        const oldVote = userVote;
+        setUserVote(oldVote === voteType ? 0 : voteType);
 
         try {
             const { error } = await supabase.rpc('handle_vote', {
@@ -63,6 +81,7 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
             onVoteChanged()
         } catch (error: any) {
             console.error("Error voting:", error.message)
+            setUserVote(oldVote)
             toast.error("Failed to submit vote. Please try again.")
         } finally {
             setLoadingVote(false)
@@ -216,34 +235,8 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
     if (isDeleted) return null;
 
     return (
-        <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', transition: 'transform 0.2s', cursor: 'pointer' }} onClick={handleExpandToggle} onMouseOver={e => e.currentTarget.style.transform = isExpanded ? 'none' : 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+        <div className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', transition: 'transform 0.2s', cursor: 'pointer' }} onClick={handleExpandToggle} onMouseOver={e => e.currentTarget.style.transform = isExpanded ? 'none' : 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
 
-            {/* Voting Column */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minWidth: '40px' }}>
-                <button
-                    disabled={loadingVote}
-                    onClick={(e) => { e.stopPropagation(); handleVote(1) }}
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem', padding: '0.25rem' }}
-                    onMouseOver={e => e.currentTarget.style.color = '#ef4444'} // Reddit-like upvote orange/red
-                    onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-                >
-                    ▲
-                </button>
-                <span style={{ fontWeight: 700, fontSize: '0.9rem', color: netVotes > 0 ? '#ef4444' : netVotes < 0 ? '#3b82f6' : 'var(--text-primary)' }}>
-                    {netVotes}
-                </span>
-                <button
-                    disabled={loadingVote}
-                    onClick={(e) => { e.stopPropagation(); handleVote(-1) }}
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem', padding: '0.25rem' }}
-                    onMouseOver={e => e.currentTarget.style.color = '#3b82f6'} // Reddit-like downvote blue
-                    onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-                >
-                    ▼
-                </button>
-            </div>
-
-            {/* Content Column */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
@@ -325,8 +318,33 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                     </>
                 )}
 
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }} onMouseOver={e => e.currentTarget.style.color = 'white'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
+                {/* Action Bar (Votes & Comments) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-full)' }}>
+                        <button
+                            disabled={loadingVote}
+                            onClick={(e) => { e.stopPropagation(); handleVote(1) }}
+                            style={{ background: 'none', border: 'none', color: userVote === 1 ? '#22c55e' : 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                            onMouseOver={e => e.currentTarget.style.color = '#22c55e'} // Green for upvote
+                            onMouseOut={e => e.currentTarget.style.color = userVote === 1 ? '#22c55e' : 'var(--text-secondary)'}
+                        >
+                            ▲
+                        </button>
+                        <span style={{ fontWeight: 700, fontSize: '0.9rem', color: userVote === 1 ? '#22c55e' : userVote === -1 ? '#ef4444' : 'var(--text-primary)' }}>
+                            {netVotes}
+                        </span>
+                        <button
+                            disabled={loadingVote}
+                            onClick={(e) => { e.stopPropagation(); handleVote(-1) }}
+                            style={{ background: 'none', border: 'none', color: userVote === -1 ? '#ef4444' : 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                            onMouseOver={e => e.currentTarget.style.color = '#ef4444'} // Red for downvote
+                            onMouseOut={e => e.currentTarget.style.color = userVote === -1 ? '#ef4444' : 'var(--text-secondary)'}
+                        >
+                            ▼
+                        </button>
+                    </div>
+
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-full)' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                         💬 {post.comments?.[0]?.count || 0} Comments
                     </span>
                 </div>
