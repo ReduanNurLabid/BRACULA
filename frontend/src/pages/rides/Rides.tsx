@@ -295,52 +295,52 @@ export const Rides = () => {
             {showCreate && createPortal(
                 <div style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+                    backgroundColor: 'rgba(10, 10, 14, 0.85)', backdropFilter: 'blur(8px)',
                     zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
                 }}>
-                    <div className="glass-panel animate-fade-in-up" style={{ padding: '2rem', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem' }}>Offer a Ride</h2>
-                            <button onClick={() => setShowCreate(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.5rem' }}>&times;</button>
+                    <div className="glass-panel animate-fade-in-up" style={{ padding: '2.5rem', width: '100%', maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-glass)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                            <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }} className="text-gradient">Offer a Ride</h2>
+                            <button onClick={() => setShowCreate(false)} style={{ background: 'rgba(255, 255, 255, 0.1)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-white"><X size={18} /></button>
                         </div>
-                        <form onSubmit={handleCreateRide} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <form onSubmit={handleCreateRide} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Vehicle Type</label>
-                                <select className="input-glass" value={vehicleType} onChange={e => setVehicleType(e.target.value)} required>
-                                    <option value="Rickshaw" style={{ background: '#1a1a1a', color: 'white' }}>Rickshaw (Max 2)</option>
-                                    <option value="Bike" style={{ background: '#1a1a1a', color: 'white' }}>Bike (Max 1)</option>
-                                    <option value="Car/CNG" style={{ background: '#1a1a1a', color: 'white' }}>Car / CNG (Max 3/4)</option>
+                                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Vehicle Type</label>
+                                <select className="input-glass" value={vehicleType} onChange={e => setVehicleType(e.target.value)} required style={{ appearance: 'none' }}>
+                                    <option value="Rickshaw" style={{ background: '#0A0A0E', color: 'white' }}>Rickshaw (Max 2)</option>
+                                    <option value="Bike" style={{ background: '#0A0A0E', color: 'white' }}>Bike (Max 1)</option>
+                                    <option value="Car/CNG" style={{ background: '#0A0A0E', color: 'white' }}>Car / CNG (Max 3/4)</option>
                                 </select>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>From</label>
+                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>From (Pick up)</label>
                                     <input type="text" className="input-glass" placeholder="e.g. Merul Badda" value={startLocation} onChange={e => setStartLocation(e.target.value)} required />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>To</label>
+                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>To (Drop off)</label>
                                     <input type="text" className="input-glass" placeholder="e.g. Mohakhali" value={endLocation} onChange={e => setEndLocation(e.target.value)} required />
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Departure Time</label>
+                                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Departure Time</label>
                                 <input type="datetime-local" className="input-glass" value={departureTime} onChange={e => setDepartureTime(e.target.value)} required />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.25rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Seats Available</label>
+                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Seats Available</label>
                                     <input type="number" min="1" max="4" className="input-glass" value={totalSeats} onChange={e => setTotalSeats(parseInt(e.target.value))} required />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Price / Seat (TK)</label>
+                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Price / Seat (TK)</label>
                                     <input type="number" min="0" className="input-glass" value={pricePerSeat} onChange={e => setPricePerSeat(parseInt(e.target.value))} required />
                                 </div>
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Your Contact Number</label>
+                                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Your Contact Number</label>
                                 <input type="tel" className="input-glass" placeholder="e.g. 01XXXXXXXXX" value={driverContact} onChange={e => setDriverContact(e.target.value)} required />
                             </div>
-                            <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%' }} disabled={creating}>
+                            <button type="submit" className="btn-primary hover-lift" style={{ marginTop: '1.5rem', width: '100%', padding: '0.8rem', fontSize: '1rem', fontWeight: 600, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', border: 'none', boxShadow: '0 4px 15px rgba(109, 40, 217, 0.4)' }} disabled={creating}>
                                 {creating ? 'Offering Ride...' : 'Offer Ride'}
                             </button>
                         </form>
@@ -368,48 +368,55 @@ export const Rides = () => {
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
                                 {filteredRides.map(ride => (
-                                    <div key={ride.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div key={ride.id} className="glass-panel hover-lift" style={{ padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+                                        {/* Card Header (Gradient background) */}
+                                        <div style={{ padding: '1.25rem 1.5rem', background: 'linear-gradient(to right, rgba(109, 40, 217, 0.1), rgba(236, 72, 153, 0.05))', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                             <div>
-                                                <span style={{ background: 'var(--accent-glow)', color: 'var(--accent-primary)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-block', marginBottom: '0.5rem' }}>
+                                                <span style={{ background: 'var(--accent-glow)', color: 'var(--accent-primary)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-block', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                                     {ride.vehicle_type}
                                                 </span>
-                                                <h3 style={{ fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     {ride.profiles?.avatar_url ? (
-                                                        <img src={ride.profiles.avatar_url} alt="" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                        <img src={ride.profiles.avatar_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                                                     ) : (
-                                                        <span style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'white', border: '2px solid var(--accent-primary)', flexShrink: 0 }}>
                                                             {(ride.profiles?.full_name || '?')[0]}
-                                                        </span>
+                                                        </div>
                                                     )}
-                                                    {ride.profiles?.full_name || 'Anonymous User'}
-                                                    {(ride.profiles?.total_reviews || 0) > 0 && (
-                                                        <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem', background: 'rgba(241, 196, 15, 0.15)', color: '#f1c40f', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
-                                                            <Star size={12} fill="#f1c40f" style={{ marginRight: '2px' }} /> {ride.profiles?.trust_score}
-                                                        </span>
-                                                    )}
-                                                </h3>
-                                            </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>
-                                                    {ride.price_per_seat === 0 ? 'Free' : `৳${ride.price_per_seat} `}
+                                                    <div>
+                                                        <h3 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 600, color: 'white' }}>{ride.profiles?.full_name || 'Anonymous User'}</h3>
+                                                        {(ride.profiles?.total_reviews || 0) > 0 && (
+                                                            <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', color: '#f1c40f', marginTop: '0.2rem' }}>
+                                                                <Star size={12} fill="#f1c40f" style={{ marginRight: '4px' }} /> {ride.profiles?.trust_score}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>per seat</div>
+                                            </div>
+                                            <div style={{ textAlign: 'right', background: 'rgba(0,0,0,0.3)', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-secondary)' }}>
+                                                    {ride.price_per_seat === 0 ? 'Free' : `৳${ride.price_per_seat}`}
+                                                </div>
+                                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '0.1rem' }}>per seat</div>
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={16} color="var(--accent-secondary)" /> <span><strong>From:</strong> {ride.start_location}</span></div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={16} color="var(--accent-primary)" /> <span><strong>To:</strong> {ride.end_location}</span></div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Clock size={16} /> <span>{new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span></div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users size={16} /> <span>{ride.available_seats} / {ride.total_seats} seats available</span></div>
-                                        </div>
+                                        {/* Card Body (Details) */}
+                                        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-secondary)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-secondary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Pick Up</span> <strong style={{ color: 'white' }}>{ride.start_location}</strong></div></div>
+                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-primary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Drop Off</span> <strong style={{ color: 'white' }}>{ride.end_location}</strong></div></div>
+                                                <div style={{ height: '1px', background: 'var(--border-glass)', margin: '0.25rem 0' }}></div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Clock size={16} color="var(--text-secondary)" /> <span style={{ color: 'var(--text-primary)' }}>{new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span></div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Users size={16} color="var(--text-secondary)" /> <span style={{ color: 'var(--text-primary)' }}><strong style={{ color: 'white' }}>{ride.available_seats}</strong> of {ride.total_seats} seats remaining</span></div>
+                                            </div>
 
-                                        {ride.driver_id !== currentUser?.id && (
-                                            <button onClick={() => requestRide(ride.id)} className="btn-primary" style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.1)', color: 'white' }}>
-                                                Request to Join
-                                            </button>
-                                        )}
+                                            {ride.driver_id !== currentUser?.id && (
+                                                <button onClick={() => requestRide(ride.id)} className="btn-primary" style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', width: '100%', fontWeight: 600, transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'var(--accent-primary)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+                                                    Request to Join
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                                 {filteredRides.length === 0 && (
@@ -425,69 +432,78 @@ export const Rides = () => {
                     {activeTab === 'offered' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {myOfferedRides.map(ride => (
-                                <div key={ride.id} className="glass-panel" style={{ padding: '1.5rem' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                                <div key={ride.id} className="glass-panel hover-lift" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+                                    {/* Card Header */}
+                                    <div style={{ padding: '1.25rem 1.5rem', background: 'linear-gradient(to right, rgba(109, 40, 217, 0.1), rgba(236, 72, 153, 0.05))', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{ride.start_location} ➔ {ride.end_location}</h3>
-                                            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{new Date(ride.departure_time).toLocaleString()} • {ride.available_seats} seats left</span>
+                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                                                {ride.start_location} <span style={{ color: 'var(--accent-primary)' }}>➔</span> {ride.end_location}
+                                            </h3>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                                                {new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} • <strong style={{ color: 'white' }}>{ride.available_seats}</strong> seats left
+                                            </span>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            <span style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', background: ride.status === 'open' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: ride.status === 'open' ? '#2ecc71' : 'white', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                                            <span style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', background: ride.status === 'open' ? 'rgba(46, 204, 113, 0.15)' : 'rgba(255, 255, 255, 0.05)', color: ride.status === 'open' ? '#2ecc71' : 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                                 {ride.status}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <h4 style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Passenger Requests ({ride.ride_requests?.length || 0})</h4>
+                                    {/* Card Body (Requests) */}
+                                    <div style={{ padding: '1.5rem' }}>
 
-                                    {ride.ride_requests?.length > 0 ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                            {ride.ride_requests.map((req: any) => (
-                                                <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                                                    <div>
-                                                        <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                            {req.profiles?.avatar_url ? (
-                                                                <img src={req.profiles.avatar_url} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
-                                                            ) : (
-                                                                <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
-                                                                    {(req.profiles?.full_name || '?')[0]}
-                                                                </span>
-                                                            )}
-                                                            {req.profiles?.full_name}
-                                                            {(req.profiles?.total_reviews || 0) > 0 && (
-                                                                <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', background: 'rgba(241, 196, 15, 0.15)', color: '#f1c40f', padding: '0.1rem 0.3rem', borderRadius: '4px' }}>
-                                                                    <Star size={10} fill="#f1c40f" style={{ marginRight: '2px' }} /> {req.profiles?.trust_score}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        {req.status === 'accepted' && <div style={{ fontSize: '0.85rem', color: 'var(--accent-secondary)', marginTop: '0.2rem' }}>Contact: {req.contact_number}</div>}
-                                                    </div>
+                                        <h4 style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Ride Partner Requests ({ride.ride_requests?.length || 0})</h4>
 
-                                                    {req.status === 'pending' ? (
-                                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                            <button onClick={() => respondToRequest(req.id, true)} style={{ background: 'rgba(46, 204, 113, 0.2)', color: '#2ecc71', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Check size={14} /> Accept</button>
-                                                            <button onClick={() => respondToRequest(req.id, false)} style={{ background: 'rgba(231, 76, 60, 0.2)', color: '#e74c3c', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem' }}><X size={14} /> Reject</button>
+                                        {ride.ride_requests?.length > 0 ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                {ride.ride_requests.map((req: any) => (
+                                                    <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                                                        <div>
+                                                            <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                                {req.profiles?.avatar_url ? (
+                                                                    <img src={req.profiles.avatar_url} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                                ) : (
+                                                                    <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                                                                        {(req.profiles?.full_name || '?')[0]}
+                                                                    </span>
+                                                                )}
+                                                                {req.profiles?.full_name}
+                                                                {(req.profiles?.total_reviews || 0) > 0 && (
+                                                                    <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', background: 'rgba(241, 196, 15, 0.15)', color: '#f1c40f', padding: '0.1rem 0.3rem', borderRadius: '4px' }}>
+                                                                        <Star size={10} fill="#f1c40f" style={{ marginRight: '2px' }} /> {req.profiles?.trust_score}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {req.status === 'accepted' && <div style={{ fontSize: '0.85rem', color: 'var(--accent-secondary)', marginTop: '0.2rem' }}>Contact: {req.contact_number}</div>}
                                                         </div>
-                                                    ) : req.status === 'accepted' ? (
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 'bold', color: '#2ecc71' }}>
+
+                                                        {req.status === 'pending' ? (
+                                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                                <button onClick={() => respondToRequest(req.id, true)} style={{ background: 'rgba(46, 204, 113, 0.2)', color: '#2ecc71', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Check size={14} /> Accept</button>
+                                                                <button onClick={() => respondToRequest(req.id, false)} style={{ background: 'rgba(231, 76, 60, 0.2)', color: '#e74c3c', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.2rem' }}><X size={14} /> Reject</button>
+                                                            </div>
+                                                        ) : req.status === 'accepted' ? (
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                                <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 'bold', color: '#2ecc71' }}>
+                                                                    {req.status}
+                                                                </span>
+                                                                <button onClick={() => setRateModalTarget({ rideId: ride.id, revieweeId: req.passenger_id, revieweeName: req.profiles?.full_name })} className="btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>
+                                                                    Rate Partner
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 'bold', color: 'var(--text-secondary)' }}>
                                                                 {req.status}
                                                             </span>
-                                                            <button onClick={() => setRateModalTarget({ rideId: ride.id, revieweeId: req.passenger_id, revieweeName: req.profiles?.full_name })} className="btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>
-                                                                Rate Passenger
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 'bold', color: 'var(--text-secondary)' }}>
-                                                            {req.status}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No requests yet.</div>
-                                    )}
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', border: '1px dashed var(--border-glass)' }}>No requests yet.</div>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                             {myOfferedRides.length === 0 && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>You haven't offered any rides yet.</div>}
@@ -498,34 +514,58 @@ export const Rides = () => {
                     {activeTab === 'joined' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {myJoinedRides.map(req => (
-                                <div key={req.id} className="glass-panel" style={{ padding: '1.5rem' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div key={req.id} className="glass-panel hover-lift" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-glass)' }}>
+                                    {/* Card Header */}
+                                    <div style={{ padding: '1.25rem 1.5rem', background: 'linear-gradient(to right, rgba(109, 40, 217, 0.1), rgba(236, 72, 153, 0.05))', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{req.rides?.start_location} ➔ {req.rides?.end_location}</h3>
-                                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                                {new Date(req.rides?.departure_time).toLocaleString()} • Driver: {req.rides?.profiles?.full_name}
-                                                {(req.rides?.profiles?.total_reviews || 0) > 0 && (
-                                                    <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', background: 'rgba(241, 196, 15, 0.15)', color: '#f1c40f', padding: '0.1rem 0.3rem', borderRadius: '4px' }}>
-                                                        <Star size={10} fill="#f1c40f" style={{ marginRight: '2px' }} /> {req.rides?.profiles?.trust_score}
-                                                    </span>
-                                                )}
-                                            </p>
-                                            {req.status === 'accepted' && (
-                                                <div style={{ marginTop: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <div>
-                                                        <strong>Driver Contact:</strong> {req.rides?.contact_number}
-                                                    </div>
-                                                    <button onClick={() => setRateModalTarget({ rideId: req.ride_id, revieweeId: req.rides?.driver_id, revieweeName: req.rides?.profiles?.full_name })} className="btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>
-                                                        Rate Driver
-                                                    </button>
-                                                </div>
-                                            )}
+                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                                                {req.rides?.start_location} <span style={{ color: 'var(--accent-primary)' }}>➔</span> {req.rides?.end_location}
+                                            </h3>
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                <Clock size={14} /> {new Date(req.rides?.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                                            </div>
                                         </div>
                                         <div>
-                                            <span style={{ padding: '0.3rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', background: req.status === 'accepted' ? 'rgba(46, 204, 113, 0.2)' : req.status === 'pending' ? 'rgba(241, 196, 15, 0.2)' : 'rgba(231, 76, 60, 0.2)', color: req.status === 'accepted' ? '#2ecc71' : req.status === 'pending' ? '#f1c40f' : '#e74c3c', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                                            <span style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', background: req.status === 'accepted' ? 'rgba(46, 204, 113, 0.15)' : req.status === 'pending' ? 'rgba(241, 196, 15, 0.15)' : 'rgba(231, 76, 60, 0.15)', color: req.status === 'accepted' ? '#2ecc71' : req.status === 'pending' ? '#f1c40f' : '#e74c3c', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                                 {req.status}
                                             </span>
                                         </div>
+                                    </div>
+
+                                    {/* Card Body */}
+                                    <div style={{ padding: '1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px' }}>
+                                            {req.rides?.profiles?.avatar_url ? (
+                                                <img src={req.rides.profiles.avatar_url} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-secondary)' }} />
+                                            ) : (
+                                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
+                                                    {(req.rides?.profiles?.full_name || '?')[0]}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', letterSpacing: '0.5px' }}>Ride Partner</span>
+                                                <div style={{ fontWeight: 600, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    {req.rides?.profiles?.full_name}
+                                                    {(req.rides?.profiles?.total_reviews || 0) > 0 && (
+                                                        <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', color: '#f1c40f' }}>
+                                                            <Star size={12} fill="#f1c40f" style={{ marginRight: '2px' }} /> {req.rides?.profiles?.trust_score}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {req.status === 'accepted' && (
+                                            <div style={{ background: 'linear-gradient(to right, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.05))', border: '1px solid rgba(46, 204, 113, 0.2)', padding: '1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <strong style={{ color: '#2ecc71', display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>Partner Contact</strong>
+                                                    <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'white' }}>{req.rides?.contact_number}</span>
+                                                </div>
+                                                <button onClick={() => setRateModalTarget({ rideId: req.ride_id, revieweeId: req.rides?.driver_id, revieweeName: req.rides?.profiles?.full_name })} className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: 'var(--accent-primary)' }}>
+                                                    Rate Partner
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
