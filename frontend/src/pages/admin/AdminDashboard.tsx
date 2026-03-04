@@ -32,6 +32,17 @@ type MaterialReport = {
     profiles: { full_name: string; email: string }
 }
 
+type PostReport = {
+    id: string
+    post_id: string
+    reporter_id: string
+    reason: string
+    status: string
+    created_at: string
+    posts: { id: string; title: string; content: string; author_id: string }
+    profiles: { full_name: string; email: string }
+}
+
 export const AdminDashboard = () => {
     const { user, loading: authLoading } = useAuth()
     const navigate = useNavigate()
@@ -39,9 +50,12 @@ export const AdminDashboard = () => {
     const [stats, setStats] = useState({ users: 0, posts: 0, rides: 0, materials: 0, feedbacks: 0 })
     const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([])
     const [reports, setReports] = useState<MaterialReport[]>([])
+    const [postReports, setPostReports] = useState<PostReport[]>([])
     const [expandedFeedback, setExpandedFeedback] = useState<string | null>(null)
+    const [expandedPostReport, setExpandedPostReport] = useState<string | null>(null)
     const [filterType, setFilterType] = useState<string>('all')
     const [refundingId, setRefundingId] = useState<string | null>(null)
+    const [actioningPostId, setActioningPostId] = useState<string | null>(null)
     const confirm = useConfirm()
 
     useEffect(() => {
@@ -91,6 +105,15 @@ export const AdminDashboard = () => {
 
         if (reportsData) setReports(reportsData as any)
 
+        // Fetch post reports
+        const { data: postReportsData } = await supabase
+            .from('post_reports')
+            .select('*, posts(id, title, content, author_id), profiles:reporter_id(full_name, email)')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+
+        if (postReportsData) setPostReports(postReportsData as any)
+
         setLoading(false)
     }
 
@@ -111,6 +134,41 @@ export const AdminDashboard = () => {
             toast.error('Failed to refund: ' + err.message)
         } finally {
             setRefundingId(null)
+        }
+    }
+
+    const handleDismissPostReport = async (reportId: string) => {
+        if (!await confirm('Dismiss this report? The post will remain visible.')) return;
+        setActioningPostId(reportId)
+        try {
+            const { error } = await supabase.from('post_reports').update({ status: 'dismissed' }).eq('id', reportId);
+            if (error) throw error;
+            setPostReports(prev => prev.filter(r => r.id !== reportId));
+            toast.success('Report dismissed.');
+        } catch (err: any) {
+            toast.error('Failed to dismiss: ' + err.message);
+        } finally {
+            setActioningPostId(null);
+        }
+    }
+
+    const handleDeleteReportedPost = async (reportId: string, postId: string) => {
+        if (!await confirm('Are you sure you want to permanently DELETE the reported post?')) return;
+        setActioningPostId(reportId)
+        try {
+            // Delete post (this should cascade and delete the report automatically or we can manually mark it)
+            const { error: deleteError } = await supabase.from('posts').delete().eq('id', postId);
+            if (deleteError) throw deleteError;
+
+            // Also explicitly update report status to deleted just in case cascade is off
+            await supabase.from('post_reports').update({ status: 'deleted_post' }).eq('id', reportId);
+
+            setPostReports(prev => prev.filter(r => r.id !== reportId));
+            toast.success('Post successfully deleted.');
+        } catch (err: any) {
+            toast.error('Failed to delete post: ' + err.message);
+        } finally {
+            setActioningPostId(null);
         }
     }
 
@@ -211,6 +269,82 @@ export const AdminDashboard = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Post Reports Section */}
+            {postReports.length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f59e0b' }}>
+                        <AlertTriangle /> Reported Forum Posts ({postReports.length})
+                    </h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {postReports.map(report => {
+                            const isExpanded = expandedPostReport === report.id;
+
+                            // Handle null posts gracefully (in case the post was deleted by author before report was reviewed)
+                            if (!report.posts) {
+                                return (
+                                    <div key={report.id} className="glass-panel" style={{ padding: '1.25rem', borderLeft: '4px solid gray' }}>
+                                        <div style={{ color: 'var(--text-secondary)' }}>This reported post has already been deleted by its author.</div>
+                                        <button onClick={() => handleDismissPostReport(report.id)} className="btn-secondary" style={{ marginTop: '0.5rem' }}>Dismiss Report</button>
+                                    </div>
+                                )
+                            }
+
+                            return (
+                                <div key={report.id} className="glass-panel" style={{ padding: '1.25rem', borderLeft: '4px solid #f59e0b', cursor: 'pointer' }} onClick={() => setExpandedPostReport(isExpanded ? null : report.id)}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                                <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: 600, background: 'rgba(245, 158, 11, 0.1)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
+                                                    Post Report
+                                                </span>
+                                                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                                    {new Date(report.created_at).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {report.posts.title}
+                                                {isExpanded ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
+                                            </h3>
+                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                                                Reported by: <strong style={{ color: 'var(--text-primary)' }}>{report.profiles?.full_name}</strong>
+                                                <span style={{ display: 'block', marginTop: '0.25rem', color: '#f87171' }}>Reason: "{report.reason}"</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {isExpanded && (
+                                        <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }} onClick={e => e.stopPropagation()}>
+                                            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', overflow: 'hidden' }}>
+                                                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Post Content Preview:</h4>
+                                                <p style={{ margin: 0, whiteSpace: 'pre-wrap', color: 'var(--text-primary)', lineHeight: 1.5, fontSize: '0.95rem' }}>{report.posts.content}</p>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDismissPostReport(report.id) }}
+                                                    disabled={actioningPostId === report.id}
+                                                    className="btn-secondary"
+                                                    style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                                                >
+                                                    {actioningPostId === report.id ? '...' : 'Dismiss Report'}
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteReportedPost(report.id, report.posts.id) }}
+                                                    disabled={actioningPostId === report.id}
+                                                    style={{ flex: 1, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.5rem', borderRadius: 'var(--radius-full)', cursor: actioningPostId === report.id ? 'default' : 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontWeight: 600, transition: 'all 0.2s' }}
+                                                >
+                                                    <Trash2 size={16} />
+                                                    {actioningPostId === report.id ? '...' : 'Delete Post'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             )}

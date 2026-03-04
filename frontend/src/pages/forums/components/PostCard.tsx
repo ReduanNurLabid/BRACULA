@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import { useAuth } from '../../../contexts/AuthContext'
 import { timeAgo } from '../../../utils/dateFormatter'
 import { Link } from 'react-router-dom'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, MoreVertical, AlertTriangle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useConfirm } from '../../../contexts/ConfirmContext'
 import { createPortal } from 'react-dom'
@@ -22,6 +22,7 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
     const [newComment, setNewComment] = useState('')
     const [submittingComment, setSubmittingComment] = useState(false)
     const [isDeleted, setIsDeleted] = useState(false)
+    const [showDropdown, setShowDropdown] = useState(false)
     const confirm = useConfirm()
 
     // Edit Post State
@@ -144,6 +145,37 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
         }
     }
 
+    const handleReportPost = async () => {
+        setShowDropdown(false); // Close dropdown
+        if (!user) {
+            toast.error("You must be logged in to report a post.");
+            return;
+        }
+
+        const reason = window.prompt("Why are you reporting this post?");
+        if (reason === null) return; // User cancelled
+
+        try {
+            const { error } = await supabase.from('post_reports').insert({
+                post_id: post.id,
+                reporter_id: user.id,
+                reason: reason.trim() || 'No reason provided'
+            });
+
+            if (error) {
+                if (error.code === '23505') { // Unique violation if we added one, or just general err
+                    toast.error("You have already reported this post.");
+                } else {
+                    throw error;
+                }
+            } else {
+                toast.success("Post reported to administrators.");
+            }
+        } catch (err: any) {
+            toast.error("Failed to report post: " + err.message);
+        }
+    }
+
     const handleDeleteComment = async (id: string) => {
         if (!await confirm("Are you sure you want to delete this comment?")) return;
 
@@ -239,10 +271,38 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                             )}
                         </div>
                     </div>
-                    {user && user.id === post.author_id && (
-                        <div style={{ display: 'flex', gap: '0.25rem' }}>
-                            <button onClick={(e) => { e.stopPropagation(); setIsEditingPost(true); setEditPostTitle(post.title); setEditPostContent(post.content); }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '0.2rem' }}><Edit2 size={14} /></button>
-                            <button onClick={(e) => { e.stopPropagation(); handleDeletePost(); }} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }}><Trash2 size={14} /></button>
+                    {user && (
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setShowDropdown(!showDropdown); }}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '0.2rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                                onMouseOut={e => e.currentTarget.style.background = 'none'}
+                            >
+                                <MoreVertical size={16} />
+                            </button>
+
+                            {showDropdown && (
+                                <>
+                                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }} onClick={(e) => { e.stopPropagation(); setShowDropdown(false); }} />
+                                    <div className="glass-panel animate-fade-in-up" style={{ position: 'absolute', top: '100%', right: 0, zIndex: 10, minWidth: '150px', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        {user.id === post.author_id ? (
+                                            <>
+                                                <button onClick={(e) => { e.stopPropagation(); setShowDropdown(false); setIsEditingPost(true); setEditPostTitle(post.title); setEditPostContent(post.content); }} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', borderRadius: 'var(--radius-sm)' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseOut={e => e.currentTarget.style.background = 'none'}>
+                                                    <Edit2 size={14} /> Edit Post
+                                                </button>
+                                                <button onClick={(e) => { e.stopPropagation(); setShowDropdown(false); handleDeletePost(); }} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', borderRadius: 'var(--radius-sm)' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'none'}>
+                                                    <Trash2 size={14} /> Delete Post
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button onClick={(e) => { e.stopPropagation(); handleReportPost(); }} style={{ background: 'none', border: 'none', color: '#eab308', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', borderRadius: 'var(--radius-sm)' }} onMouseOver={e => e.currentTarget.style.background = 'rgba(234, 179, 8, 0.1)'} onMouseOut={e => e.currentTarget.style.background = 'none'}>
+                                                <AlertTriangle size={14} /> Report Post
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

@@ -12,6 +12,7 @@ export const HomeFeed = () => {
 
     const [posts, setPosts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const [activeCommunityId, setActiveCommunityId] = useState<string | null>(null)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
@@ -47,6 +48,15 @@ export const HomeFeed = () => {
         fetchPosts(false)
     }, [activeCommunityId])
 
+    useEffect(() => {
+        if (!user) { setAvatarUrl(null); return }
+        const fetchAvatar = async () => {
+            const { data } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).single()
+            if (data?.avatar_url) setAvatarUrl(data.avatar_url)
+        }
+        fetchAvatar()
+    }, [user])
+
     const handleCreateClick = () => {
         if (!user) {
             // Must be logged in to create
@@ -67,9 +77,13 @@ export const HomeFeed = () => {
 
                 {/* Create Post Banner */}
                 <div className="glass-panel" style={{ padding: '1rem 1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                        {user ? user.email?.charAt(0).toUpperCase() : '?'}
-                    </div>
+                    {avatarUrl ? (
+                        <img src={avatarUrl} alt="Profile" style={{ flexShrink: 0, width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                    ) : (
+                        <div style={{ flexShrink: 0, overflow: 'hidden', width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                            {user ? user.email?.charAt(0).toUpperCase() : '?'}
+                        </div>
+                    )}
                     <input
                         type="text"
                         placeholder="Create a new post..."

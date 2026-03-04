@@ -16,6 +16,7 @@ import { Clubs } from './pages/clubs/Clubs'
 import { Profile } from './pages/profile/Profile'
 import { Feedback } from './pages/feedback/Feedback'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
+import { Shoutbox } from './pages/shoutbox/Shoutbox'
 
 const App = () => {
     return (
@@ -49,6 +50,7 @@ const App = () => {
                     <Route path="/clubs" element={<Clubs />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile/:userId" element={<Profile />} />
+                    <Route path="/shoutbox" element={<Shoutbox />} />
                     <Route path="/feedback" element={<Feedback />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                 </Routes>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Home } from 'lucide-react'
 
 export const Navbar = () => {
     const { user } = useAuth()
@@ -30,6 +30,7 @@ export const Navbar = () => {
                 {/* Desktop Nav */}
                 <div className="nav-desktop">
                     <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-secondary)' }}>
+                        <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem' }} className="hover-white"><Home size={18} /> Home</Link>
                         <Link to="/study" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Study</Link>
                         <Link to="/rides" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Rides</Link>
                         <Link to="/clubs" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Clubs</Link>
@@ -40,7 +41,7 @@ export const Navbar = () => {
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt="Profile" style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
-                                <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.85rem', border: '2px solid var(--accent-primary)' }}>
+                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.85rem', border: '2px solid var(--accent-primary)' }}>
                                     {user.email?.charAt(0).toUpperCase()}
                                 </div>
                             )}
@@ -57,7 +58,7 @@ export const Navbar = () => {
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
-                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.75rem' }}>
+                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.75rem' }}>
                                     {user.email?.charAt(0).toUpperCase()}
                                 </div>
                             )}
@@ -72,6 +73,7 @@ export const Navbar = () => {
             {/* Mobile Dropdown Menu */}
             {menuOpen && (
                 <div className="nav-mobile-menu open glass-panel" onClick={closeMenu}>
+                    <Link to="/" className="nav-mobile-link">🏠 Home</Link>
                     <Link to="/study" className="nav-mobile-link">📚 Study Materials</Link>
                     <Link to="/rides" className="nav-mobile-link">🚗 Ride Sharing</Link>
                     <Link to="/clubs" className="nav-mobile-link">🎭 Clubs</Link>

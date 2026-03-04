@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { useAuth } from '../../../contexts/AuthContext'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, MessageSquare } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 type Community = {
     id: string
@@ -23,6 +24,7 @@ export const Sidebar = ({ onSelectCommunity, activeCommunity }: SidebarProps) =>
     const [newDesc, setNewDesc] = useState('')
     const [creating, setCreating] = useState(false)
     const [expanded, setExpanded] = useState(false)
+    const navigate = useNavigate()
 
     const fetchCommunities = async () => {
         const { data } = await supabase.from('communities').select('*').order('is_general', { ascending: false }).order('name')
@@ -83,6 +85,23 @@ export const Sidebar = ({ onSelectCommunity, activeCommunity }: SidebarProps) =>
                     </span>
                 </div>
                 {expanded ? <ChevronUp size={18} color="var(--text-secondary)" /> : <ChevronDown size={18} color="var(--text-secondary)" />}
+            </button>
+
+            {/* Shoutbox Global Link */}
+            <button
+                onClick={() => navigate('/shoutbox')}
+                style={{
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    width: '100%', background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)',
+                    cursor: 'pointer', padding: '0.85rem', color: 'var(--accent-primary)',
+                    borderRadius: 'var(--radius-md)', marginTop: '1rem',
+                    fontWeight: 600, transition: 'all 0.2s',
+                    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.1)'
+                }}
+                className="hover-lift"
+            >
+                <MessageSquare size={18} />
+                Anondopur Shoutbox
             </button>
 
             {/* Expandable content */}
