@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+.DS_Store
+dist/
+dist-ssr/
+*.local
+.npm/
+
+# Editor directories and files
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
