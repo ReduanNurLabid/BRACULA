@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
 import { Navbar } from './components/layout/Navbar'
@@ -19,6 +19,9 @@ import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { Shoutbox } from './pages/shoutbox/Shoutbox'
 
 const App = () => {
+    const location = useLocation()
+    const isShoutbox = location.pathname === '/shoutbox'
+
     return (
         <>
             <Toaster
@@ -38,7 +41,14 @@ const App = () => {
 
             <Navbar />
 
-            <main style={{ paddingTop: '5rem', minHeight: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
+            <main style={{
+                paddingTop: '5rem',
+                minHeight: isShoutbox ? '100dvh' : 'calc(100vh - 100px)',
+                height: isShoutbox ? '100dvh' : 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: isShoutbox ? 'hidden' : 'visible'
+            }}>
                 <Routes>
                     <Route path="/" element={<HomeFeed />} />
                     <Route path="/login" element={<Login />} />
@@ -56,7 +66,7 @@ const App = () => {
                 </Routes>
             </main>
 
-            <Footer />
+            {!isShoutbox && <Footer />}
         </>
     )
 }

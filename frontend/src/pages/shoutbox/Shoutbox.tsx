@@ -154,9 +154,9 @@ export const Shoutbox = () => {
     };
 
     return (
-        <div className="container animate-fade-in-up" style={{ padding: '2rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ padding: '0.75rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-lg)' }}>
+        <div className="container animate-fade-in-up" style={{ padding: 'clamp(1rem, 3vh, 2rem) clamp(0.5rem, 3vw, 1.5rem)', flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexShrink: 0 }}>
+                <div style={{ padding: '0.75rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-lg)', display: 'none' /* Hide icon on mobile? Keep it for now, just flexShrink */ }}>
                     <MessageSquare size={24} color="var(--accent-primary)" />
                 </div>
                 <div>
@@ -202,7 +202,7 @@ export const Shoutbox = () => {
                 </div>
             )}
 
-            <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '60vh', overflow: 'hidden', position: 'relative' }}>
+            <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
 
                 {!user ? (
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
@@ -263,8 +263,8 @@ export const Shoutbox = () => {
                                 <input
                                     type="text"
                                     className="input-glass"
-                                    style={{ flex: 1, background: 'rgba(255,255,255,0.05)' }}
-                                    placeholder="Shout something to the campus..."
+                                    style={{ flex: 1, background: 'rgba(255,255,255,0.05)', minWidth: 0 /* Prevents input from overflowing flex on small screens */ }}
+                                    placeholder="Shout something..."
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     maxLength={500}
@@ -274,7 +274,7 @@ export const Shoutbox = () => {
                                     type="submit"
                                     className={cooldown > 0 ? "btn-secondary" : "btn-primary"}
                                     disabled={!newMessage.trim() || cooldown > 0 || sending || !username}
-                                    style={{ padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.3s' }}
+                                    style={{ padding: '0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.3s', whiteSpace: 'nowrap', flexShrink: 0 }}
                                 >
                                     {cooldown > 0 ? (
                                         <>
