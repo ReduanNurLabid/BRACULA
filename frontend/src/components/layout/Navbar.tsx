@@ -93,7 +93,7 @@ export const Navbar = () => {
                             <span style={{ width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%', boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)' }}></span>
                         )}
                     </Link>
-                    <Link to="/feedback" className="nav-mobile-link">💬 Feedback</Link>
+                    <Link to="/feedback" className="nav-mobile-link">💡 Feedback</Link>
                     <div style={{ borderTop: '1px solid var(--border-glass)', marginTop: '0.25rem', paddingTop: '0.5rem' }}>
                         {user ? (
                             <Link to="/profile" className="nav-mobile-link">👤 Profile</Link>
