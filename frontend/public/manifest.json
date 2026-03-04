@@ -1,0 +1,17 @@
+{
+    "name": "BRACULA",
+    "short_name": "BRACULA",
+    "description": "BRAC University Community Platform built for students, by students.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0A0A0E",
+    "theme_color": "#0A0A0E",
+    "icons": [
+        {
+            "src": "/bracula.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}
