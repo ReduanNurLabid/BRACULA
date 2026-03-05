@@ -312,7 +312,7 @@ a {
     /* Navbar */
     .navbar-container {
         padding: 0.75rem 1rem;
-        top: 0.5rem;
+        top: max(0.5rem, env(safe-area-inset-top));
         width: calc(100% - 1rem);
     }
 
@@ -327,7 +327,7 @@ a {
     /* Mobile menu overlay */
     .nav-mobile-menu {
         position: fixed;
-        top: 4.5rem;
+        top: calc(4.5rem + env(safe-area-inset-top, 0px));
         left: 50%;
         transform: translateX(-50%);
         width: calc(100% - 1rem);
@@ -360,7 +360,7 @@ a {
 
     /* Main paddings */
     main {
-        padding-top: 4rem !important;
+        padding-top: calc(4rem + env(safe-area-inset-top, 0px)) !important;
     }
 }
 
