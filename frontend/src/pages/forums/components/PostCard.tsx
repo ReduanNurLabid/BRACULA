@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import { useAuth } from '../../../contexts/AuthContext'
 import { timeAgo } from '../../../utils/dateFormatter'
 import { Link } from 'react-router-dom'
-import { Edit2, Trash2, MoreVertical, AlertTriangle } from 'lucide-react'
+import { Edit2, Trash2, MoreVertical, AlertTriangle, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { useConfirm } from '../../../contexts/ConfirmContext'
 import { createPortal } from 'react-dom'
@@ -36,6 +36,11 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
 
     // History Modal State
     const [showHistoryModal, setShowHistoryModal] = useState<'post' | string | null>(null)
+
+    // Report Modal State
+    const [showReportModal, setShowReportModal] = useState(false)
+    const [reportReason, setReportReason] = useState('')
+    const [submittingReport, setSubmittingReport] = useState(false)
 
     const [userVote, setUserVote] = useState<number>(0)
 
@@ -164,21 +169,25 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
         }
     }
 
-    const handleReportPost = async () => {
+    const handleReportPost = () => {
         setShowDropdown(false); // Close dropdown
         if (!user) {
             toast.error("You must be logged in to report a post.");
             return;
         }
+        setShowReportModal(true);
+    }
 
-        const reason = window.prompt("Why are you reporting this post?");
-        if (reason === null) return; // User cancelled
+    const submitReport = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user || !reportReason.trim()) return;
 
+        setSubmittingReport(true);
         try {
             const { error } = await supabase.from('post_reports').insert({
                 post_id: post.id,
                 reporter_id: user.id,
-                reason: reason.trim() || 'No reason provided'
+                reason: reportReason.trim()
             });
 
             if (error) {
@@ -189,9 +198,13 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                 }
             } else {
                 toast.success("Post reported to administrators.");
+                setShowReportModal(false);
+                setReportReason('');
             }
         } catch (err: any) {
             toast.error("Failed to report post: " + err.message);
+        } finally {
+            setSubmittingReport(false);
         }
     }
 
@@ -453,6 +466,42 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                                 ))
                             )}
                         </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* Report Modal */}
+            {showReportModal && createPortal(
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10, 10, 14, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }} onClick={(e) => { e.stopPropagation(); setShowReportModal(false); setReportReason(''); }}>
+                    <div className="glass-panel animate-fade-in-up" style={{ width: '100%', maxWidth: '450px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border-glass)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#eab308' }}>
+                                <AlertTriangle size={24} /> Report Post
+                            </h3>
+                            <button onClick={() => { setShowReportModal(false); setReportReason(''); }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-white"><X size={18} /></button>
+                        </div>
+                        <form onSubmit={submitReport} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Why are you reporting this post?</label>
+                                <textarea
+                                    className="input-glass"
+                                    value={reportReason}
+                                    onChange={e => setReportReason(e.target.value)}
+                                    placeholder="Please provide details about why this post violates our community guidelines..."
+                                    rows={4}
+                                    required
+                                    style={{ resize: 'vertical', width: '100%', padding: '0.75rem' }}
+                                    autoFocus
+                                />
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                                <button type="button" onClick={() => { setShowReportModal(false); setReportReason(''); }} className="btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem' }} disabled={submittingReport}>Cancel</button>
+                                <button type="submit" className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem', background: 'rgba(234, 179, 8, 0.15)', color: '#eab308', border: '1px solid rgba(234, 179, 8, 0.3)' }} disabled={submittingReport || !reportReason.trim()}>
+                                    {submittingReport ? 'Submitting...' : 'Submit Report'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>,
                 document.body
