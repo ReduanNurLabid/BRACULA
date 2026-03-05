@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Star, Edit3, Save, X } from 'lucide-react'
+import { Star, Edit3, Save, X, Palette } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useTheme } from '../../contexts/ThemeContext'
 
 const DEPARTMENTS = [
     { label: 'CSE', color: '#3b82f6' },
@@ -28,6 +29,7 @@ const DEPARTMENTS = [
 
 export const Profile = () => {
     const { user, signOut } = useAuth()
+    const { theme, setTheme } = useTheme()
     const navigate = useNavigate()
     const { userId } = useParams<{ userId: string }>()
 
@@ -306,6 +308,42 @@ export const Profile = () => {
                         </span>
                     </div>
                 </div>
+
+                {/* Theme Picker (own profile) */}
+                {isOwnProfile && (
+                    <div style={{ marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
+                            <Palette size={16} /> App Theme
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+                            {[
+                                { id: 'default', label: 'BRACULA Dark' },
+                                { id: 'minimal', label: 'Minimal Dark' },
+                                { id: 'high-contrast', label: 'High Contrast' },
+                                { id: 'light', label: 'Light Mode' }
+                            ].map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setTheme(t.id as any)}
+                                    style={{
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: `1.5px solid ${theme === t.id ? 'var(--accent-primary)' : 'var(--border-glass)'}`,
+                                        background: theme === t.id ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
+                                        color: theme === t.id ? 'white' : 'var(--text-secondary)',
+                                        fontWeight: theme === t.id ? 700 : 500,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        textAlign: 'center',
+                                        fontSize: '0.85rem'
+                                    }}
+                                >
+                                    {t.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Info Cards (own profile) */}
                 {isOwnProfile && (
