@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useDeferredValue, useMemo } from 'react'
+import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useInView } from 'react-intersection-observer'
 import { Layers, Upload, Download, Search, Star, ExternalLink, Link as LinkIcon, AlertTriangle, Clock, X, MessageSquarePlus, Edit2, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
@@ -6,56 +8,32 @@ import { toast } from 'react-hot-toast'
 import { useConfirm } from '../../contexts/ConfirmContext'
 
 // Star Rating Component
-const StarRating = ({ materialId, onRate }: { materialId: string; onRate: () => void }) => {
-    const [userRating, setUserRating] = useState<number | null>(null)
-    const [avgRating, setAvgRating] = useState<number>(0)
-    const [totalRatings, setTotalRatings] = useState(0)
+const StarRating = ({
+    materialId,
+    canRate,
+    initialAvgRating,
+    initialTotalRatings,
+    initialUserRating,
+    onRate
+}: {
+    materialId: string;
+    canRate: boolean;
+    initialAvgRating: number;
+    initialTotalRatings: number;
+    initialUserRating: number | null;
+    onRate: () => void;
+}) => {
+    const [userRating, setUserRating] = useState<number | null>(initialUserRating)
+    const [avgRating, setAvgRating] = useState<number>(initialAvgRating)
+    const [totalRatings, setTotalRatings] = useState(initialTotalRatings)
     const [hoverStar, setHoverStar] = useState<number>(0)
-    const [canRate, setCanRate] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
-        fetchRatings()
-        checkCanRate()
-    }, [materialId])
-
-    const fetchRatings = async () => {
-        const { data } = await supabase
-            .from('material_ratings')
-            .select('rating')
-            .eq('material_id', materialId)
-
-        if (data && data.length > 0) {
-            const avg = data.reduce((sum: number, r: any) => sum + r.rating, 0) / data.length
-            setAvgRating(Math.round(avg * 10) / 10)
-            setTotalRatings(data.length)
-        }
-
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-            const { data: myRating } = await supabase
-                .from('material_ratings')
-                .select('rating')
-                .eq('material_id', materialId)
-                .eq('user_id', user.id)
-                .single()
-            if (myRating) setUserRating(myRating.rating)
-        }
-    }
-
-    const checkCanRate = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const { data } = await supabase
-            .from('material_downloads')
-            .select('id')
-            .eq('material_id', materialId)
-            .eq('user_id', user.id)
-            .limit(1)
-
-        if (data && data.length > 0) setCanRate(true)
-    }
+        setAvgRating(initialAvgRating)
+        setTotalRatings(initialTotalRatings)
+        setUserRating(initialUserRating)
+    }, [initialAvgRating, initialTotalRatings, initialUserRating])
 
     const submitRating = async (stars: number) => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -73,7 +51,6 @@ const StarRating = ({ materialId, onRate }: { materialId: string; onRate: () => 
 
             if (error) throw error
             setUserRating(stars)
-            fetchRatings()
             onRate()
         } catch (err: any) {
             toast.error(err.message)
@@ -121,11 +98,8 @@ const StarRating = ({ materialId, onRate }: { materialId: string; onRate: () => 
 }
 
 export const Materials = () => {
-    const [materials, setMaterials] = useState<any[]>([])
-    const [requests, setRequests] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-    const [balance, setBalance] = useState(0)
-    const [downloadedIds, setDownloadedIds] = useState<Set<string>>(new Set())
+    const { user } = useAuth()
+    const queryClient = useQueryClient()
 
     // Upload Form State
     const [showUpload, setShowUpload] = useState(false)
@@ -155,68 +129,104 @@ export const Materials = () => {
     const [reportingId, setReportingId] = useState<string | null>(null)
     const confirm = useConfirm()
 
-    useEffect(() => {
-        fetchMaterials()
-        fetchRequests()
-        fetchBalance()
-        fetchDownloaded()
-    }, [])
+    // 1. Fetch Downloaded IDs
+    const { data: downloadedIds = new Set<string>() } = useQuery({
+        queryKey: ['downloadedMaterials', user?.id],
+        enabled: !!user,
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('material_downloads')
+                .select('material_id')
+                .eq('user_id', user!.id)
+            return new Set(data?.map((d: any) => d.material_id) || [])
+        }
+    })
 
-    const fetchDownloaded = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-        const { data } = await supabase
-            .from('material_downloads')
-            .select('material_id')
-            .eq('user_id', user.id)
-        if (data) setDownloadedIds(new Set(data.map((d: any) => d.material_id)))
-    }
-
-    const fetchMaterials = async () => {
-        try {
+    // 2. Fetch Materials
+    const { ref: materialsRef, inView: materialsInView } = useInView()
+    const {
+        data: materialsData,
+        isLoading: loadingMaterials,
+        fetchNextPage: fetchNextMaterials,
+        hasNextPage: hasNextMaterials,
+        isFetchingNextPage: isFetchingNextMaterials
+    } = useInfiniteQuery({
+        queryKey: ['materials'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 15;
             const { data, error } = await supabase
                 .from('materials')
                 .select('*, profiles:uploader_id(full_name)')
                 .order('created_at', { ascending: false })
-
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
             if (error) throw error
-            if (data) setMaterials(data)
-        } catch (err) {
-            console.error("Error fetching materials:", err)
-        } finally {
-            setLoading(false)
-        }
-    }
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => lastPage.length === 15 ? allPages.length : undefined,
+        initialPageParam: 0
+    })
+    const materials = materialsData?.pages.flat() || []
 
-    const fetchRequests = async () => {
-        try {
+    // 3. Fetch Open Requests
+    const { ref: requestsRef, inView: requestsInView } = useInView()
+    const {
+        data: requestsData,
+        fetchNextPage: fetchNextRequests,
+        hasNextPage: hasNextRequests,
+        isFetchingNextPage: isFetchingNextRequests
+    } = useInfiniteQuery({
+        queryKey: ['material_requests'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 15;
             const { data, error } = await supabase
                 .from('material_requests')
                 .select('*, profiles:requester_id(full_name)')
                 .eq('status', 'open')
                 .order('created_at', { ascending: false })
-
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
             if (error) throw error
-            if (data) setRequests(data)
-        } catch (err) {
-            console.error("Error fetching requests:", err)
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => lastPage.length === 15 ? allPages.length : undefined,
+        initialPageParam: 0
+    })
+    const requests = requestsData?.pages.flat() || []
+
+    useEffect(() => {
+        if (materialsInView && hasNextMaterials) fetchNextMaterials()
+        if (requestsInView && hasNextRequests) fetchNextRequests()
+    }, [materialsInView, hasNextMaterials, fetchNextMaterials, requestsInView, hasNextRequests, fetchNextRequests])
+
+    // 4. Fetch User Credit Balance
+    const { data: balance = 0 } = useQuery({
+        queryKey: ['userBalance', user?.id],
+        enabled: !!user,
+        queryFn: async () => {
+            const { data } = await supabase
+                .from('profiles')
+                .select('credit_balance')
+                .eq('id', user!.id)
+                .single()
+            return data?.credit_balance || 0
         }
-    }
+    })
 
-    const { user } = useAuth()
+    // 5. Bulk Fetch Ratings for loaded materials
+    const materialIds = useMemo(() => materials.map(m => m.id), [materials])
+    const { data: allRatings = [] } = useQuery({
+        queryKey: ['material_ratings', materialIds],
+        enabled: materialIds.length > 0,
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('material_ratings')
+                .select('*')
+                .in('material_id', materialIds)
+            if (error) throw error
+            return data || []
+        }
+    })
 
-    const fetchBalance = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const { data } = await supabase
-            .from('profiles')
-            .select('credit_balance')
-            .eq('id', user.id)
-            .single()
-
-        if (data) setBalance(data.credit_balance)
-    }
+    const loading = loadingMaterials
 
     const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -270,7 +280,7 @@ export const Materials = () => {
 
             if (rpcError) throw rpcError
 
-            toast.success("Material uploaded successfully! +2 Downloads awarded.")
+            toast.success("Material uploaded successfully!")
             setShowUpload(false)
             setFulfillingRequestId(null)
             setTitle('')
@@ -279,9 +289,12 @@ export const Materials = () => {
             setFile(null)
             setDriveLink('')
             setIsGDrive(false)
-            fetchMaterials()
-            fetchRequests()
-            fetchBalance()
+
+            // Invalidate queries to trigger re-fetch
+            queryClient.invalidateQueries({ queryKey: ['materials'] })
+            queryClient.invalidateQueries({ queryKey: ['material_requests'] })
+            queryClient.invalidateQueries({ queryKey: ['userBalance', user?.id] })
+
         } catch (err: any) {
             console.error(err)
             toast.error("Upload failed: " + err.message)
@@ -310,9 +323,9 @@ export const Materials = () => {
                 user_id: user.id
             })
 
-            setDownloadedIds(prev => new Set(prev).add(mat.id))
-            fetchBalance()
-            fetchMaterials()
+            queryClient.invalidateQueries({ queryKey: ['downloadedMaterials', user.id] })
+            queryClient.invalidateQueries({ queryKey: ['userBalance', user?.id] })
+            queryClient.invalidateQueries({ queryKey: ['materials'] })
 
             // If they purchased from the modal, update the selected material object
             setSelectedMaterial({ ...mat, downloads_count: mat.downloads_count + 1, last_accessed_at: new Date().toISOString() })
@@ -348,7 +361,7 @@ export const Materials = () => {
             setShowRequestForm(false)
             setRequestCourseCode('')
             setRequestDescription('')
-            fetchRequests()
+            queryClient.invalidateQueries({ queryKey: ['material_requests'] })
         } catch (err: any) {
             console.error(err)
             toast.error("Failed to submit request: " + err.message)
@@ -370,7 +383,7 @@ export const Materials = () => {
         try {
             const { error } = await supabase.from('material_requests').delete().eq('id', id);
             if (error) throw error;
-            fetchRequests();
+            queryClient.invalidateQueries({ queryKey: ['material_requests'] });
             toast.success("Request deleted successfully!");
         } catch (err: any) {
             toast.error("Failed to delete request: " + err.message);
@@ -386,7 +399,7 @@ export const Materials = () => {
             }).eq('id', id);
             if (error) throw error;
             setEditingRequestId(null);
-            fetchRequests();
+            queryClient.invalidateQueries({ queryKey: ['material_requests'] });
             toast.success("Request updated successfully!");
         } catch (err: any) {
             toast.error("Failed to update request: " + err.message);
@@ -415,52 +428,72 @@ export const Materials = () => {
         }
     }
 
+    const deferredSearchQuery = useDeferredValue(searchQuery)
+
     const filteredMaterials = materials.filter(mat =>
-        mat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mat.course_code.toLowerCase().includes(searchQuery.toLowerCase())
+        mat.title.toLowerCase().includes(deferredSearchQuery.toLowerCase()) ||
+        mat.course_code.toLowerCase().includes(deferredSearchQuery.toLowerCase())
     )
 
     const gDriveLinks = filteredMaterials.filter(m => m.is_gdrive)
     const standardFiles = filteredMaterials.filter(m => !m.is_gdrive)
 
-    const MaterialCard = ({ mat }: { mat: any }) => (
-        <div
-            className="glass-panel hover-lift"
-            style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer' }}
-            onClick={() => setSelectedMaterial(mat)}
-        >
-            <div>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span style={{ background: mat.is_gdrive ? 'rgba(46, 204, 113, 0.2)' : 'var(--accent-glow)', color: mat.is_gdrive ? '#2ecc71' : 'var(--accent-primary)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '1rem', fontWeight: 700, letterSpacing: '0.5px' }}>
-                        {mat.course_code}
-                    </span>
-                    {mat.semester && (
-                        <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem' }}>
-                            {mat.semester}
+    const MaterialCard = ({ mat }: { mat: any }) => {
+        const matRatings = allRatings.filter((r: any) => r.material_id === mat.id);
+        const avg = matRatings.length > 0 ? matRatings.reduce((sum: number, r: any) => sum + r.rating, 0) / matRatings.length : 0;
+        const avgRating = Math.round(avg * 10) / 10;
+        const totalRatings = matRatings.length;
+        const userRating = matRatings.find((r: any) => r.user_id === user?.id)?.rating || null;
+        const canRate = downloadedIds.has(mat.id);
+
+        return (
+            <div
+                className="glass-panel hover-lift"
+                style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer' }}
+                onClick={() => setSelectedMaterial(mat)}
+            >
+                <div>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{ background: mat.is_gdrive ? 'rgba(46, 204, 113, 0.2)' : 'var(--accent-glow)', color: mat.is_gdrive ? '#2ecc71' : 'var(--accent-primary)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '1rem', fontWeight: 700, letterSpacing: '0.5px' }}>
+                            {mat.course_code}
                         </span>
+                        {mat.semester && (
+                            <span style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.85rem' }}>
+                                {mat.semester}
+                            </span>
+                        )}
+                    </div>
+                    <h3 style={{ marginTop: '1rem', fontSize: '1.25rem', lineHeight: 1.3, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {mat.is_gdrive && <LinkIcon size={18} color="#2ecc71" />}
+                        {mat.title}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                        By {mat.profiles?.full_name || 'Anonymous Student'}
+                    </p>
+                </div>
+
+                <StarRating
+                    materialId={mat.id}
+                    canRate={canRate}
+                    initialAvgRating={avgRating}
+                    initialTotalRatings={totalRatings}
+                    initialUserRating={userRating}
+                    onRate={() => {
+                        queryClient.invalidateQueries({ queryKey: ['material_ratings'] })
+                    }}
+                />
+
+                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '1rem' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{mat.downloads_count} accesses</span>
+                    {downloadedIds.has(mat.id) ? (
+                        <span style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: 600 }}>Unlocked</span>
+                    ) : (
+                        <span style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600 }}>1 Download</span>
                     )}
                 </div>
-                <h3 style={{ marginTop: '1rem', fontSize: '1.25rem', lineHeight: 1.3, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {mat.is_gdrive && <LinkIcon size={18} color="#2ecc71" />}
-                    {mat.title}
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                    By {mat.profiles?.full_name || 'Anonymous Student'}
-                </p>
             </div>
-
-            <StarRating materialId={mat.id} onRate={fetchMaterials} />
-
-            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-glass)', paddingTop: '1rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{mat.downloads_count} accesses</span>
-                {downloadedIds.has(mat.id) ? (
-                    <span style={{ color: '#10b981', fontSize: '0.85rem', fontWeight: 600 }}>Unlocked</span>
-                ) : (
-                    <span style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600 }}>1 Download</span>
-                )}
-            </div>
-        </div>
-    )
+        )
+    }
 
     return (
         <>
@@ -477,7 +510,7 @@ export const Materials = () => {
                         <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: 'var(--radius-full)' }}>
                             <span style={{ color: 'var(--accent-secondary)', fontWeight: 'bold' }}>{balance}</span> Available Downloads
                         </div>
-                        <button className="btn-secondary" onClick={() => { setShowRequestForm(!showRequestForm); setShowUpload(false) }} style={{ border: '1px solid var(--accent-secondary)', color: 'white' }}>
+                        <button className="btn-secondary" onClick={() => { setShowRequestForm(!showRequestForm); setShowUpload(false) }} style={{ border: '1px solid var(--accent-secondary)', color: 'var(--text-primary)' }}>
                             <MessageSquarePlus size={18} /> Request Material
                         </button>
                         <button className="btn-primary" onClick={() => { setShowUpload(!showUpload); setShowRequestForm(false) }}>
@@ -631,6 +664,9 @@ export const Materials = () => {
                                         </div>
                                     ))}
                                 </div>
+                                <div ref={requestsRef} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
+                                    {isFetchingNextRequests ? 'Loading more requests...' : hasNextRequests ? 'Load More' : ''}
+                                </div>
                             </div>
                         )}
 
@@ -677,6 +713,9 @@ export const Materials = () => {
                                     )}
                                 </div>
                             </div>
+                        </div>
+                        <div ref={materialsRef} style={{ textAlign: 'center', padding: '2rem', width: '100%', color: 'var(--text-secondary)' }}>
+                            {isFetchingNextMaterials ? 'Loading more materials...' : hasNextMaterials ? 'Load More' : materials.length > 0 ? 'End of materials.' : ''}
                         </div>
                     </>
                 )}

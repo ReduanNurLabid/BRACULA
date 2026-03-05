@@ -156,7 +156,7 @@ export const Profile = () => {
                         letterSpacing: '2px'
                     }}>
                         {avatarUrl ? (
-                            <img src={avatarUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                            <img loading="lazy" src={avatarUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                         ) : initials}
                     </div>
 

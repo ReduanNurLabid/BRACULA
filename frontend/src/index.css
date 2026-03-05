@@ -10,6 +10,7 @@
     --text-primary: #FFFFFF;
     --text-secondary: #A0A0B0;
     --text-muted: #6B6B7B;
+    --text-on-accent: #FFFFFF;
 
     --accent-primary: #6D28D9;
     --accent-secondary: #EC4899;
@@ -40,6 +41,7 @@
     --text-primary: #E0E0E0;
     --text-secondary: #9E9E9E;
     --text-muted: #757575;
+    --text-on-accent: #FFFFFF;
 
     --accent-primary: #607D8B;
     --accent-secondary: #78909C;
@@ -63,6 +65,7 @@
     --text-secondary: #FFFF00;
     /* High contrast yellow for secondary */
     --text-muted: #CCCCCC;
+    --text-on-accent: #000000;
 
     --accent-primary: #00FFFF;
     /* Cyan */
@@ -87,6 +90,7 @@
     --text-primary: #0F172A;
     --text-secondary: #475569;
     --text-muted: #64748B;
+    --text-on-accent: #FFFFFF;
 
     --accent-primary: #4F46E5;
     --accent-secondary: #E11D48;

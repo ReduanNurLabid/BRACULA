@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInView } from 'react-intersection-observer'
 import { supabase } from '../../lib/supabase'
 import { Sidebar } from './components/Sidebar'
 import { PostCard } from './components/PostCard'
@@ -10,43 +12,55 @@ export const HomeFeed = () => {
     const { user } = useAuth()
     const navigate = useNavigate()
 
-    const [posts, setPosts] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const [activeCommunityId, setActiveCommunityId] = useState<string | null>(null)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
-    const fetchPosts = async (silent = false) => {
-        if (!silent) setLoading(true)
+    const { ref, inView } = useInView()
 
-        let query = supabase
-            .from('posts')
-            .select(`
-                *,
-                profiles:author_id(full_name, avatar_url, department),
-                communities:community_id(name),
-                comments(count)
-            `)
-            .order('created_at', { ascending: false })
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch: fetchPosts
+    } = useInfiniteQuery({
+        queryKey: ['posts', activeCommunityId],
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 10;
+            let query = supabase
+                .from('posts')
+                .select(`
+                    *,
+                    profiles:author_id(full_name, avatar_url, department),
+                    communities:community_id(name),
+                    comments(count)
+                `)
+                .order('created_at', { ascending: false })
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
 
-        if (activeCommunityId) {
-            query = query.eq('community_id', activeCommunityId)
-        }
+            if (activeCommunityId) {
+                query = query.eq('community_id', activeCommunityId)
+            }
 
-        const { data, error } = await query
-
-        if (error) {
-            console.error("Error fetching posts:", error)
-        } else if (data) {
-            setPosts(data)
-        }
-
-        if (!silent) setLoading(false)
-    }
+            const { data, error } = await query
+            if (error) throw error
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === 10 ? allPages.length : undefined
+        },
+        initialPageParam: 0
+    })
 
     useEffect(() => {
-        fetchPosts(false)
-    }, [activeCommunityId])
+        if (inView && hasNextPage) {
+            fetchNextPage()
+        }
+    }, [inView, hasNextPage, fetchNextPage])
+
+    const posts = data?.pages.flat() || []
 
     useEffect(() => {
         if (!user) { setAvatarUrl(null); return }
@@ -78,7 +92,7 @@ export const HomeFeed = () => {
                 {/* Create Post Banner */}
                 <div className="glass-panel" style={{ padding: '1rem 1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     {avatarUrl ? (
-                        <img src={avatarUrl} alt="Profile" style={{ flexShrink: 0, width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                        <img loading="lazy" src={avatarUrl} alt="Profile" style={{ flexShrink: 0, width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                     ) : (
                         <div style={{ flexShrink: 0, overflow: 'hidden', width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                             {user ? user.email?.charAt(0).toUpperCase() : '?'}
@@ -97,7 +111,7 @@ export const HomeFeed = () => {
 
                 {/* Posts Feed */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {loading ? (
+                    {isLoading ? (
                         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading feed...</div>
                     ) : posts.length === 0 ? (
                         <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
@@ -105,9 +119,18 @@ export const HomeFeed = () => {
                             <p>Be the first to start a conversation!</p>
                         </div>
                     ) : (
-                        posts.map(post => (
-                            <PostCard key={post.id} post={post} onVoteChanged={() => fetchPosts(true)} />
-                        ))
+                        <>
+                            {posts.map(post => (
+                                <PostCard key={post.id} post={post} onVoteChanged={() => fetchPosts()} />
+                            ))}
+                            <div ref={ref} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
+                                {isFetchingNextPage
+                                    ? 'Loading more...'
+                                    : hasNextPage
+                                        ? 'Load More'
+                                        : 'You have reached the end of the feed.'}
+                            </div>
+                        </>
                     )}
                 </div>
 

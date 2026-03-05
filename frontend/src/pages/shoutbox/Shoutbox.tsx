@@ -242,9 +242,9 @@ export const Shoutbox = () => {
                                                 borderRadius: '1.5rem',
                                                 borderBottomLeftRadius: isMe ? '1.5rem' : '0.25rem',
                                                 borderBottomRightRadius: isMe ? '0.25rem' : '1.5rem',
-                                                background: isMe ? 'var(--accent-primary)' : 'rgba(255,255,255,0.05)',
-                                                border: isMe ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                                color: 'var(--text-primary)',
+                                                background: isMe ? 'var(--accent-primary)' : 'var(--bg-glass-strong)',
+                                                border: isMe ? 'none' : '1px solid var(--border-glass)',
+                                                color: isMe ? 'var(--text-on-accent)' : 'var(--text-primary)',
                                                 wordBreak: 'break-word',
                                                 lineHeight: 1.5
                                             }}>

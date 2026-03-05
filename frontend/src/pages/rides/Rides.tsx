@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useDeferredValue } from 'react'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useInView } from 'react-intersection-observer'
 import { Car, MapPin, Clock, Users, PlusCircle, Check, X, Star } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { useConfirm } from '../../contexts/ConfirmContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { createPortal } from 'react-dom'
 
 export const Rides = () => {
+    const { user: currentUser } = useAuth()
+    const queryClient = useQueryClient()
+
     const [activeTab, setActiveTab] = useState<'find' | 'offered' | 'joined'>('find')
-
-    const [rides, setRides] = useState<any[]>([])
-    const [myOfferedRides, setMyOfferedRides] = useState<any[]>([])
-    const [myJoinedRides, setMyJoinedRides] = useState<any[]>([])
-
-    const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
 
     // Create Ride Modal
@@ -26,7 +26,6 @@ export const Rides = () => {
     const [pricingType, setPricingType] = useState('exact')
     const [driverContact, setDriverContact] = useState('')
     const [creating, setCreating] = useState(false)
-    const [currentUser, setCurrentUser] = useState<any>(null)
     const confirm = useConfirm()
 
     // Request Ride Modal
@@ -40,94 +39,107 @@ export const Rides = () => {
     const [reviewComment, setReviewComment] = useState('')
     const [submittingReview, setSubmittingReview] = useState(false)
 
-    useEffect(() => {
-        setupUser()
-    }, [])
-
-    useEffect(() => {
-        if (!currentUser) return
-
-        if (activeTab === 'find') fetchRides()
-        if (activeTab === 'offered') fetchMyOfferedRides()
-        if (activeTab === 'joined') fetchMyJoinedRides()
-    }, [activeTab, currentUser])
-
-    const setupUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        setCurrentUser(user)
-        if (user) {
-            fetchRides() // default load
-        } else {
-            setLoading(false)
-        }
-    }
-
-    const fetchRides = async () => {
-        setLoading(true)
-        try {
+    // Find Rides Query
+    const { ref: findRef, inView: findInView } = useInView()
+    const {
+        data: ridesData,
+        isLoading: loadingRides,
+        fetchNextPage: fetchNextRides,
+        hasNextPage: hasNextRides,
+        isFetchingNextPage: isFetchingNextRides
+    } = useInfiniteQuery({
+        queryKey: ['rides'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 10;
             const { data, error } = await supabase
                 .from('rides')
-                .select('*, profiles(full_name, email, trust_score, total_reviews, avatar_url)') // Updated to include email for consistency
+                .select('*, profiles(full_name, email, trust_score, total_reviews, avatar_url)')
                 .eq('status', 'open')
                 .gte('departure_time', new Date().toISOString())
                 .order('departure_time', { ascending: true })
-
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
             if (error) throw error
-            if (data) setRides(data)
-        } catch (error) {
-            console.error('Error fetching rides:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => lastPage.length === 10 ? allPages.length : undefined,
+        initialPageParam: 0
+    })
 
-    const fetchMyOfferedRides = async () => {
-        setLoading(true)
-        try {
+    // My Offered Rides Query
+    const { ref: offeredRef, inView: offeredInView } = useInView()
+    const {
+        data: offeredData,
+        isLoading: loadingOffered,
+        fetchNextPage: fetchNextOffered,
+        hasNextPage: hasNextOffered,
+        isFetchingNextPage: isFetchingNextOffered
+    } = useInfiniteQuery({
+        queryKey: ['myOfferedRides', currentUser?.id],
+        enabled: !!currentUser,
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 10;
             const { data, error } = await supabase
                 .from('rides')
                 .select(`
-    *,
-    ride_requests(
+                    *,
+                    ride_requests(
                         *,
-        profiles(full_name, email, trust_score, total_reviews, avatar_url)
-    )
-        `)
-                .eq('driver_id', currentUser.id)
+                        profiles(full_name, email, trust_score, total_reviews, avatar_url)
+                    )
+                `)
+                .eq('driver_id', currentUser!.id)
                 .order('created_at', { ascending: false })
-
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
             if (error) throw error
-            if (data) setMyOfferedRides(data)
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => lastPage.length === 10 ? allPages.length : undefined,
+        initialPageParam: 0
+    })
 
-    const fetchMyJoinedRides = async () => {
-        setLoading(true)
-        try {
+    // My Joined Rides Query
+    const { ref: joinedRef, inView: joinedInView } = useInView()
+    const {
+        data: joinedData,
+        isLoading: loadingJoined,
+        fetchNextPage: fetchNextJoined,
+        hasNextPage: hasNextJoined,
+        isFetchingNextPage: isFetchingNextJoined
+    } = useInfiniteQuery({
+        queryKey: ['myJoinedRides', currentUser?.id],
+        enabled: !!currentUser,
+        queryFn: async ({ pageParam = 0 }) => {
+            const limit = 10;
             const { data, error } = await supabase
                 .from('ride_requests')
                 .select(`
-    *,
-    rides(
+                    *,
+                    rides(
                         *,
-        profiles(full_name, email, trust_score, total_reviews, avatar_url)
-    )
-        `)
-                .eq('passenger_id', currentUser.id)
+                        profiles(full_name, email, trust_score, total_reviews, avatar_url)
+                    )
+                `)
+                .eq('passenger_id', currentUser!.id)
                 .order('created_at', { ascending: false })
-
+                .range(pageParam * limit, (pageParam + 1) * limit - 1)
             if (error) throw error
-            if (data) setMyJoinedRides(data)
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
+            return data || []
+        },
+        getNextPageParam: (lastPage, allPages) => lastPage.length === 10 ? allPages.length : undefined,
+        initialPageParam: 0
+    })
+
+    useEffect(() => {
+        if (activeTab === 'find' && findInView && hasNextRides) fetchNextRides()
+        if (activeTab === 'offered' && offeredInView && hasNextOffered) fetchNextOffered()
+        if (activeTab === 'joined' && joinedInView && hasNextJoined) fetchNextJoined()
+    }, [activeTab, findInView, hasNextRides, offeredInView, hasNextOffered, joinedInView, hasNextJoined, fetchNextRides, fetchNextOffered, fetchNextJoined])
+
+    const rides = ridesData?.pages.flat() || []
+    const myOfferedRides = offeredData?.pages.flat() || []
+    const myJoinedRides = joinedData?.pages.flat() || []
+
+    const loading = loadingRides || loadingOffered || loadingJoined
 
     const handleCreateRide = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -156,10 +168,16 @@ export const Rides = () => {
             if (error) throw error
 
             toast.success('Ride offered successfully!')
-            setShowCreate(false)
-            if (activeTab === 'find') fetchRides()
-            else setActiveTab('offered')
-        } catch (error: any) {
+            setShowCreate(false) // Changed from setShowCreateModal
+            // Reset form
+            setStartLocation('')
+            setEndLocation('')
+            setDepartureTime('')
+
+            queryClient.invalidateQueries({ queryKey: ['rides'] })
+            queryClient.invalidateQueries({ queryKey: ['myOfferedRides', currentUser?.id] })
+
+        } catch (error: any) { // Changed err to error for consistency
             toast.error(error.message)
         } finally {
             setCreating(false)
@@ -195,7 +213,7 @@ export const Rides = () => {
                 toast.success('Request sent successfully! You can track it in My Joined Rides.')
                 setRequestingRideId(null)
                 setPassengerContact('')
-                if (activeTab === 'find') fetchRides()
+                queryClient.invalidateQueries({ queryKey: ['rides'] })
             }
         } catch (error: any) {
             toast.error(error.message)
@@ -214,7 +232,7 @@ export const Rides = () => {
                 toast.error("Cannot accept: No available seats left.")
             } else {
                 toast.success(approve ? "Request Accepted" : "Request Rejected")
-                fetchMyOfferedRides()
+                queryClient.invalidateQueries({ queryKey: ['myOfferedRides', currentUser?.id] })
             }
         } catch (err: any) {
             toast.error(err.message)
@@ -245,8 +263,8 @@ export const Rides = () => {
                 setRateModalTarget(null)
                 setRating(5)
                 setReviewComment('')
-                fetchMyOfferedRides()
-                fetchMyJoinedRides()
+                queryClient.invalidateQueries({ queryKey: ['myOfferedRides', currentUser?.id] })
+                queryClient.invalidateQueries({ queryKey: ['myJoinedRides', currentUser?.id] })
             }
         } catch (error: any) {
             toast.error(error.message)
@@ -267,7 +285,7 @@ export const Rides = () => {
 
             if (error) throw error;
             toast.success("Ride has been cancelled.");
-            fetchMyOfferedRides();
+            queryClient.invalidateQueries({ queryKey: ['myOfferedRides', currentUser?.id] });
         } catch (err: any) {
             toast.error("Failed to cancel ride: " + err.message);
         }
@@ -291,15 +309,17 @@ export const Rides = () => {
 
             if (error) throw error;
             toast.success("Request cancelled.");
-            fetchMyJoinedRides();
+            queryClient.invalidateQueries({ queryKey: ['myJoinedRides', currentUser?.id] });
         } catch (err: any) {
             toast.error("Failed to cancel request: " + err.message);
         }
     }
 
+    const deferredSearchQuery = useDeferredValue(searchQuery)
+
     const filteredRides = rides.filter(ride =>
-        ride.start_location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        ride.end_location.toLowerCase().includes(searchQuery.toLowerCase())
+        ride.start_location.toLowerCase().includes(deferredSearchQuery.toLowerCase()) ||
+        ride.end_location.toLowerCase().includes(deferredSearchQuery.toLowerCase())
     )
 
     return (
@@ -433,7 +453,7 @@ export const Rides = () => {
                                                 </span>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     {ride.profiles?.avatar_url ? (
-                                                        <img src={ride.profiles.avatar_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                                                        <img loading="lazy" src={ride.profiles.avatar_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                                                     ) : (
                                                         <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', border: '2px solid var(--accent-primary)', flexShrink: 0 }}>
                                                             {(ride.profiles?.full_name || '?')[0]}
@@ -488,6 +508,9 @@ export const Rides = () => {
                                         No open rides found matching that location.
                                     </div>
                                 )}
+                                <div ref={findRef} style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
+                                    {isFetchingNextRides ? 'Loading more...' : hasNextRides ? 'Load More' : rides.length > 0 ? 'End of list.' : ''}
+                                </div>
                             </div>
                         </>
                     )}
@@ -500,11 +523,11 @@ export const Rides = () => {
                                     {/* Card Header */}
                                     <div style={{ padding: '1.25rem 1.5rem', background: 'linear-gradient(to right, rgba(109, 40, 217, 0.1), rgba(236, 72, 153, 0.05))', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
                                                 {ride.start_location} <span style={{ color: 'var(--accent-primary)' }}>➔</span> {ride.end_location}
                                             </h3>
                                             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                                {new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} • <strong style={{ color: 'white' }}>{ride.available_seats}</strong> seats left
+                                                {new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} • <strong style={{ color: 'var(--text-primary)' }}>{ride.available_seats}</strong> seats left
                                             </span>
                                         </div>
                                         <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
@@ -531,7 +554,7 @@ export const Rides = () => {
                                                         <div>
                                                             <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                                 {req.profiles?.avatar_url ? (
-                                                                    <img src={req.profiles.avatar_url} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                                    <img loading="lazy" src={req.profiles.avatar_url} alt="" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />
                                                                 ) : (
                                                                     <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
                                                                         {(req.profiles?.full_name || '?')[0]}
@@ -576,6 +599,9 @@ export const Rides = () => {
                                 </div>
                             ))}
                             {myOfferedRides.length === 0 && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>You haven't offered any rides yet.</div>}
+                            <div ref={offeredRef} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
+                                {isFetchingNextOffered ? 'Loading more...' : hasNextOffered ? 'Load More' : ''}
+                            </div>
                         </div>
                     )}
 
@@ -587,7 +613,7 @@ export const Rides = () => {
                                     {/* Card Header */}
                                     <div style={{ padding: '1.25rem 1.5rem', background: 'linear-gradient(to right, rgba(109, 40, 217, 0.1), rgba(236, 72, 153, 0.05))', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
-                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white' }}>
+                                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
                                                 {req.rides?.start_location} <span style={{ color: 'var(--accent-primary)' }}>➔</span> {req.rides?.end_location}
                                             </h3>
                                             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -610,7 +636,7 @@ export const Rides = () => {
                                     <div style={{ padding: '1.5rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px' }}>
                                             {req.rides?.profiles?.avatar_url ? (
-                                                <img src={req.rides.profiles.avatar_url} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-secondary)' }} />
+                                                <img loading="lazy" src={req.rides.profiles.avatar_url} alt="" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-secondary)' }} />
                                             ) : (
                                                 <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'white', flexShrink: 0 }}>
                                                     {(req.rides?.profiles?.full_name || '?')[0]}
@@ -618,7 +644,7 @@ export const Rides = () => {
                                             )}
                                             <div>
                                                 <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', letterSpacing: '0.5px' }}>Ride Partner</span>
-                                                <div style={{ fontWeight: 600, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     {req.rides?.profiles?.full_name}
                                                     {(req.rides?.profiles?.total_reviews || 0) > 0 && (
                                                         <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', color: '#f1c40f' }}>
@@ -633,7 +659,7 @@ export const Rides = () => {
                                             <div style={{ background: 'linear-gradient(to right, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.05))', border: '1px solid rgba(46, 204, 113, 0.2)', padding: '1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div>
                                                     <strong style={{ color: '#2ecc71', display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>Partner Contact</strong>
-                                                    <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'white' }}>{req.rides?.contact_number}</span>
+                                                    <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{req.rides?.contact_number}</span>
                                                 </div>
                                                 <button onClick={() => setRateModalTarget({ rideId: req.ride_id, revieweeId: req.rides?.driver_id, revieweeName: req.rides?.profiles?.full_name })} className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: 'var(--accent-primary)' }}>
                                                     Rate Partner
@@ -644,6 +670,9 @@ export const Rides = () => {
                                 </div>
                             ))}
                             {myJoinedRides.length === 0 && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>You haven't requested to join any rides yet.</div>}
+                            <div ref={joinedRef} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)' }}>
+                                {isFetchingNextJoined ? 'Loading more...' : hasNextJoined ? 'Load More' : ''}
+                            </div>
                         </div>
                     )}
                 </>

@@ -48,7 +48,7 @@ export const Navbar = () => {
                     {user ? (
                         <Link to="/profile" className="hover-lift" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
                             {avatarUrl ? (
-                                <img src={avatarUrl} alt="Profile" style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                                <img loading="lazy" src={avatarUrl} alt="Profile" style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
                                 <div style={{ flexShrink: 0, overflow: 'hidden', width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem', border: '2px solid var(--accent-primary)' }}>
                                     {user.email?.charAt(0).toUpperCase()}
@@ -65,7 +65,7 @@ export const Navbar = () => {
                     {user && (
                         <Link to="/profile" onClick={closeMenu}>
                             {avatarUrl ? (
-                                <img src={avatarUrl} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
+                                <img loading="lazy" src={avatarUrl} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
                                 <div style={{ flexShrink: 0, overflow: 'hidden', width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.75rem' }}>
                                     {user.email?.charAt(0).toUpperCase()}

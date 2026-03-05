@@ -259,7 +259,7 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                             </span>
                             <span>•</span>
                             {post.profiles?.avatar_url ? (
-                                <img src={post.profiles.avatar_url} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
+                                <img loading="lazy" src={post.profiles.avatar_url} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
                             ) : (
                                 <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                                     {(post.profiles?.full_name || '?')[0]}
@@ -397,7 +397,7 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                                     <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                                             {c.profiles?.avatar_url ? (
-                                                <img src={c.profiles.avatar_url} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                <img loading="lazy" src={c.profiles.avatar_url} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
                                             ) : (
                                                 <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700, color: 'white' }}>
                                                     {(c.profiles?.full_name || '?')[0]}
