@@ -439,3 +439,26 @@ a {
         padding: 0.6rem 0.75rem;
     }
 }
+
+/* ===================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   =================================== */
+@media (max-width: 768px) {
+
+    /* Disable heavy blur filters on mobile to maintain 60/120fps scrolling */
+    .glass-panel,
+    .btn-secondary,
+    .input-glass,
+    .navbar-container,
+    .nav-mobile-menu {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        /* Increase background opacity slightly to compensate for lost blur */
+        background-color: var(--bg-secondary) !important;
+    }
+
+    /* Disable enormous background blur blobs which destroy mobile GPU fill rate */
+    .bg-blob {
+        display: none !important;
+    }
+}
