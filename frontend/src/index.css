@@ -303,8 +303,8 @@ a {
 }
 
 /* ====== Utility ====== */
-.hover-white:hover {
-    color: white !important;
+.hover-text-primary:hover {
+    color: var(--text-primary) !important;
 }
 
 .hover-lift {
@@ -361,8 +361,8 @@ a {
 }
 
 .nav-mobile-link:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: var(--bg-glass-strong);
+    color: var(--text-primary);
 }
 
 /* ===================================

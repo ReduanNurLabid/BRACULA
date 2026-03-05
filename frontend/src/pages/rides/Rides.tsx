@@ -367,7 +367,7 @@ export const Rides = () => {
                     <div className="glass-panel animate-fade-in-up" style={{ padding: '2.5rem', width: '100%', maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-glass)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                             <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }} className="text-gradient">Offer a Ride</h2>
-                            <button onClick={() => setShowCreate(false)} style={{ background: 'rgba(255, 255, 255, 0.1)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-white"><X size={18} /></button>
+                            <button onClick={() => setShowCreate(false)} style={{ background: 'rgba(255, 255, 255, 0.1)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-text-primary"><X size={18} /></button>
                         </div>
                         <form onSubmit={handleCreateRide} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div>

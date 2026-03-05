@@ -32,12 +32,12 @@ export const Navbar = () => {
                 {/* Desktop Nav */}
                 <div className="nav-desktop">
                     <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-secondary)' }}>
-                        <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem' }} className="hover-white"><Home size={18} /> Home</Link>
-                        <Link to="/study" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Study</Link>
-                        <Link to="/rides" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Rides</Link>
-                        <Link to="/clubs" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">Clubs</Link>
-                        <Link to="/to-let" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-white">To-Let</Link>
-                        <Link to="/shoutbox" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem', position: 'relative' }} className="hover-white">
+                        <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem' }} className="hover-text-primary"><Home size={18} /> Home</Link>
+                        <Link to="/study" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-text-primary">Study</Link>
+                        <Link to="/rides" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-text-primary">Rides</Link>
+                        <Link to="/clubs" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-text-primary">Clubs</Link>
+                        <Link to="/to-let" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500 }} className="hover-text-primary">To-Let</Link>
+                        <Link to="/shoutbox" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.35rem', position: 'relative' }} className="hover-text-primary">
                             <MessageSquare size={18} />
                             Shoutbox
                             {hasUnread && (

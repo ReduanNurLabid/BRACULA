@@ -479,7 +479,7 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                             <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#eab308' }}>
                                 <AlertTriangle size={24} /> Report Post
                             </h3>
-                            <button onClick={() => { setShowReportModal(false); setReportReason(''); }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-white"><X size={18} /></button>
+                            <button onClick={() => { setShowReportModal(false); setReportReason(''); }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '50%', transition: 'all 0.2s' }} className="hover-text-primary"><X size={18} /></button>
                         </div>
                         <form onSubmit={submitReport} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div>
