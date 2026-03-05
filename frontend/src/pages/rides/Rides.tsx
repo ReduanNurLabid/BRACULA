@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Car, MapPin, Clock, Users, PlusCircle, Check, X, Star } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'react-hot-toast'
+import { useConfirm } from '../../contexts/ConfirmContext'
 import { createPortal } from 'react-dom'
 
 export const Rides = () => {
@@ -22,9 +23,11 @@ export const Rides = () => {
     const [departureTime, setDepartureTime] = useState('')
     const [totalSeats, setTotalSeats] = useState(1)
     const [pricePerSeat, setPricePerSeat] = useState(0)
+    const [pricingType, setPricingType] = useState('exact')
     const [driverContact, setDriverContact] = useState('')
     const [creating, setCreating] = useState(false)
     const [currentUser, setCurrentUser] = useState<any>(null)
+    const confirm = useConfirm()
 
     // Request Ride Modal
     const [requestingRideId, setRequestingRideId] = useState<string | null>(null)
@@ -145,7 +148,8 @@ export const Rides = () => {
                     departure_time: new Date(departureTime).toISOString(),
                     total_seats: totalSeats,
                     available_seats: totalSeats,
-                    price_per_seat: pricePerSeat,
+                    price_per_seat: pricingType === 'exact' ? pricePerSeat : 0,
+                    pricing_type: pricingType,
                     contact_number: driverContact
                 })
 
@@ -251,6 +255,48 @@ export const Rides = () => {
         }
     }
 
+    const cancelRide = async (rideId: string) => {
+        if (!currentUser) return;
+        if (!await confirm("WARNING: Cancelling a ride will deduct 5 points from your Trust Score. Do you want to proceed?")) return;
+
+        try {
+            const { error } = await supabase.rpc('rpc_cancel_ride', {
+                p_ride_id: rideId,
+                p_driver_id: currentUser.id
+            });
+
+            if (error) throw error;
+            toast.success("Ride has been cancelled.");
+            fetchMyOfferedRides();
+        } catch (err: any) {
+            toast.error("Failed to cancel ride: " + err.message);
+        }
+    }
+
+    const cancelRequest = async (requestId: string, currentStatus: string) => {
+        if (!currentUser) return;
+
+        let message = "Are you sure you want to cancel this request?";
+        if (currentStatus === 'accepted') {
+            message = "WARNING: Cancelling an accepted request will deduct 3 points from your Trust Score. Do you want to proceed?";
+        }
+
+        if (!await confirm(message)) return;
+
+        try {
+            const { error } = await supabase.rpc('rpc_cancel_ride_request', {
+                p_request_id: requestId,
+                p_passenger_id: currentUser.id
+            });
+
+            if (error) throw error;
+            toast.success("Request cancelled.");
+            fetchMyJoinedRides();
+        } catch (err: any) {
+            toast.error("Failed to cancel request: " + err.message);
+        }
+    }
+
     const filteredRides = rides.filter(ride =>
         ride.start_location.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ride.end_location.toLowerCase().includes(searchQuery.toLowerCase())
@@ -326,15 +372,25 @@ export const Rides = () => {
                                 <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Departure Time</label>
                                 <input type="datetime-local" className="input-glass" value={departureTime} onChange={e => setDepartureTime(e.target.value)} required />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.25rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))', gap: '1.25rem' }}>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Seats Available</label>
                                     <input type="number" min="1" max="4" className="input-glass" value={totalSeats} onChange={e => setTotalSeats(parseInt(e.target.value))} required />
                                 </div>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Price / Seat (TK)</label>
-                                    <input type="number" min="0" className="input-glass" value={pricePerSeat} onChange={e => setPricePerSeat(parseInt(e.target.value))} required />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Pricing Type</label>
+                                    <select className="input-glass" value={pricingType} onChange={e => setPricingType(e.target.value)} required style={{ appearance: 'none', flex: 1 }}>
+                                        <option value="exact" style={{ background: '#0A0A0E', color: 'white' }}>Exact Amount</option>
+                                        <option value="free" style={{ background: '#0A0A0E', color: 'white' }}>Free</option>
+                                        <option value="split" style={{ background: '#0A0A0E', color: 'white' }}>Split Cost</option>
+                                    </select>
                                 </div>
+                                {pricingType === 'exact' && (
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Price / Seat (TK)</label>
+                                        <input type="number" min="0" className="input-glass" value={pricePerSeat} onChange={e => setPricePerSeat(parseInt(e.target.value))} required />
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Your Contact Number</label>
@@ -393,11 +449,19 @@ export const Rides = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div style={{ textAlign: 'right', background: 'rgba(0,0,0,0.3)', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-secondary)' }}>
-                                                    {ride.price_per_seat === 0 ? 'Free' : `৳${ride.price_per_seat}`}
-                                                </div>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '0.1rem' }}>per seat</div>
+                                            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', background: 'rgba(0,0,0,0.3)', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                {ride.pricing_type === 'free' ? (
+                                                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#2ecc71', background: 'rgba(46, 204, 113, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>Free</span>
+                                                ) : ride.pricing_type === 'split' ? (
+                                                    <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(109, 40, 217, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '4px', textAlign: 'center' }}>Split<br />Cost</span>
+                                                ) : (
+                                                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-secondary)' }}>
+                                                        ৳{ride.price_per_seat}
+                                                    </div>
+                                                )}
+                                                {ride.pricing_type === 'exact' && (
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '0.2rem' }}>per seat</div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -443,10 +507,15 @@ export const Rides = () => {
                                                 {new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} • <strong style={{ color: 'white' }}>{ride.available_seats}</strong> seats left
                                             </span>
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
+                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                                             <span style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', background: ride.status === 'open' ? 'rgba(46, 204, 113, 0.15)' : 'rgba(255, 255, 255, 0.05)', color: ride.status === 'open' ? '#2ecc71' : 'var(--text-secondary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                                 {ride.status}
                                             </span>
+                                            {ride.status === 'open' && (
+                                                <button onClick={() => cancelRide(ride.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 600 }} className="hover-lift">
+                                                    Cancel Ride
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
 
@@ -525,10 +594,15 @@ export const Rides = () => {
                                                 <Clock size={14} /> {new Date(req.rides?.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                                             </div>
                                         </div>
-                                        <div>
-                                            <span style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', background: req.status === 'accepted' ? 'rgba(46, 204, 113, 0.15)' : req.status === 'pending' ? 'rgba(241, 196, 15, 0.15)' : 'rgba(231, 76, 60, 0.15)', color: req.status === 'accepted' ? '#2ecc71' : req.status === 'pending' ? '#f1c40f' : '#e74c3c', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                                {req.status}
+                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+                                            <span style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', background: req.status === 'accepted' ? 'rgba(46, 204, 113, 0.15)' : req.status === 'pending' ? 'rgba(241, 196, 15, 0.15)' : req.status.includes('cancelled') ? 'rgba(255, 255, 255, 0.05)' : 'rgba(231, 76, 60, 0.15)', color: req.status === 'accepted' ? '#2ecc71' : req.status === 'pending' ? '#f1c40f' : req.status.includes('cancelled') ? 'var(--text-secondary)' : '#e74c3c', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                {req.status === 'cancelled_by_passenger' ? 'Cancelled (You)' : req.status === 'cancelled_by_driver' ? 'Cancelled (Driver)' : req.status}
                                             </span>
+                                            {(req.status === 'pending' || req.status === 'accepted') && (
+                                                <button onClick={() => cancelRequest(req.id, req.status)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 600 }} className="hover-lift">
+                                                    Cancel Request
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
 
