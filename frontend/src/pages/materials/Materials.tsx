@@ -641,7 +641,7 @@ export const Materials = () => {
                                 placeholder="Search by course code or title..."
                                 value={searchQuery}
                                 onChange={e => setSearchQuery(e.target.value)}
-                                style={{ background: 'transparent', border: 'none', color: 'white', width: '100%', outline: 'none', fontSize: '1.05rem' }}
+                                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', width: '100%', outline: 'none', fontSize: '1.05rem' }}
                             />
                         </div>
 

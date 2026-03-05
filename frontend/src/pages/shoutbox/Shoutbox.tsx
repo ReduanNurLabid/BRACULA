@@ -244,7 +244,7 @@ export const Shoutbox = () => {
                                                 borderBottomRightRadius: isMe ? '0.25rem' : '1.5rem',
                                                 background: isMe ? 'var(--accent-primary)' : 'rgba(255,255,255,0.05)',
                                                 border: isMe ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                                color: 'white',
+                                                color: 'var(--text-primary)',
                                                 wordBreak: 'break-word',
                                                 lineHeight: 1.5
                                             }}>

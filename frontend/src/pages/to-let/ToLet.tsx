@@ -13,7 +13,7 @@ export const ToLet = () => {
                 </p>
 
                 <div style={{ marginTop: '2rem', padding: '1rem 2rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-glass)' }}>
-                    <h2 style={{ color: 'white', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Coming Soon</h2>
+                    <h2 style={{ color: 'var(--text-primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Coming Soon</h2>
                     <p style={{ color: 'var(--text-muted)', margin: 0 }}>
                         We're currently perfecting the core features for our beta launch. The housing hub will be available in the next major update!
                     </p>

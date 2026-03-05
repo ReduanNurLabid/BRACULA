@@ -261,11 +261,11 @@ export const PostCard = ({ post, onVoteChanged }: PostCardProps) => {
                             {post.profiles?.avatar_url ? (
                                 <img src={post.profiles.avatar_url} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%', objectFit: 'cover' }} />
                             ) : (
-                                <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700, color: 'white' }}>
+                                <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                                     {(post.profiles?.full_name || '?')[0]}
                                 </span>
                             )}
-                            <span><Link to={`/profile/${post.author_id}`} style={{ color: 'white', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.stopPropagation()} onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')} onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>{post.profiles?.full_name || 'Anonymous'}</Link></span>
+                            <span><Link to={`/profile/${post.author_id}`} style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 700 }} onClick={e => e.stopPropagation()} onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')} onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>{post.profiles?.full_name || 'Anonymous'}</Link></span>
                             {post.profiles?.department && (
                                 <span style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', borderRadius: 'var(--radius-full)', background: 'rgba(109, 40, 217, 0.15)', color: 'var(--accent-primary)', fontWeight: 600 }}>{post.profiles.department}</span>
                             )}

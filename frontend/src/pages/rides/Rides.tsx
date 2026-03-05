@@ -353,9 +353,9 @@ export const Rides = () => {
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Vehicle Type</label>
                                 <select className="input-glass" value={vehicleType} onChange={e => setVehicleType(e.target.value)} required style={{ appearance: 'none' }}>
-                                    <option value="Rickshaw" style={{ background: '#0A0A0E', color: 'white' }}>Rickshaw (Max 2)</option>
-                                    <option value="Bike" style={{ background: '#0A0A0E', color: 'white' }}>Bike (Max 1)</option>
-                                    <option value="Car/CNG" style={{ background: '#0A0A0E', color: 'white' }}>Car / CNG (Max 3/4)</option>
+                                    <option value="Rickshaw" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Rickshaw (Max 2)</option>
+                                    <option value="Bike" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Bike (Max 1)</option>
+                                    <option value="Car/CNG" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Car / CNG (Max 3/4)</option>
                                 </select>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
@@ -380,9 +380,9 @@ export const Rides = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Pricing Type</label>
                                     <select className="input-glass" value={pricingType} onChange={e => setPricingType(e.target.value)} required style={{ appearance: 'none', flex: 1 }}>
-                                        <option value="exact" style={{ background: '#0A0A0E', color: 'white' }}>Exact Amount</option>
-                                        <option value="free" style={{ background: '#0A0A0E', color: 'white' }}>Free</option>
-                                        <option value="split" style={{ background: '#0A0A0E', color: 'white' }}>Split Cost</option>
+                                        <option value="exact" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Exact Amount</option>
+                                        <option value="free" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Free</option>
+                                        <option value="split" style={{ background: '#0A0A0E', color: 'var(--text-primary)' }}>Split Cost</option>
                                     </select>
                                 </div>
                                 {pricingType === 'exact' && (
@@ -435,12 +435,12 @@ export const Rides = () => {
                                                     {ride.profiles?.avatar_url ? (
                                                         <img src={ride.profiles.avatar_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                                                     ) : (
-                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'white', border: '2px solid var(--accent-primary)', flexShrink: 0 }}>
+                                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', border: '2px solid var(--accent-primary)', flexShrink: 0 }}>
                                                             {(ride.profiles?.full_name || '?')[0]}
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <h3 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 600, color: 'white' }}>{ride.profiles?.full_name || 'Anonymous User'}</h3>
+                                                        <h3 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 600, color: 'var(--text-primary)' }}>{ride.profiles?.full_name || 'Anonymous User'}</h3>
                                                         {(ride.profiles?.total_reviews || 0) > 0 && (
                                                             <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem', color: '#f1c40f', marginTop: '0.2rem' }}>
                                                                 <Star size={12} fill="#f1c40f" style={{ marginRight: '4px' }} /> {ride.profiles?.trust_score}
@@ -468,15 +468,15 @@ export const Rides = () => {
                                         {/* Card Body (Details) */}
                                         <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-secondary)' }}>
-                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-secondary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Pick Up</span> <strong style={{ color: 'white' }}>{ride.start_location}</strong></div></div>
-                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-primary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Drop Off</span> <strong style={{ color: 'white' }}>{ride.end_location}</strong></div></div>
+                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-secondary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Pick Up</span> <strong style={{ color: 'var(--text-primary)' }}>{ride.start_location}</strong></div></div>
+                                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}><MapPin size={18} color="var(--accent-primary)" style={{ marginTop: '2px', flexShrink: 0 }} /> <div><span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>Drop Off</span> <strong style={{ color: 'var(--text-primary)' }}>{ride.end_location}</strong></div></div>
                                                 <div style={{ height: '1px', background: 'var(--border-glass)', margin: '0.25rem 0' }}></div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Clock size={16} color="var(--text-secondary)" /> <span style={{ color: 'var(--text-primary)' }}>{new Date(ride.departure_time).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span></div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Users size={16} color="var(--text-secondary)" /> <span style={{ color: 'var(--text-primary)' }}><strong style={{ color: 'white' }}>{ride.available_seats}</strong> of {ride.total_seats} seats remaining</span></div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Users size={16} color="var(--text-secondary)" /> <span style={{ color: 'var(--text-primary)' }}><strong style={{ color: 'var(--text-primary)' }}>{ride.available_seats}</strong> of {ride.total_seats} seats remaining</span></div>
                                             </div>
 
                                             {ride.driver_id !== currentUser?.id && (
-                                                <button onClick={() => requestRide(ride.id)} className="btn-primary" style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', width: '100%', fontWeight: 600, transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'var(--accent-primary)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+                                                <button onClick={() => requestRide(ride.id)} className="btn-primary" style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', width: '100%', fontWeight: 600, transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background = 'var(--accent-primary)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
                                                     Request to Join
                                                 </button>
                                             )}

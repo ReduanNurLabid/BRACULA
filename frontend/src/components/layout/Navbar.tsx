@@ -50,7 +50,7 @@ export const Navbar = () => {
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt="Profile" style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
-                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.85rem', border: '2px solid var(--accent-primary)' }}>
+                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem', border: '2px solid var(--accent-primary)' }}>
                                     {user.email?.charAt(0).toUpperCase()}
                                 </div>
                             )}
@@ -67,13 +67,13 @@ export const Navbar = () => {
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent-primary)' }} />
                             ) : (
-                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'white', fontSize: '0.75rem' }}>
+                                <div style={{ flexShrink: 0, overflow: 'hidden', width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.75rem' }}>
                                     {user.email?.charAt(0).toUpperCase()}
                                 </div>
                             )}
                         </Link>
                     )}
-                    <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', color: 'white', padding: '0.25rem' }}>
+                    <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', padding: '0.25rem' }}>
                         {menuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>

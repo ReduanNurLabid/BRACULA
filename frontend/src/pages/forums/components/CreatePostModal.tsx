@@ -80,10 +80,10 @@ export const CreatePostModal = ({ onClose, onPostCreated, preselectedCommunityId
                             onChange={e => setCommunityId(e.target.value)}
                             className="input-glass"
                             required
-                            style={{ backgroundColor: '#0f172a', color: 'white', appearance: 'auto' }}
+                            style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', appearance: 'auto' }}
                         >
                             {communities.map(c => (
-                                <option key={c.id} value={c.id} style={{ backgroundColor: '#0f172a', color: 'white' }}>{c.name}</option>
+                                <option key={c.id} value={c.id} style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>{c.name}</option>
                             ))}
                         </select>
                     </div>
