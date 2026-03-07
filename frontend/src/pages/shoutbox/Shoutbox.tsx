@@ -50,7 +50,9 @@ export const Shoutbox = () => {
         } catch (err: any) {
             console.error('Error fetching profile:', err.message);
             toast.error('Profile load error: ' + (err.message || 'Unknown network error'));
-            setShowUsernameSetup(true);
+            // Do NOT show username setup here, because this might be a transient network error
+            // If we show it, existing users might overwrite their username unintentionally.
+            // setShowUsernameSetup(true); 
         }
     };
 
