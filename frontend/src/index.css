@@ -290,6 +290,9 @@ a {
     font-family: inherit;
     width: 100%;
     transition: all var(--transition-fast);
+    font-size: 16px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .input-glass:focus {

@@ -37,7 +37,8 @@ export const Shoutbox = () => {
                 .from('profiles')
                 .select('shoutbox_username')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
+
             if (error) throw error;
 
             if (data?.shoutbox_username) {
@@ -47,6 +48,8 @@ export const Shoutbox = () => {
             }
         } catch (err: any) {
             console.error('Error fetching profile:', err.message);
+            toast.error('Profile load error: ' + (err.message || 'Unknown network error'));
+            setShowUsernameSetup(true);
         }
     };
 
@@ -63,7 +66,7 @@ export const Shoutbox = () => {
             // Reverse so oldest is top, newest is bottom
             setMessages((data || []).reverse());
         } catch (err: any) {
-            toast.error('Failed to load messages');
+            toast.error('Load error: ' + (err.message || 'Network error on iOS'));
             console.error(err);
         } finally {
             setLoading(false);
@@ -267,6 +270,11 @@ export const Shoutbox = () => {
                                     placeholder="Shout something..."
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
+                                    onFocus={() => {
+                                        setTimeout(() => {
+                                            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                        }, 100);
+                                    }}
                                     maxLength={500}
                                     disabled={cooldown > 0 || !username}
                                 />
