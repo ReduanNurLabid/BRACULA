@@ -33,14 +33,11 @@ export const Shoutbox = () => {
     const fetchUserProfile = async () => {
         if (!user) return;
         try {
-            // Adding a dynamic header or making it look like a POST bypasses Safari's aggressive GET caching bugs
+            // Using a dummy param like 't' bypasses simple caching without triggering strict CORS preflight issues on iOS WebKit
             const { data, error } = await supabase
                 .from('profiles')
                 .select('shoutbox_username')
                 .eq('id', user.id)
-                .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-                .setHeader('Pragma', 'no-cache')
-                .setHeader('Expires', '0')
                 .maybeSingle();
 
             if (error) throw error;
@@ -64,10 +61,7 @@ export const Shoutbox = () => {
                 .from('shoutbox_messages')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(100)
-                .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-                .setHeader('Pragma', 'no-cache')
-                .setHeader('Expires', '0');
+                .limit(100);
 
             if (error) throw error;
             // Reverse so oldest is top, newest is bottom
