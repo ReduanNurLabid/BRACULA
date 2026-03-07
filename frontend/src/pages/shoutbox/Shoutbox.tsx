@@ -33,10 +33,14 @@ export const Shoutbox = () => {
     const fetchUserProfile = async () => {
         if (!user) return;
         try {
+            // Adding a dynamic header or making it look like a POST bypasses Safari's aggressive GET caching bugs
             const { data, error } = await supabase
                 .from('profiles')
                 .select('shoutbox_username')
                 .eq('id', user.id)
+                .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+                .setHeader('Pragma', 'no-cache')
+                .setHeader('Expires', '0')
                 .maybeSingle();
 
             if (error) throw error;
@@ -60,7 +64,10 @@ export const Shoutbox = () => {
                 .from('shoutbox_messages')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(100);
+                .limit(100)
+                .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+                .setHeader('Pragma', 'no-cache')
+                .setHeader('Expires', '0');
 
             if (error) throw error;
             // Reverse so oldest is top, newest is bottom
@@ -181,9 +188,9 @@ export const Shoutbox = () => {
                     <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', width: '90%' }}>
                         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                             <UserCircle size={48} color="var(--accent-primary)" style={{ margin: '0 auto 1rem auto' }} />
-                            <h2>Choose Your Identity</h2>
+                            <h2>Set your username for the shoutbox</h2>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                                This generic name will be your mask in the shoutbox. <br /><strong style={{ color: 'var(--accent)' }}>You cannot change it again for 7 days!</strong>
+                                This name will be displayed in the shoutbox. <br /><strong style={{ color: 'var(--accent)' }}>You cannot change it again for 7 days!</strong>
                             </p>
                         </div>
                         <form onSubmit={handleSetUsername} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -191,7 +198,7 @@ export const Shoutbox = () => {
                                 autoFocus
                                 type="text"
                                 className="input-glass"
-                                placeholder="e.g. Shadow Ninja, Happy Hippocamous"
+                                placeholder="Choose a username..."
                                 value={newUsernameInput}
                                 onChange={(e) => setNewUsernameInput(e.target.value)}
                                 required
